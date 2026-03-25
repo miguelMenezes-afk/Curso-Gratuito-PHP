@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Início</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* ─── HERO ─── */
+  #home {
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+    padding-top: 140px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,77,255,.15);
+    border: 1px solid rgba(124,77,255,.4);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: .78rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--php);
+    margin-bottom: 28px;
+    width: fit-content;
+  }
+  .hero-badge::before { content: '●'; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+  }
+  .hero-title .accent { color: var(--accent); }
+  .hero-title .glow {
+    background: linear-gradient(90deg, var(--php), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .hero-stats {
+    display: flex; gap: 36px; margin-top: 52px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    color: var(--white); line-height: 1;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+  /* CODE WINDOW */
+  .code-window {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(124,77,255,0.1);
+    animation: floatAnim 6s ease-in-out infinite;
+  }
+  @keyframes floatAnim { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+  .code-header {
+    background: var(--bg3);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .code-file { color: var(--muted); font-family: 'Space Mono', monospace; font-size: .75rem; margin-left: auto; }
+
+  .code-body {
+    padding: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: .82rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .ln { color: #2d3d6b; user-select: none; margin-right: 18px; }
+  .c-tag { color: #ff6b9d; }
+  .c-var { color: #82aaff; }
+  .c-str { color: #c3e88d; }
+  .c-kw  { color: #c792ea; }
+  .c-fn  { color: #89ddff; }
+  .c-cmt { color: #546e7a; font-style: italic; }
+
+  .typing-cursor { display: inline-block; width: 2px; height: 14px; background: var(--accent); animation: blink 1s infinite; vertical-align: middle; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ORBIT BG */
+  .orbit-bg {
+    position: absolute; top: 50%; left: 58%; transform: translate(-50%,-50%);
+    width: 700px; height: 700px; pointer-events: none; z-index: 0; opacity: .07;
+  }
+  .orbit-ring {
+    position: absolute; border-radius: 50%; border: 1px solid var(--php);
+  }
+  .orbit-ring:nth-child(1) { width: 200px; height: 200px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: spin 20s linear infinite; }
+  .orbit-ring:nth-child(2) { width: 350px; height: 350px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: spin 35s linear infinite reverse; }
+  .orbit-ring:nth-child(3) { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: spin 50s linear infinite; }
+  .orbit-ring:nth-child(4) { width: 650px; height: 650px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: spin 70s linear infinite reverse; }
+  @keyframes spin { from{transform:translate(-50%,-50%) rotate(0)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .code-window { display: none; }
+    .hero-stats { flex-wrap: wrap; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<canvas class="particle-canvas" id="particles"></canvas>
+
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+</nav>
+
+<section id="home">
+  <div class="orbit-bg">
+    <div class="orbit-ring"></div>
+    <div class="orbit-ring"></div>
+    <div class="orbit-ring"></div>
+    <div class="orbit-ring"></div>
+  </div>
+
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge">🚀 Curso 100% Gratuito</div>
+      <h1 class="hero-title">
+        Aprenda <span class="glow">PHP</span><br>
+        do zero ao<br>
+        <span class="accent">avançado</span>
+      </h1>
+      <p class="hero-sub">
+        Um curso completo e gratuito desenvolvido por estudantes de <strong>Engenharia de Software</strong> para democratizar o acesso ao conhecimento em programação back-end com PHP.
+      </p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="modulos.html">Começar agora →</a>
+        <a class="btn-outline" href="motivacoes.html">Por que PHP?</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">8<span>+</span></div>
+          <div class="stat-label">Módulos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">40<span>+</span></div>
+          <div class="stat-label">Aulas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100<span>%</span></div>
+          <div class="stat-label">Gratuito</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="code-window">
+        <div class="code-header">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="code-file">hello_world.php</span>
+        </div>
+        <div class="code-body">
+          <div><span class="ln">1</span><span class="c-tag">&lt;?php</span></div>
+          <div><span class="ln">2</span></div>
+          <div><span class="ln">3</span><span class="c-cmt">// Bem-vindo ao PHPMaster!</span></div>
+          <div><span class="ln">4</span><span class="c-kw">function</span> <span class="c-fn">saudacao</span>(<span class="c-var">$nome</span>) {</div>
+          <div><span class="ln">5</span>&nbsp;&nbsp;<span class="c-var">$msg</span> = <span class="c-str">"Olá, $nome!"</span>;</div>
+          <div><span class="ln">6</span>&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-var">$msg</span> . <span class="c-str">" 🚀"</span>;</div>
+          <div><span class="ln">7</span>}</div>
+          <div><span class="ln">8</span></div>
+          <div><span class="ln">9</span><span class="c-var">$aluno</span> = <span class="c-str">"Desenvolvedor"</span>;</div>
+          <div><span class="ln">10</span><span class="c-fn">echo</span> saudacao(<span class="c-var">$aluno</span>);</div>
+          <div><span class="ln">11</span></div>
+          <div><span class="ln">12</span><span class="c-cmt">// Output: Olá, Desenvolvedor! 🚀</span></div>
+          <div><span class="ln">13</span><span class="c-tag">?&gt;</span><span class="typing-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PHP<span>Master</span></div>
+  <p>Projeto de Extensão Curricular — Engenharia de Software</p>
+  <p style="color:var(--muted);font-size:.8rem">Feito com ❤️ para a comunidade</p>
+</footer>
+
+<script src="particles.js"></script>
+</body>
+</html>
