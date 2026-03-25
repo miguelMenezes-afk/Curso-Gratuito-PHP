@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Contato</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .contato-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 60px;
+  }
+
+  .contato-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem; font-weight: 700; margin-bottom: 16px;
+  }
+  .contato-info p { color: var(--muted); line-height: 1.7; margin-bottom: 32px; }
+
+  .contact-items { display: flex; flex-direction: column; gap: 16px; }
+  .contact-item {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; transition: all .3s;
+  }
+  .contact-item:hover { border-color: var(--accent); }
+  .ci-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  }
+  .ci-label { font-size: .75rem; color: var(--muted); }
+  .ci-value { font-weight: 500; font-size: .95rem; }
+
+  .form-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px;
+  }
+  .form-group { margin-bottom: 22px; }
+  .form-group label {
+    display: block; font-size: .82rem; color: var(--muted);
+    margin-bottom: 8px; letter-spacing: .5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; background: var(--bg2);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .95rem;
+    outline: none; transition: all .2s; resize: vertical;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,.08); }
+  .form-group select { cursor: pointer; }
+  .form-group select option { background: var(--bg2); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .submit-btn {
+    width: 100%; background: linear-gradient(135deg, var(--php), var(--accent));
+    border: none; padding: 16px; border-radius: 12px;
+    color: var(--bg); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 1rem; cursor: pointer;
+    transition: all .3s; letter-spacing: .5px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,229,255,.3); }
+
+  @media (max-width: 900px) {
+    .contato-grid { grid-template-columns: 1fr; gap: 40px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<canvas class="particle-canvas" id="particles"></canvas>
+<div class="toast" id="toast">✅ Mensagem enviada com sucesso!</div>
+
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta active">Contato</a></li>
+  </ul>
+</nav>
+
+<section id="contato">
+  <p class="section-label">// fale conosco</p>
+  <h2 class="section-title">Entre em <em>Contato</em></h2>
+
+  <div class="contato-grid">
+    <div class="contato-info">
+      <h3>Dúvidas? Sugestões? Parcerias?</h3>
+      <p>Estamos aqui para te ajudar! Entre em contato conosco pelo formulário ou pelos canais abaixo. Nossa equipe responde em até 48 horas.</p>
+
+      <div class="contact-items">
+        <div class="contact-item">
+          <div class="ci-icon">📧</div>
+          <div>
+            <div class="ci-label">E-mail</div>
+            <div class="ci-value">phpmaster@engsoft.edu.br</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">🎓</div>
+          <div>
+            <div class="ci-label">Instituição</div>
+            <div class="ci-value">Faculdade de Engenharia de Software</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">💬</div>
+          <div>
+            <div class="ci-label">Discord</div>
+            <div class="ci-value">discord.gg/phpmaster</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">🐙</div>
+          <div>
+            <div class="ci-label">GitHub</div>
+            <div class="ci-value">github.com/phpmaster-curso</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>NOME</label>
+          <input type="text" placeholder="Seu nome" id="f-nome">
+        </div>
+        <div class="form-group">
+          <label>E-MAIL</label>
+          <input type="email" placeholder="seu@email.com" id="f-email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ASSUNTO</label>
+        <select id="f-assunto">
+          <option value="">Selecione um assunto</option>
+          <option>Dúvida sobre o conteúdo</option>
+          <option>Sugestão de melhoria</option>
+          <option>Parceria / Colaboração</option>
+          <option>Reportar um problema</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>MENSAGEM</label>
+        <textarea rows="5" placeholder="Escreva sua mensagem aqui..." id="f-msg"></textarea>
+      </div>
+      <button class="submit-btn" onclick="enviarForm()">Enviar mensagem 🚀</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PHP<span>Master</span></div>
+  <p>Projeto de Extensão Curricular — Engenharia de Software</p>
+  <p style="color:var(--muted);font-size:.8rem">Feito com ❤️ para a comunidade</p>
+</footer>
+
+<script src="particles.js"></script>
+<script>
+  function enviarForm() {
+    const nome = document.getElementById('f-nome').value;
+    const email = document.getElementById('f-email').value;
+    if (!nome || !email) {
+      alert('Por favor, preencha ao menos seu nome e e-mail!');
+      return;
+    }
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    document.getElementById('f-nome').value = '';
+    document.getElementById('f-email').value = '';
+    document.getElementById('f-assunto').value = '';
+    document.getElementById('f-msg').value = '';
+  }
+</script>
+</body>
+</html>
