@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Motivações</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .sobre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 60px;
+  }
+
+  .sobre-text p {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+  }
+  .sobre-text p strong { color: var(--text); font-weight: 500; }
+
+  .motivos-list { display: flex; flex-direction: column; gap: 20px; margin-top: 36px; }
+
+  .motivo-card {
+    display: flex; gap: 18px; align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    transition: all .3s;
+    cursor: default;
+  }
+  .motivo-card:hover {
+    border-color: var(--php);
+    transform: translateX(6px);
+    box-shadow: -4px 0 20px rgba(124,77,255,0.15);
+  }
+  .motivo-icon {
+    font-size: 1.6rem; min-width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(124,77,255,.1);
+    border-radius: 12px;
+    border: 1px solid rgba(124,77,255,.2);
+  }
+  .motivo-info h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 1rem; margin-bottom: 4px;
+  }
+  .motivo-info p { color: var(--muted); font-size: .9rem; line-height: 1.5; }
+
+  .sobre-visual { position: relative; }
+
+  .big-quote {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text);
+    letter-spacing: -1px;
+    padding: 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .big-quote::before {
+    content: '"';
+    font-size: 10rem;
+    color: rgba(124,77,255,0.08);
+    position: absolute;
+    top: -30px; left: 20px;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  .big-quote em { color: var(--accent); font-style: normal; }
+  .big-quote span { display: block; margin-top: 20px; font-size: 1rem; color: var(--muted); font-weight: 400; }
+
+  .php-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .fact-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: all .3s;
+  }
+  .fact-box:hover { border-color: var(--accent); }
+  .fact-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800; color: var(--accent);
+  }
+  .fact-desc { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+  @media (max-width: 900px) {
+    .sobre-grid { grid-template-columns: 1fr; gap: 40px; }
+    .php-facts { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<canvas class="particle-canvas" id="particles"></canvas>
+
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html" class="active">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+</nav>
+
+<section id="sobre">
+  <p class="section-label">// motivações</p>
+  <h2 class="section-title">Por que criamos<br><em>esse projeto?</em></h2>
+
+  <div class="sobre-grid">
+    <div class="sobre-text">
+      <p>
+        Este projeto nasceu dentro da <strong>faculdade de Engenharia de Software</strong> com um propósito claro: tornar o aprendizado de programação acessível a todos, independentemente de condição financeira ou localização geográfica.
+      </p>
+      <p>
+        PHP é uma das linguagens mais utilizadas no mundo — está por trás de gigantes como <strong>WordPress, Facebook e Wikipedia</strong>. Dominar PHP abre portas para o mercado de trabalho e para a construção de sistemas web completos.
+      </p>
+      <p>
+        Acreditamos que <strong>conhecimento é um bem público</strong>. Por isso, todo o conteúdo deste curso é e sempre será gratuito.
+      </p>
+
+      <div class="motivos-list">
+        <div class="motivo-card">
+          <div class="motivo-icon">🌎</div>
+          <div class="motivo-info">
+            <h4>Democratizar o acesso</h4>
+            <p>Remover barreiras financeiras para que qualquer pessoa possa aprender programação de qualidade.</p>
+          </div>
+        </div>
+        <div class="motivo-card">
+          <div class="motivo-icon">💼</div>
+          <div class="motivo-info">
+            <h4>Impulsionar carreiras</h4>
+            <p>PHP é a base de 78% dos sites com back-end conhecido. Aprender PHP abre portas reais no mercado.</p>
+          </div>
+        </div>
+        <div class="motivo-card">
+          <div class="motivo-icon">🎓</div>
+          <div class="motivo-info">
+            <h4>Extensão curricular</h4>
+            <p>Colocamos em prática nossa formação para gerar impacto social real na comunidade.</p>
+          </div>
+        </div>
+        <div class="motivo-card">
+          <div class="motivo-icon">🤝</div>
+          <div class="motivo-info">
+            <h4>Comunidade ativa</h4>
+            <p>Criamos um espaço colaborativo onde alunos aprendem juntos e se apoiam mutuamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sobre-visual">
+      <div class="big-quote">
+        Programação é a <em>nova alfabetização</em> do século XXI.
+        <span>— Missão PHPMaster</span>
+      </div>
+      <div class="php-facts">
+        <div class="fact-box">
+          <div class="fact-num">78%</div>
+          <div class="fact-desc">dos sites usam PHP no back-end</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">30+</div>
+          <div class="fact-desc">anos de evolução da linguagem</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">Fácil</div>
+          <div class="fact-desc">de aprender</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">Free</div>
+          <div class="fact-desc">sempre gratuito para todos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">PHP<span>Master</span></div>
+  <p>Projeto de Extensão Curricular — Engenharia de Software</p>
+  <p style="color:var(--muted);font-size:.8rem">Feito com ❤️ para a comunidade</p>
+</footer>
+
+<script src="particles.js"></script>
+</body>
+</html>
