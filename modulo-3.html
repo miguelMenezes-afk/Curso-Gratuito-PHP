@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Módulo 3: Estruturas de Controle</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #0f1525;
+  --bg3:     #141c30;
+  --card:    #161e35;
+  --border:  #1f2d50;
+  --php:     #7c4dff;
+  --accent:  #00e5ff;
+  --text:    #e8eaf6;
+  --muted:   #8892b0;
+  --white:   #ffffff;
+  --green:   #69ffb4;
+  --yellow:  #ffd166;
+  --red:     #ff6b6b;
+  --radius:  16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1;}
+.glow-1{width:500px;height:500px;background:var(--php);top:-100px;right:-100px;}
+.glow-2{width:400px;height:400px;background:var(--accent);bottom:0;left:-100px;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);text-decoration:none;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg)!important;padding:9px 20px;border-radius:50px;font-weight:700!important;}
+
+.layout{display:block;min-height:100vh;padding-top:60px;}
+
+.sidebar{
+  position:fixed;top:60px;left:0;bottom:0;width:280px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;z-index:100;
+  padding:28px 0 60px;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.sidebar-header{padding:0 22px 20px;border-bottom:1px solid var(--border);}
+.mod-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:50px;padding:4px 12px;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--php);
+  margin-bottom:10px;
+}
+.sidebar-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3;color:var(--white);}
+.sidebar-progress{margin-top:14px;}
+.prog-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;}
+
+.sidebar-nav{padding:16px 0;}
+.sidebar-section{padding:8px 22px 4px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+.lesson-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 22px;
+  background:none;border:none;cursor:pointer;
+  text-align:left;transition:all .2s;
+  border-left:3px solid transparent;
+}
+.lesson-btn:hover{background:rgba(255,255,255,.04);}
+.lesson-btn.active{background:rgba(124,77,255,.1);border-left-color:var(--php);}
+.lesson-btn.completed{border-left-color:var(--green);}
+
+.l-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+}
+.lesson-btn.active .l-icon{background:rgba(124,77,255,.2);border-color:rgba(124,77,255,.5);}
+.lesson-btn.completed .l-icon{background:rgba(105,255,180,.1);border-color:rgba(105,255,180,.3);}
+
+.l-info{flex:1;}
+.l-num{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.l-title{font-size:.88rem;font-weight:500;color:var(--text);margin-top:1px;}
+.lesson-btn.active .l-title{color:var(--white);font-weight:600;}
+
+.l-check{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .2s;}
+.lesson-btn.completed .l-check{opacity:1;}
+
+.main{margin-left:280px;min-height:100vh;max-width:100%;overflow-x:hidden;}
+
+.lesson-panel{display:none;animation:fadeUp .4s ease;}
+.lesson-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.lesson-hero{
+  padding:48px 6% 36px;
+  background:linear-gradient(135deg,rgba(124,77,255,.06),rgba(0,229,255,.04));
+  border-bottom:1px solid var(--border);
+}
+.lesson-body{padding:48px 6%;}
+.lesson-hero > *,.lesson-body > *{max-width:900px;}
+.lesson-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lesson-num-tag{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);padding:4px 10px;border-radius:50px;}
+.lesson-dur{font-size:.8rem;color:var(--muted);}
+.lesson-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-1px;margin-bottom:12px;}
+.lesson-title em{font-style:normal;color:var(--accent);}
+.lesson-desc{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px;}
+
+.content-block{margin-bottom:40px;}
+
+.block-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.block-title::before{
+  content:'';width:4px;height:22px;border-radius:2px;
+  background:linear-gradient(180deg,var(--php),var(--accent));
+  display:block;flex-shrink:0;
+}
+
+.prose{color:var(--muted);line-height:1.85;font-size:1rem;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose em{color:var(--accent);font-style:normal;}
+.prose p{margin-bottom:14px;}
+.prose ul{padding-left:20px;margin-bottom:14px;}
+.prose ul li{margin-bottom:8px;}
+.prose ol{padding-left:20px;margin-bottom:14px;}
+.prose ol li{margin-bottom:8px;}
+.prose a{color:var(--accent);text-decoration:none;}
+
+.callout{
+  border-radius:14px;padding:20px 22px;margin:24px 0;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.callout-info{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.callout-tip{background:rgba(105,255,180,.06);border:1px solid rgba(105,255,180,.2);}
+.callout-warn{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;font-size:.9rem;margin-bottom:4px;color:var(--white);}
+.callout-info .callout-body strong{color:var(--accent);}
+.callout-tip .callout-body strong{color:var(--green);}
+.callout-warn .callout-body strong{color:var(--yellow);}
+.callout-body p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+
+.code-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin:20px 0;
+}
+.cb-header{
+  background:var(--bg3);padding:11px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.cb-dots{display:flex;gap:6px;}
+.cb-dot{width:10px;height:10px;border-radius:50%;}
+.cb-dot:nth-child(1){background:#ff5f57;}
+.cb-dot:nth-child(2){background:#febc2e;}
+.cb-dot:nth-child(3){background:#28c840;}
+.cb-lang{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.cb-copy{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:3px 10px;cursor:pointer;transition:all .2s;
+}
+.cb-copy:hover{color:var(--accent);border-color:var(--accent);}
+.cb-body{
+  padding:22px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.85;overflow-x:auto;
+}
+.c-tag{color:#ff6b9d;} .c-var{color:#82aaff;} .c-str{color:#c3e88d;}
+.c-kw{color:#c792ea;}  .c-fn{color:#89ddff;}  .c-num{color:#f78c6c;}
+.c-cmt{color:#546e7a;font-style:italic;} .c-out{color:#ffd166;}
+.ln{color:#2d3d6b;user-select:none;margin-right:16px;}
+
+.section-divider{
+  display:flex;align-items:center;gap:14px;margin:48px 0 36px;
+}
+.section-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.section-divider span{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--muted);letter-spacing:2px;white-space:nowrap;
+}
+
+.activity-card{
+  background:var(--card);border:1px solid rgba(0,229,255,.25);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(0,229,255,.05);
+}
+.activity-header{
+  background:linear-gradient(135deg,rgba(124,77,255,.15),rgba(0,229,255,.1));
+  padding:20px 28px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid rgba(0,229,255,.15);
+}
+.activity-icon{font-size:1.6rem;}
+.activity-header-info{flex:1;}
+.activity-tag{
+  font-family:'Space Mono',monospace;font-size:.67rem;
+  color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+}
+.activity-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+.activity-body{padding:28px;}
+
+.quiz-question{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:12px;padding:14px 18px;cursor:pointer;
+  transition:all .2s;font-size:.95rem;
+}
+.quiz-opt:hover{border-color:var(--php);background:rgba(124,77,255,.06);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(105,255,180,.08);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+.quiz-opt-letter{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;
+  transition:all .2s;
+}
+.quiz-opt.correct .quiz-opt-letter{background:var(--green);color:var(--bg);border-color:var(--green);}
+.quiz-opt.wrong .quiz-opt-letter{background:var(--red);color:var(--white);border-color:var(--red);}
+.quiz-feedback{
+  padding:14px 18px;border-radius:12px;font-size:.9rem;
+  display:none;margin-bottom:16px;line-height:1.5;
+}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct-fb{background:rgba(105,255,180,.08);border:1px solid rgba(105,255,180,.3);color:var(--green);}
+.quiz-feedback.wrong-fb{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+
+.drag-area{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.drag-chip{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 16px;
+  font-family:'Space Mono',monospace;font-size:.8rem;
+  cursor:grab;user-select:none;transition:all .2s;
+  color:var(--accent);
+}
+.drag-chip:hover{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drag-chip.dragging{opacity:.4;}
+.drop-zones{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.drop-zone{
+  min-height:50px;border:2px dashed var(--border);
+  border-radius:12px;padding:10px 16px;
+  display:flex;align-items:center;gap:12px;
+  transition:all .2s;font-size:.9rem;color:var(--muted);
+}
+.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drop-zone .zone-label{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);min-width:180px;}
+.drop-zone .placed-chip{
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:6px;padding:5px 12px;font-family:'Space Mono',monospace;
+  font-size:.8rem;color:var(--php);cursor:pointer;
+}
+.drop-zone.correct-zone{border-color:var(--green);background:rgba(105,255,180,.06);}
+.drop-zone.wrong-zone{border-color:var(--red);background:rgba(255,107,107,.06);}
+
+.fitb-sentence{font-size:1rem;line-height:2.5;color:var(--text);margin-bottom:20px;}
+.fitb-input{
+  display:inline-block;background:var(--bg2);
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:4px 12px;font-family:'Space Mono',monospace;
+  font-size:.85rem;color:var(--accent);outline:none;
+  width:130px;text-align:center;transition:all .2s;
+  vertical-align:middle;
+}
+.fitb-input:focus{border-color:var(--accent);}
+.fitb-input.correct{border-color:var(--green);color:var(--green);}
+.fitb-input.wrong{border-color:var(--red);color:var(--red);}
+
+.xp-reward{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(105,255,180,.08),rgba(0,229,255,.05));
+  border:1px solid rgba(105,255,180,.25);border-radius:12px;
+  padding:14px 20px;margin-top:16px;display:none;
+}
+.xp-reward.show{display:flex;}
+.xp-icon{font-size:1.5rem;}
+.xp-text{font-size:.9rem;}
+.xp-text strong{color:var(--green);}
+
+.activity-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.act-btn{
+  padding:10px 22px;border-radius:10px;font-family:'Syne',sans-serif;
+  font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s;border:none;
+}
+.act-btn-primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);}
+.act-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3);}
+.act-btn-secondary{background:var(--bg2);color:var(--muted);border:1px solid var(--border);}
+.act-btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+
+.sandbox-wrap{
+  background:var(--bg2);border:1px solid rgba(124,77,255,.3);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(124,77,255,.07);
+}
+.sandbox-header{
+  background:var(--bg3);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.sandbox-title{display:flex;align-items:center;gap:10px;}
+.sandbox-title .s-dots{display:flex;gap:5px;}
+.sandbox-title .s-dot{width:10px;height:10px;border-radius:50%;}
+.s-dot:nth-child(1){background:#ff5f57;}
+.s-dot:nth-child(2){background:#febc2e;}
+.s-dot:nth-child(3){background:#28c840;}
+.sandbox-title span{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;}
+.sandbox-actions{display:flex;gap:10px;align-items:center;}
+.sandbox-tag{
+  font-family:'Space Mono',monospace;font-size:.68rem;
+  color:var(--php);background:rgba(124,77,255,.12);
+  border:1px solid rgba(124,77,255,.3);border-radius:50px;padding:4px 10px;
+}
+.run-btn{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;padding:9px 20px;border-radius:8px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;
+  cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;
+}
+.run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.35);}
+.run-btn:active{transform:scale(.97);}
+
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sandbox-editor-wrap{border-right:1px solid var(--border);}
+.sandbox-pane-label{
+  padding:10px 18px;background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+.sandbox-pane-label .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.sandbox-editor{
+  width:100%;min-height:220px;padding:20px;resize:none;
+  background:transparent;border:none;outline:none;
+  font-family:'Space Mono',monospace;font-size:.83rem;
+  line-height:1.8;color:var(--text);tab-size:2;
+}
+.sandbox-output{
+  padding:20px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.8;min-height:220px;
+  color:var(--green);white-space:pre-wrap;word-break:break-word;
+}
+.sandbox-output.error{color:var(--red);}
+.sandbox-output .out-placeholder{color:var(--muted);font-style:italic;}
+
+.sandbox-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  font-size:.78rem;color:var(--muted);
+}
+.sandbox-note{font-family:'Space Mono',monospace;}
+.sandbox-clear{
+  margin-left:auto;background:none;border:1px solid var(--border);
+  color:var(--muted);border-radius:6px;padding:4px 12px;
+  font-size:.75rem;cursor:pointer;transition:all .2s;
+}
+.sandbox-clear:hover{border-color:var(--red);color:var(--red);}
+
+.exercises-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:36px;margin-top:48px;
+}
+.ex-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  padding-bottom:20px;border-bottom:1px solid var(--border);
+}
+.ex-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.ex-header-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;}
+.ex-header-info p{color:var(--muted);font-size:.88rem;margin-top:3px;}
+
+.exercise{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.exercise:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ex-num{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);margin-bottom:8px;letter-spacing:1px;}
+.ex-question{font-size:.98rem;line-height:1.65;color:var(--text);margin-bottom:16px;}
+.ex-question strong{color:var(--accent);}
+
+.gabarito-toggle{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:9px 16px;color:var(--muted);
+  font-size:.83rem;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;
+  margin-top:12px;
+}
+.gabarito-toggle:hover{border-color:var(--yellow);color:var(--yellow);}
+.gabarito-toggle .arrow{transition:transform .25s;}
+.gabarito-toggle.open .arrow{transform:rotate(180deg);}
+.gabarito-body{
+  margin-top:14px;padding:20px;
+  background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.2);
+  border-radius:12px;display:none;animation:fadeUp .3s ease;
+}
+.gabarito-body.open{display:block;}
+.gabarito-body .gab-label{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);
+  letter-spacing:2px;margin-bottom:12px;
+}
+.gabarito-body .prose{font-size:.9rem;}
+
+.lesson-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 6%;border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.nav-lesson-btn{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;cursor:pointer;
+  transition:all .25s;text-decoration:none;
+  font-size:.9rem;color:var(--muted);
+}
+.nav-lesson-btn:hover{border-color:var(--accent);color:var(--text);}
+.nav-lesson-btn.primary{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;font-weight:700;
+}
+.nav-lesson-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.3);color:var(--bg);}
+.nav-lesson-btn.disabled{opacity:.3;pointer-events:none;}
+.complete-btn{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--green),#00b88a);
+  color:var(--bg);border:none;border-radius:12px;padding:12px 24px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .25s;
+}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(105,255,180,.3);}
+
+.xp-bar-total{
+  position:fixed;bottom:0;left:280px;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:12px 5%;display:flex;align-items:center;gap:16px;
+  z-index:50;
+}
+.xp-label{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;width:0%;}
+.xp-count{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);white-space:nowrap;}
+
+.toast{
+  position:fixed;bottom:60px;right:28px;
+  background:var(--card);border:1px solid var(--green);color:var(--green);
+  border-radius:14px;padding:14px 20px;font-size:.88rem;font-weight:500;
+  z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;cursor:pointer;
+  color:var(--muted);font-size:1.1rem;line-height:1;
+  transition:all .2s;
+}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:99;
+}
+.sidebar-overlay.open{display:block;}
+
+@media(max-width:900px){
+  .menu-toggle{display:block;}
+  .nav-links li:not(:last-child){display:none;}
+  .layout{grid-template-columns:1fr;}
+  .main{margin-left:0;}
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .3s ease;
+    width:min(280px, 85vw);
+    z-index:150;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .lesson-hero,.lesson-body{padding-left:5%;padding-right:5%;}
+  .sandbox-grid{grid-template-columns:1fr;}
+  .sandbox-editor-wrap{border-right:none;border-bottom:1px solid var(--border);}
+  .xp-bar-total{left:0;}
+  .lesson-nav{flex-wrap:wrap;gap:10px;padding:20px 5%;}
+  .nav-lesson-btn{flex:1;min-width:120px;justify-content:center;}
+  .drop-zone .zone-label{min-width:80px;font-size:.68rem;}
+  .fitb-input{width:100px;font-size:.78rem;}
+  .exercises-section{padding:24px 18px;}
+  .callout{flex-direction:column;gap:8px;}
+}
+@media(max-width:480px){
+  .lesson-title{font-size:1.5rem;}
+  .sandbox-header{flex-wrap:wrap;gap:8px;}
+  .sandbox-actions{flex-wrap:wrap;}
+  .activity-header{flex-wrap:wrap;}
+  .activity-body{padding:18px;}
+  .activity-actions{flex-direction:column;}
+  .act-btn{width:100%;text-align:center;}
+  .nav-lesson-btn span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu de aulas">☰</button>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="mod-badge">📦 MOD 03</div>
+      <h2>Estruturas de Controle</h2>
+      <div class="sidebar-progress">
+        <div class="prog-label"><span>Progresso</span><span id="prog-pct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Aulas</div>
+      <button class="lesson-btn active" onclick="goToLesson(0)" id="lb-0">
+        <div class="l-icon">🔀</div>
+        <div class="l-info"><div class="l-num">AULA 01</div><div class="l-title">if / else / elseif</div></div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(1)" id="lb-1">
+        <div class="l-icon">🎛️</div>
+        <div class="l-info"><div class="l-num">AULA 02</div><div class="l-title">switch / match</div></div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(2)" id="lb-2">
+        <div class="l-icon">🔁</div>
+        <div class="l-info"><div class="l-num">AULA 03</div><div class="l-title">for e while</div></div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(3)" id="lb-3">
+        <div class="l-icon">📋</div>
+        <div class="l-info"><div class="l-num">AULA 04</div><div class="l-title">foreach</div></div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(4)" id="lb-4">
+        <div class="l-icon">🏁</div>
+        <div class="l-info"><div class="l-num">AULA 05</div><div class="l-title">break, continue e do-while</div></div>
+        <span class="l-check">✓</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ AULA 1 ══════════ -->
+    <div class="lesson-panel active" id="lesson-0">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 01 / 05</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>if</em> / else / elseif</h1>
+        <p class="lesson-desc">Aprenda a ensinar o PHP a tomar decisões. Com if, else e elseif, seu programa passa a reagir de formas diferentes dependendo das condições.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que são estruturas de controle?</h2>
+          <div class="prose">
+            <p>Por padrão, um programa PHP executa as instruções <strong>linha por linha</strong>, de cima para baixo. Mas quase todo sistema real precisa tomar decisões: exibir uma mensagem diferente para usuários logados, bloquear acesso a menores de idade, ou exibir promoções apenas nos fins de semana.</p>
+            <p>As <em>estruturas de controle</em> permitem alterar esse fluxo de execução com base em condições. A mais fundamental delas é o <strong>if</strong>.</p>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">A estrutura if</h2>
+          <div class="prose">
+            <p>O <strong>if</strong> executa um bloco de código <em>somente se</em> uma condição for verdadeira (<code style="font-family:'Space Mono',monospace;color:var(--accent);">true</code>):</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · if-basico.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$idade</span> = <span class="c-num">20</span>;<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">if</span> (<span class="c-var">$idade</span> >= <span class="c-num">18</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Acesso permitido!\n"</span>;<br>
+<span class="ln">6</span>}<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Saída: Acesso permitido!</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Operadores de comparação</strong>
+              <p><code style="font-family:'Space Mono',monospace;">==</code> igual a &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">!=</code> diferente &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">&gt;</code> maior &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">&lt;</code> menor &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">&gt;=</code> maior ou igual &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">&lt;=</code> menor ou igual &nbsp;·&nbsp; <code style="font-family:'Space Mono',monospace;">===</code> idêntico (valor e tipo)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">if + else</h2>
+          <div class="prose">
+            <p>O <strong>else</strong> define o que acontece quando a condição do if é <em>falsa</em>:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · if-else.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$hora</span> = <span class="c-num">14</span>;<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">if</span> (<span class="c-var">$hora</span> < <span class="c-num">12</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Bom dia!\n"</span>;<br>
+<span class="ln">6</span>} <span class="c-kw">else</span> {<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Boa tarde ou boa noite!\n"</span>;<br>
+<span class="ln">8</span>}<br>
+<span class="ln">9</span><br>
+<span class="ln">10</span><span class="c-cmt">// Saída: Boa tarde ou boa noite!</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">elseif: múltiplas condições</h2>
+          <div class="prose">
+            <p>Quando há mais de dois casos possíveis, usamos <strong>elseif</strong> para encadear condições. O PHP verifica cada uma em ordem e executa apenas o primeiro bloco cujo teste for verdadeiro:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · elseif.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$nota</span> = <span class="c-num">75</span>;<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">if</span> (<span class="c-var">$nota</span> >= <span class="c-num">90</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Conceito A\n"</span>;<br>
+<span class="ln">6</span>} <span class="c-kw">elseif</span> (<span class="c-var">$nota</span> >= <span class="c-num">70</span>) {<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Conceito B\n"</span>;<br>
+<span class="ln">8</span>} <span class="c-kw">elseif</span> (<span class="c-var">$nota</span> >= <span class="c-num">50</span>) {<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Conceito C\n"</span>;<br>
+<span class="ln">10</span>} <span class="c-kw">else</span> {<br>
+<span class="ln">11</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Reprovado\n"</span>;<br>
+<span class="ln">12</span>}<br>
+<span class="ln">13</span><span class="c-cmt">// Saída: Conceito B</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✅</div>
+            <div class="callout-body">
+              <strong>Operador ternário — if em uma linha</strong>
+              <p>Para condições simples, use <code style="font-family:'Space Mono',monospace;">$resultado = (condição) ? valor_se_true : valor_se_false;</code>. Exemplo: <code style="font-family:'Space Mono',monospace;">$msg = ($idade >= 18) ? "Adulto" : "Menor";</code></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 1: QUIZ -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz rápido · +10 XP</div>
+              <h3>Qual será a saída do código?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Dado o código abaixo, qual mensagem será exibida?<br><br>
+            <code style="font-family:'Space Mono',monospace;background:var(--bg3);padding:10px 14px;border-radius:8px;display:block;margin-top:8px;color:var(--text);">$x = 15;<br>if ($x > 20) {<br>&nbsp;&nbsp;echo "Grande";<br>} elseif ($x > 10) {<br>&nbsp;&nbsp;echo "Médio";<br>} else {<br>&nbsp;&nbsp;echo "Pequeno";<br>}</code></p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">A</div> Grande</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','0-0')"><div class="quiz-opt-letter">B</div> Médio</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">C</div> Pequeno</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">D</div> Nenhuma saída</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-0-0"></div>
+            <div class="xp-reward" id="xp-0-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+10 XP!</strong> Como 15 &gt; 10, o elseif é verdadeiro e imprime "Médio".</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>if-else.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-1')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-1" spellcheck="false">&lt;?php
+
+$hora = 9; // Mude o valor e veja o resultado!
+
+if ($hora >= 6 && $hora < 12) {
+    echo "Bom dia! ☀️\n";
+} elseif ($hora >= 12 && $hora < 18) {
+    echo "Boa tarde! 🌤️\n";
+} elseif ($hora >= 18 && $hora < 24) {
+    echo "Boa noite! 🌙\n";
+} else {
+    echo "Você está acordado de madrugada! 🦉\n";
+}
+
+// Teste o operador ternário:
+$temperatura = 32;
+$clima = ($temperatura > 30) ? "quente" : "agradável";
+echo "Está " . $clima . " hoje!\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-1"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Dica: use && (E) e || (OU) para combinar condições</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-1','out-sb-1')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 1 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique o if, else e elseif no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Crie um script PHP que receba uma variável <strong>$numero</strong> e exiba se o número é <strong>positivo</strong>, <strong>negativo</strong> ou <strong>zero</strong>. Teste com pelo menos três valores diferentes.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$numero = -7;
+
+if ($numero > 0) {
+    echo "$numero é positivo.\n";
+} elseif ($numero < 0) {
+    echo "$numero é negativo.\n";
+} else {
+    echo "O número é zero.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Escreva um script que defina a variável <strong>$dia_semana</strong> com um número de 1 a 7 (1 = Segunda, 7 = Domingo) e exiba se é um <strong>dia útil</strong> ou <strong>fim de semana</strong>. Use o operador <code style="font-family:'Space Mono',monospace;color:var(--accent);">||</code> (OU) na condição.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$dia_semana = 6; // 6 = Sábado
+
+if ($dia_semana == 6 || $dia_semana == 7) {
+    echo "Fim de semana! Hora de descansar. 😎\n";
+} elseif ($dia_semana >= 1 && $dia_semana <= 5) {
+    echo "Dia útil. Vamos trabalhar! 💼\n";
+} else {
+    echo "Número de dia inválido.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie um sistema simples de <strong>classificação de IMC</strong>. Receba as variáveis <strong>$peso</strong> (kg) e <strong>$altura</strong> (m), calcule o IMC (<code style="font-family:'Space Mono',monospace;color:var(--accent);">peso / altura²</code>) e classifique: Abaixo do peso (&lt;18.5), Normal (18.5–24.9), Sobrepeso (25–29.9), Obesidade (≥30).</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$peso   = 70;
+$altura = 1.75;
+
+$imc = $peso / ($altura * $altura);
+$imc_fmt = number_format($imc, 2);
+
+echo "IMC calculado: $imc_fmt\n";
+
+if ($imc < 18.5) {
+    echo "Classificação: Abaixo do peso\n";
+} elseif ($imc < 25) {
+    echo "Classificação: Peso normal ✅\n";
+} elseif ($imc < 30) {
+    echo "Classificação: Sobrepeso\n";
+} else {
+    echo "Classificação: Obesidade\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn disabled">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(0)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(1)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-0 -->
+
+    <!-- ══════════ AULA 2 ══════════ -->
+    <div class="lesson-panel" id="lesson-1">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 02 / 05</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>switch</em> e match</h1>
+        <p class="lesson-desc">Quando há muitas opções possíveis para uma mesma variável, o switch e o match são mais elegantes e legíveis do que uma cadeia de elseifs.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O switch: escolhendo entre muitos casos</h2>
+          <div class="prose">
+            <p>O <strong>switch</strong> avalia uma expressão e compara seu valor com uma série de <code style="font-family:'Space Mono',monospace;color:var(--accent);">case</code>. Quando encontra um valor igual, executa o código daquele case até encontrar um <code style="font-family:'Space Mono',monospace;color:var(--accent);">break</code>:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · switch.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$dia</span> = <span class="c-str">"segunda"</span>;<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">switch</span> (<span class="c-var">$dia</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-kw">case</span> <span class="c-str">"segunda"</span>:<br>
+<span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Início da semana!\n"</span>;<br>
+<span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">break</span>;<br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-kw">case</span> <span class="c-str">"sexta"</span>:<br>
+<span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Sextou! 🎉\n"</span>;<br>
+<span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">break</span>;<br>
+<span class="ln">11</span>&nbsp;&nbsp;<span class="c-kw">case</span> <span class="c-str">"sabado"</span>:<br>
+<span class="ln">12</span>&nbsp;&nbsp;<span class="c-kw">case</span> <span class="c-str">"domingo"</span>:<br>
+<span class="ln">13</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Fim de semana! 😎\n"</span>;<br>
+<span class="ln">14</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">break</span>;<br>
+<span class="ln">15</span>&nbsp;&nbsp;<span class="c-kw">default</span>:<br>
+<span class="ln">16</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Dia normal de semana.\n"</span>;<br>
+<span class="ln">17</span>}<br>
+<span class="ln">18</span><span class="c-cmt">// Saída: Início da semana!</span>
+            </div>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Não esqueça o break!</strong>
+              <p>Sem o <code style="font-family:'Space Mono',monospace;">break</code>, o PHP continua executando os cases seguintes mesmo que não correspondam ao valor — isso se chama <em>fall-through</em>. Às vezes é útil (como nos cases "sabado" e "domingo" acima), mas geralmente é um bug.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">match: o switch moderno do PHP 8</h2>
+          <div class="prose">
+            <p>O <strong>match</strong> foi introduzido no PHP 8 e é uma versão mais poderosa e segura do switch. Principais diferenças:</p>
+            <ul>
+              <li>Usa <strong>comparação estrita</strong> (valor e tipo, como ===)</li>
+              <li><strong>Retorna um valor</strong> — pode ser atribuído a uma variável</li>
+              <li><strong>Não precisa de break</strong> — cada braço é executado isoladamente</li>
+              <li>Lança um <strong>erro</strong> se nenhum caso bater (o switch vai silenciosamente para o default)</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · match.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$status</span> = <span class="c-num">2</span>;<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-var">$mensagem</span> = <span class="c-kw">match</span>(<span class="c-var">$status</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-num">1</span> =&gt; <span class="c-str">"Pedido recebido"</span>,<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="c-num">2</span> =&gt; <span class="c-str">"Em processamento"</span>,<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-num">3</span> =&gt; <span class="c-str">"Enviado"</span>,<br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-num">4</span> =&gt; <span class="c-str">"Entregue"</span>,<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-kw">default</span> =&gt; <span class="c-str">"Status desconhecido"</span>,<br>
+<span class="ln">10</span>};<br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-str">"Status: "</span> . <span class="c-var">$mensagem</span>;<br>
+<span class="ln">13</span><span class="c-cmt">// Saída: Status: Em processamento</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 2: DRAG & DROP -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon">🎯</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Arrastar e Soltar · +15 XP</div>
+              <h3>Associe o conceito à estrutura correta!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Arraste cada característica para a estrutura correspondente: <strong>switch</strong> ou <strong>match</strong>.</p>
+            <div class="drag-area" id="drag-chips">
+              <div class="drag-chip" draggable="true" data-val="Precisa de break">Precisa de break</div>
+              <div class="drag-chip" draggable="true" data-val="Retorna um valor">Retorna um valor</div>
+              <div class="drag-chip" draggable="true" data-val="Comparação loose (==)">Comparação loose (==)</div>
+              <div class="drag-chip" draggable="true" data-val="Comparação estrita (===)">Comparação estrita (===)</div>
+            </div>
+            <div class="drop-zones" id="drop-zones">
+              <div class="drop-zone" data-answer="Precisa de break"><span class="zone-label">switch →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="Comparação loose (==)"><span class="zone-label">switch →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="Retorna um valor"><span class="zone-label">match →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="Comparação estrita (===)"><span class="zone-label">match →</span><span class="zone-slot"></span></div>
+            </div>
+            <div class="xp-reward" id="xp-1-0"><div class="xp-icon">🏆</div><div class="xp-text">Perfeito! <strong>+15 XP!</strong> Você dominou as diferenças entre switch e match!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkDrag()">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetDrag()">Resetar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>switch-match.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-2')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-2" spellcheck="false">&lt;?php
+
+// Exemplo com switch
+$mes = 3;
+
+switch ($mes) {
+    case 1: echo "Janeiro\n";   break;
+    case 2: echo "Fevereiro\n"; break;
+    case 3: echo "Março\n";     break;
+    case 4: echo "Abril\n";     break;
+    default: echo "Outro mês\n";
+}
+
+// Exemplo com match (PHP 8)
+$nivel = 2;
+$descricao = match($nivel) {
+    1 => "Iniciante",
+    2 => "Básico",
+    3 => "Intermediário",
+    4 => "Avançado",
+    default => "Nível desconhecido",
+};
+
+echo "Nível: " . $descricao . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-2"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Mude o valor de $mes e $nivel para testar diferentes casos</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-2','out-sb-2')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 2 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique switch e match no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Crie um script usando <strong>switch</strong> que receba uma variável <strong>$estacao</strong> com os valores "verao", "outono", "inverno" ou "primavera" e exiba uma mensagem característica de cada estação do ano.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$estacao = "inverno";
+
+switch ($estacao) {
+    case "verao":
+        echo "Verão: Sol, praia e calor! ☀️\n";
+        break;
+    case "outono":
+        echo "Outono: Folhas caindo e vento fresco. 🍂\n";
+        break;
+    case "inverno":
+        echo "Inverno: Frio e chocolate quente! ❄️\n";
+        break;
+    case "primavera":
+        echo "Primavera: Flores e clima agradável. 🌸\n";
+        break;
+    default:
+        echo "Estação inválida.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Reescreva o exercício anterior utilizando <strong>match</strong> em vez de switch. Atribua o texto da mensagem a uma variável <strong>$mensagem</strong> e exiba-a com echo ao final.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$estacao = "primavera";
+
+$mensagem = match($estacao) {
+    "verao"     => "Sol, praia e calor! ☀️",
+    "outono"    => "Folhas caindo e vento fresco. 🍂",
+    "inverno"   => "Frio e chocolate quente! ❄️",
+    "primavera" => "Flores e clima agradável. 🌸",
+    default     => "Estação inválida.",
+};
+
+echo $mensagem . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie uma calculadora simples usando <strong>switch</strong>. Receba variáveis <strong>$a</strong>, <strong>$b</strong> e <strong>$operacao</strong> ("+", "-", "*", "/") e exiba o resultado. Trate a divisão por zero com um elseif ou case especial.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$a = 10;
+$b = 3;
+$operacao = "/";
+
+switch ($operacao) {
+    case "+":
+        echo "$a + $b = " . ($a + $b) . "\n";
+        break;
+    case "-":
+        echo "$a - $b = " . ($a - $b) . "\n";
+        break;
+    case "*":
+        echo "$a * $b = " . ($a * $b) . "\n";
+        break;
+    case "/":
+        if ($b == 0) {
+            echo "Erro: divisão por zero!\n";
+        } else {
+            $resultado = number_format($a / $b, 2);
+            echo "$a / $b = $resultado\n";
+        }
+        break;
+    default:
+        echo "Operação inválida.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(0)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(1)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(2)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-1 -->
+
+    <!-- ══════════ AULA 3 ══════════ -->
+    <div class="lesson-panel" id="lesson-2">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 03 / 05</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title">Laços <em>for</em> e <em>while</em></h1>
+        <p class="lesson-desc">Automatize repetições com os laços for e while. Pare de escrever o mesmo código dezenas de vezes — deixe o PHP fazer isso por você.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O laço for: repetição com contador</h2>
+          <div class="prose">
+            <p>O <strong>for</strong> é usado quando você sabe exatamente <em>quantas vezes</em> quer repetir algo. Sua sintaxe possui três partes separadas por ponto e vírgula:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · for.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// for (início; condição; incremento)</span><br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">for</span> (<span class="c-var">$i</span> = <span class="c-num">1</span>; <span class="c-var">$i</span> <= <span class="c-num">5</span>; <span class="c-var">$i</span>++) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Repetição número: "</span> . <span class="c-var">$i</span> . <span class="c-str">"\n"</span>;<br>
+<span class="ln">6</span>}<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Saída:</span><br>
+<span class="ln">9</span><span class="c-cmt">// Repetição número: 1</span><br>
+<span class="ln">10</span><span class="c-cmt">// Repetição número: 2  ... até 5</span><br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// For decrescente</span><br>
+<span class="ln">13</span><span class="c-kw">for</span> (<span class="c-var">$i</span> = <span class="c-num">10</span>; <span class="c-var">$i</span> >= <span class="c-num">1</span>; <span class="c-var">$i</span>--) {<br>
+<span class="ln">14</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-var">$i</span> . <span class="c-str">" "</span>;<br>
+<span class="ln">15</span>}<br>
+<span class="ln">16</span><span class="c-cmt">// Saída: 10 9 8 7 6 5 4 3 2 1</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Anatomia do for</strong>
+              <p><strong>Início:</strong> executado uma vez antes do laço (<code style="font-family:'Space Mono',monospace;">$i = 1</code>) · <strong>Condição:</strong> verificada antes de cada iteração; se false, o laço para (<code style="font-family:'Space Mono',monospace;">$i &lt;= 5</code>) · <strong>Incremento:</strong> executado ao final de cada iteração (<code style="font-family:'Space Mono',monospace;">$i++</code>)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">O laço while: repetir enquanto uma condição for verdadeira</h2>
+          <div class="prose">
+            <p>O <strong>while</strong> é usado quando não sabemos de antemão quantas vezes repetiremos — apenas sabemos a condição de parada:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · while.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$tentativas</span> = <span class="c-num">0</span>;<br>
+<span class="ln">3</span><span class="c-var">$max</span> = <span class="c-num">3</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-kw">while</span> (<span class="c-var">$tentativas</span> < <span class="c-var">$max</span>) {<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="c-var">$tentativas</span>++;<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Tentativa "</span> . <span class="c-var">$tentativas</span> . <span class="c-str">" de "</span> . <span class="c-var">$max</span> . <span class="c-str">"\n"</span>;<br>
+<span class="ln">8</span>}<br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-str">"Esgotou as tentativas!\n"</span>;<br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-cmt">// Saída:</span><br>
+<span class="ln">12</span><span class="c-cmt">// Tentativa 1 de 3</span><br>
+<span class="ln">13</span><span class="c-cmt">// Tentativa 2 de 3</span><br>
+<span class="ln">14</span><span class="c-cmt">// Tentativa 3 de 3</span><br>
+<span class="ln">15</span><span class="c-cmt">// Esgotou as tentativas!</span>
+            </div>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Cuidado com loops infinitos!</strong>
+              <p>Se a condição do while nunca se tornar false, o programa ficará preso para sempre. Sempre garanta que a variável controladora seja atualizada dentro do laço.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 3: FILL IN THE BLANK -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon">✏️</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Complete o código · +15 XP</div>
+              <h3>Preencha o laço for corretamente!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Complete o laço for para imprimir os números de 1 a 10.</p>
+            <div class="fitb-sentence">
+              <span class="c-kw" style="color:#c792ea;">for</span> (<span class="c-var" style="color:#82aaff;">$i</span> = <input class="fitb-input" id="fitb-0" placeholder="início" data-answer="1" style="width:70px;">; <span class="c-var" style="color:#82aaff;">$i</span> <input class="fitb-input" id="fitb-1" placeholder="operador" data-answer="<=" style="width:70px;"> <input class="fitb-input" id="fitb-2" placeholder="limite" data-answer="10" style="width:70px;">; <span class="c-var" style="color:#82aaff;">$i</span><input class="fitb-input" id="fitb-3" placeholder="incremento" data-answer="++" style="width:80px;">) {<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn" style="color:#89ddff;">echo</span> <span class="c-var" style="color:#82aaff;">$i</span> . <span class="c-str" style="color:#c3e88d;">"\n"</span>;<br>}
+            </div>
+            <div class="quiz-feedback" id="qfb-2-0"></div>
+            <div class="xp-reward" id="xp-2-0"><div class="xp-icon">⭐</div><div class="xp-text">Excelente! <strong>+15 XP!</strong> Você sabe construir um laço for do zero!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkFitb('2-0',['1','<=','10','++'])">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetFitb(['fitb-0','fitb-1','fitb-2','fitb-3'],'qfb-2-0','xp-2-0')">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>for-while.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-3')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-3" spellcheck="false">&lt;?php
+
+// Tabuada do 7 com for
+echo "=== Tabuada do 7 ===\n";
+for ($i = 1; $i <= 10; $i++) {
+    $resultado = 7 * $i;
+    echo "7 x $i = $resultado\n";
+}
+
+echo "\n";
+
+// Somar números com while
+echo "=== Soma de 1 a 100 ===\n";
+$soma = 0;
+$n = 1;
+while ($n <= 100) {
+    $soma += $n;
+    $n++;
+}
+echo "Soma: $soma\n"; // Deve dar 5050
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-3"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Dica: $i++ é igual a $i = $i + 1</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-3','out-sb-3')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 3 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique for e while no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Usando o laço <strong>for</strong>, crie um script que exiba todos os números <strong>pares</strong> entre 1 e 30. Dica: use o operador módulo <code style="font-family:'Space Mono',monospace;color:var(--accent);">%</code> para verificar se um número é par (<code style="font-family:'Space Mono',monospace;color:var(--accent);">$n % 2 == 0</code>).</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+echo "Números pares de 1 a 30:\n";
+for ($i = 1; $i <= 30; $i++) {
+    if ($i % 2 == 0) {
+        echo $i . " ";
+    }
+}
+echo "\n";
+
+// Alternativa mais eficiente: começar em 2 e incrementar de 2 em 2
+for ($i = 2; $i <= 30; $i += 2) {
+    echo $i . " ";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Usando o laço <strong>while</strong>, escreva um script que simule o <strong>crescimento de uma conta bancária</strong>. Comece com R$ 1.000,00 e aplique um rendimento de 2% ao mês. O laço deve continuar enquanto o saldo for menor que R$ 2.000,00. Exiba o saldo a cada mês e quantos meses foram necessários.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$saldo = 1000.00;
+$taxa  = 0.02;
+$mes   = 0;
+
+while ($saldo < 2000) {
+    $mes++;
+    $saldo *= (1 + $taxa);
+    $saldo_fmt = number_format($saldo, 2, ',', '.');
+    echo "Mês $mes: R$ $saldo_fmt\n";
+}
+
+echo "\nDoubling time: $mes meses para dobrar o capital!\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie um script PHP que exiba um <strong>triângulo de asteriscos</strong> usando laços for aninhados. A altura do triângulo deve ser controlada por uma variável <strong>$altura</strong>. Exemplo com altura 5:<br><br>
+            <code style="font-family:'Space Mono',monospace;display:block;background:var(--bg3);padding:10px;border-radius:8px;margin-top:8px;">*<br>**<br>***<br>****<br>*****</code></p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$altura = 5;
+
+for ($linha = 1; $linha <= $altura; $linha++) {
+    for ($col = 1; $col <= $linha; $col++) {
+        echo "*";
+    }
+    echo "\n";
+}
+?&gt;
+
+/* Saída:
+*
+**
+***
+****
+*****
+*/</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(1)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(2)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(3)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-2 -->
+
+    <!-- ══════════ AULA 4 ══════════ -->
+    <div class="lesson-panel" id="lesson-3">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 04 / 05</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title">O laço <em>foreach</em></h1>
+        <p class="lesson-desc">O foreach é o laço mais usado em PHP. Ele percorre arrays de forma elegante e segura, item por item, sem precisar controlar índices manualmente.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">foreach com arrays simples</h2>
+          <div class="prose">
+            <p>O <strong>foreach</strong> itera sobre cada elemento de um array. A cada volta do laço, o PHP coloca o valor atual em uma variável temporária:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · foreach-simples.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$frutas</span> = [<span class="c-str">"Maçã"</span>, <span class="c-str">"Banana"</span>, <span class="c-str">"Laranja"</span>, <span class="c-str">"Uva"</span>];<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">foreach</span> (<span class="c-var">$frutas</span> <span class="c-kw">as</span> <span class="c-var">$fruta</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"🍎 "</span> . <span class="c-var">$fruta</span> . <span class="c-str">"\n"</span>;<br>
+<span class="ln">6</span>}<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Saída:</span><br>
+<span class="ln">9</span><span class="c-cmt">// 🍎 Maçã</span><br>
+<span class="ln">10</span><span class="c-cmt">// 🍎 Banana  ...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">foreach com chave e valor</h2>
+          <div class="prose">
+            <p>Quando o array possui <strong>chaves nomeadas</strong> (array associativo), podemos acessar tanto a chave quanto o valor com a sintaxe <code style="font-family:'Space Mono',monospace;color:var(--accent);">as $chave => $valor</code>:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · foreach-associativo.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$aluno</span> = [<br>
+<span class="ln">3</span>&nbsp;&nbsp;<span class="c-str">"nome"</span>  => <span class="c-str">"Ana Lima"</span>,<br>
+<span class="ln">4</span>&nbsp;&nbsp;<span class="c-str">"curso"</span> => <span class="c-str">"Eng. de Software"</span>,<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-str">"nota"</span>  => <span class="c-num">9.5</span>,<br>
+<span class="ln">6</span>];<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-kw">foreach</span> (<span class="c-var">$aluno</span> <span class="c-kw">as</span> <span class="c-var">$campo</span> => <span class="c-var">$valor</span>) {<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-var">$campo</span> . <span class="c-str">": "</span> . <span class="c-var">$valor</span> . <span class="c-str">"\n"</span>;<br>
+<span class="ln">10</span>}<br>
+<span class="ln">11</span><span class="c-cmt">// Saída:</span><br>
+<span class="ln">12</span><span class="c-cmt">// nome: Ana Lima</span><br>
+<span class="ln">13</span><span class="c-cmt">// curso: Eng. de Software</span><br>
+<span class="ln">14</span><span class="c-cmt">// nota: 9.5</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">foreach com arrays de arrays (lista de registros)</h2>
+          <div class="prose">
+            <p>Um padrão muito comum em PHP é percorrer uma <em>lista de registros</em> — como dados vindos de um banco de dados:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · foreach-lista.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$produtos</span> = [<br>
+<span class="ln">3</span>&nbsp;&nbsp;[<span class="c-str">"nome"</span> => <span class="c-str">"Notebook"</span>, <span class="c-str">"preco"</span> => <span class="c-num">3500</span>],<br>
+<span class="ln">4</span>&nbsp;&nbsp;[<span class="c-str">"nome"</span> => <span class="c-str">"Mouse"</span>,    <span class="c-str">"preco"</span> => <span class="c-num">80</span>],<br>
+<span class="ln">5</span>&nbsp;&nbsp;[<span class="c-str">"nome"</span> => <span class="c-str">"Teclado"</span>,  <span class="c-str">"preco"</span> => <span class="c-num">150</span>],<br>
+<span class="ln">6</span>];<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-kw">foreach</span> (<span class="c-var">$produtos</span> <span class="c-kw">as</span> <span class="c-var">$produto</span>) {<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-var">$produto</span>[<span class="c-str">"nome"</span>] . <span class="c-str">": R$ "</span> . <span class="c-var">$produto</span>[<span class="c-str">"preco"</span>] . <span class="c-str">"\n"</span>;<br>
+<span class="ln">10</span>}
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✅</div>
+            <div class="callout-body">
+              <strong>foreach vs for para arrays</strong>
+              <p>Prefira sempre o <strong>foreach</strong> para percorrer arrays em PHP — ele é mais seguro (não precisa saber o tamanho do array), mais legível e menos sujeito a erros de índice.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 4: QUIZ -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz de código · +20 XP</div>
+              <h3>O que este foreach produz?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Analise o código abaixo e selecione a saída correta:<br><br>
+            <code style="font-family:'Space Mono',monospace;background:var(--bg3);padding:10px 14px;border-radius:8px;display:block;margin-top:8px;color:var(--text);">$notas = ["João"=>8, "Maria"=>10, "Pedro"=>6];<br>foreach ($notas as $nome => $nota) {<br>&nbsp;&nbsp;if ($nota >= 7) {<br>&nbsp;&nbsp;&nbsp;&nbsp;echo "$nome: Aprovado\n";<br>&nbsp;&nbsp;}<br>}</code></p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">A</div> João: Aprovado · Maria: Aprovado · Pedro: Aprovado</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','3-0')"><div class="quiz-opt-letter">B</div> João: Aprovado · Maria: Aprovado</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">C</div> Maria: Aprovado</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">D</div> Nenhuma saída — erro de sintaxe</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-3-0"></div>
+            <div class="xp-reward" id="xp-3-0"><div class="xp-icon">🎉</div><div class="xp-text">Correto! <strong>+20 XP!</strong> Pedro (nota 6) não passa pelo if pois 6 &lt; 7.</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>foreach.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-4')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-4" spellcheck="false">&lt;?php
+
+// Lista de alunos com notas
+$turma = [
+    ["nome" => "Ana",    "nota" => 9.0],
+    ["nome" => "Bruno",  "nota" => 5.5],
+    ["nome" => "Carla",  "nota" => 7.5],
+    ["nome" => "Diego",  "nota" => 8.0],
+    ["nome" => "Elisa",  "nota" => 4.0],
+];
+
+$aprovados = 0;
+$reprovados = 0;
+
+foreach ($turma as $aluno) {
+    $status = ($aluno["nota"] >= 6) ? "✅ Aprovado" : "❌ Reprovado";
+    echo $aluno["nome"] . " (" . $aluno["nota"] . "): $status\n";
+
+    if ($aluno["nota"] >= 6) {
+        $aprovados++;
+    } else {
+        $reprovados++;
+    }
+}
+
+echo "\n--- Resumo ---\n";
+echo "Aprovados:  $aprovados\n";
+echo "Reprovados: $reprovados\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-4"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Combine foreach com if para filtrar dados!</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-4','out-sb-4')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 4 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique foreach no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Crie um array com o nome de <strong>5 cidades brasileiras</strong>. Use <strong>foreach</strong> para exibir cada cidade com seu número de ordem (1, 2, 3...). Dica: crie uma variável contadora fora do laço.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$cidades = ["São Paulo", "Rio de Janeiro", "Curitiba", "Salvador", "Fortaleza"];
+
+$i = 1;
+foreach ($cidades as $cidade) {
+    echo "$i. $cidade\n";
+    $i++;
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie um array associativo com o <strong>cardápio de um restaurante</strong> (prato => preço). Use foreach para exibir o cardápio formatado. Ao final, calcule e exiba o <strong>preço médio</strong> dos pratos.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$cardapio = [
+    "Frango grelhado" => 28.90,
+    "Peixe assado"    => 35.50,
+    "Salada Caesar"   => 18.00,
+    "Massa carbonara" => 32.00,
+    "Risoto funghi"   => 42.00,
+];
+
+echo "=== CARDÁPIO ===\n";
+$total = 0;
+$qtd = 0;
+
+foreach ($cardapio as $prato => $preco) {
+    $preco_fmt = number_format($preco, 2, ',', '.');
+    echo "$prato: R$ $preco_fmt\n";
+    $total += $preco;
+    $qtd++;
+}
+
+$media = number_format($total / $qtd, 2, ',', '.');
+echo "\nPreço médio: R$ $media\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie um array com <strong>10 números inteiros</strong> variados (positivos e negativos). Use foreach para separar e exibir em duas listas: os <strong>números positivos</strong> e os <strong>números negativos</strong>. Ao final, exiba a soma de cada grupo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$numeros = [5, -3, 8, -12, 1, -7, 4, -2, 9, -6];
+
+$positivos  = [];
+$negativos  = [];
+
+foreach ($numeros as $num) {
+    if ($num >= 0) {
+        $positivos[] = $num;
+    } else {
+        $negativos[] = $num;
+    }
+}
+
+echo "Positivos: " . implode(", ", $positivos) . "\n";
+echo "Soma dos positivos: " . array_sum($positivos) . "\n\n";
+echo "Negativos: " . implode(", ", $negativos) . "\n";
+echo "Soma dos negativos: " . array_sum($negativos) . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(2)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(3)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(4)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-3 -->
+
+    <!-- ══════════ AULA 5 ══════════ -->
+    <div class="lesson-panel" id="lesson-4">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 05 / 05</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title"><em>break</em>, <em>continue</em> e do-while</h1>
+        <p class="lesson-desc">Controle seus laços com precisão cirúrgica: interrompa loops antecipadamente com break, pule iterações com continue, e conheça o do-while.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">break: interrompendo um laço</h2>
+          <div class="prose">
+            <p>O <strong>break</strong> interrompe imediatamente o laço em que está, mesmo que a condição ainda seja verdadeira. É muito útil em buscas — assim que encontramos o que queremos, paramos:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · break.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$produtos</span> = [<span class="c-str">"Caneta"</span>, <span class="c-str">"Lápis"</span>, <span class="c-str">"Borracha"</span>, <span class="c-str">"Régua"</span>];<br>
+<span class="ln">3</span><span class="c-var">$busca</span> = <span class="c-str">"Borracha"</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-kw">foreach</span> (<span class="c-var">$produtos</span> <span class="c-kw">as</span> <span class="c-var">$i</span> => <span class="c-var">$produto</span>) {<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Verificando: "</span> . <span class="c-var">$produto</span> . <span class="c-str">"\n"</span>;<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-kw">if</span> (<span class="c-var">$produto</span> === <span class="c-var">$busca</span>) {<br>
+<span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Encontrado na posição "</span> . <span class="c-var">$i</span> . <span class="c-str">"!\n"</span>;<br>
+<span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">break</span>; <span class="c-cmt">// Para a busca aqui</span><br>
+<span class="ln">10</span>&nbsp;&nbsp;}<br>
+<span class="ln">11</span>}<br>
+<span class="ln">12</span><span class="c-cmt">// "Régua" nunca é verificada!</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">continue: pulando uma iteração</h2>
+          <div class="prose">
+            <p>O <strong>continue</strong> pula o restante do código da iteração atual e vai direto para a próxima. Diferente do break, o laço <em>continua</em> executando:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · continue.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// Exibir apenas números ímpares de 1 a 10</span><br>
+<span class="ln">3</span><span class="c-kw">for</span> (<span class="c-var">$i</span> = <span class="c-num">1</span>; <span class="c-var">$i</span> <= <span class="c-num">10</span>; <span class="c-var">$i</span>++) {<br>
+<span class="ln">4</span>&nbsp;&nbsp;<span class="c-kw">if</span> (<span class="c-var">$i</span> % <span class="c-num">2</span> === <span class="c-num">0</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">continue</span>; <span class="c-cmt">// Pula os pares</span><br>
+<span class="ln">6</span>&nbsp;&nbsp;}<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-var">$i</span> . <span class="c-str">" "</span>;<br>
+<span class="ln">8</span>}<br>
+<span class="ln">9</span><span class="c-cmt">// Saída: 1 3 5 7 9</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">do-while: execute pelo menos uma vez</h2>
+          <div class="prose">
+            <p>O <strong>do-while</strong> é similar ao while, mas com uma diferença crucial: o bloco de código é executado <em>pelo menos uma vez</em>, pois a condição é verificada <strong>após</strong> a execução, e não antes:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · do-while.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// Menu de opções — exibe pelo menos uma vez</span><br>
+<span class="ln">3</span><span class="c-var">$opcao</span> = <span class="c-num">0</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-kw">do</span> {<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"=== MENU ===\n"</span>;<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"1. Ver produtos\n"</span>;<br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"2. Adicionar item\n"</span>;<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"0. Sair\n"</span>;<br>
+<span class="ln">10</span>&nbsp;&nbsp;<span class="c-var">$opcao</span> = <span class="c-num">0</span>; <span class="c-cmt">// Simulando "sair"</span><br>
+<span class="ln">11</span>} <span class="c-kw">while</span> (<span class="c-var">$opcao</span> != <span class="c-num">0</span>);<br>
+<span class="ln">12</span><br>
+<span class="ln">13</span><span class="c-fn">echo</span> <span class="c-str">"Saindo do menu.\n"</span>;<br>
+<span class="ln">14</span><span class="c-cmt">// O menu é exibido UMA VEZ mesmo com opcao = 0</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Quando usar do-while?</strong>
+              <p>Use do-while quando o bloco <em>precisa ser executado ao menos uma vez</em> — como menus, validações de entrada do usuário, ou processos que devem rodar antes de verificar se devem continuar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 5: QUIZ FINAL -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-icon">🏆</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz Final do Módulo · +25 XP</div>
+              <h3>Desafio Final — Módulo 3</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual é a diferença fundamental entre <strong>break</strong> e <strong>continue</strong> dentro de um laço?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">A</div> Não há diferença — ambos encerram o laço completamente.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">B</div> break pula a iteração atual; continue encerra o laço inteiro.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','4-0')"><div class="quiz-opt-letter">C</div> break encerra o laço inteiro; continue pula apenas a iteração atual e vai para a próxima.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">D</div> continue só funciona dentro do switch, não em laços.</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-4-0"></div>
+            <div class="xp-reward" id="xp-4-0"><div class="xp-icon">🎓</div><div class="xp-text"><strong>+25 XP!</strong> Parabéns! Módulo 3 concluído com maestria!</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>break-continue.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-5')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-5" spellcheck="false">&lt;?php
+
+// BREAK: encontrar o primeiro número divisível por 7
+echo "=== BREAK: Buscando divisível por 7 ===\n";
+for ($i = 50; $i <= 100; $i++) {
+    if ($i % 7 === 0) {
+        echo "Primeiro divisível por 7 entre 50-100: $i\n";
+        break;
+    }
+}
+
+echo "\n";
+
+// CONTINUE: mostrar múltiplos de 3, pulando os de 9
+echo "=== CONTINUE: Múltiplos de 3, exceto de 9 ===\n";
+for ($i = 1; $i <= 30; $i++) {
+    if ($i % 9 === 0) {
+        continue; // Pula os múltiplos de 9
+    }
+    if ($i % 3 === 0) {
+        echo $i . " ";
+    }
+}
+echo "\n\n";
+
+// DO-WHILE: contagem regressiva
+echo "=== DO-WHILE: Contagem regressiva ===\n";
+$contador = 5;
+do {
+    echo "$contador... ";
+    $contador--;
+} while ($contador > 0);
+echo "BOOM! 💥\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-5"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Combine break e continue com if para controle preciso!</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-5','out-sb-5')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS FINAIS -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">🏁</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Finais — Módulo 3</h3>
+              <p>Consolide todo o aprendizado de Estruturas de Controle</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Crie um script PHP que percorra os números de 1 a 50 e use <strong>continue</strong> para pular os múltiplos de 5. Exiba todos os outros números e, ao final, mostre a soma dos números que foram exibidos.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$soma = 0;
+
+for ($i = 1; $i <= 50; $i++) {
+    if ($i % 5 === 0) {
+        continue; // Pula múltiplos de 5
+    }
+    echo $i . " ";
+    $soma += $i;
+}
+
+echo "\n\nSoma dos números exibidos: $soma\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Implemente um algoritmo de <strong>busca em array</strong> usando foreach e break. Crie um array com 8 nomes de pessoas. Defina uma variável <strong>$procurado</strong> com um dos nomes. Use foreach para encontrá-lo, exiba sua posição e pare a busca com break. Se não for encontrado, exiba uma mensagem de "não encontrado".</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$nomes = ["Alice","Bruno","Carla","Diego",
+          "Elisa","Felipe","Gisele","Henrique"];
+$procurado = "Felipe";
+$encontrado = false;
+
+foreach ($nomes as $indice => $nome) {
+    if ($nome === $procurado) {
+        echo "\"$procurado\" encontrado na posição $indice!\n";
+        $encontrado = true;
+        break;
+    }
+}
+
+if (!$encontrado) {
+    echo "\"$procurado\" não foi encontrado no array.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO FINAL</div>
+            <p class="ex-question">Crie um script que simule um <strong>caixa registradora</strong>. Tenha um array de produtos com nome e preço. Use foreach para percorrer os produtos e, para cada um, use um if/elseif para aplicar descontos: produtos acima de R$ 100 recebem 10% de desconto, entre R$ 50 e R$ 100 recebem 5%, abaixo de R$ 50 sem desconto. Exiba o preço original, o desconto e o preço final de cada item, além do total da compra.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$produtos = [
+    ["nome" => "Notebook",   "preco" => 3500.00],
+    ["nome" => "Mouse",      "preco" => 80.00],
+    ["nome" => "Mousepad",   "preco" => 35.00],
+    ["nome" => "Headset",    "preco" => 150.00],
+    ["nome" => "Cabo USB",   "preco" => 25.00],
+];
+
+$total = 0;
+echo "=== CAIXA REGISTRADORA ===\n\n";
+
+foreach ($produtos as $item) {
+    $preco = $item["preco"];
+
+    if ($preco > 100) {
+        $desconto_pct = 10;
+    } elseif ($preco >= 50) {
+        $desconto_pct = 5;
+    } else {
+        $desconto_pct = 0;
+    }
+
+    $desconto = $preco * ($desconto_pct / 100);
+    $preco_final = $preco - $desconto;
+    $total += $preco_final;
+
+    $p = number_format($preco, 2, ',', '.');
+    $d = number_format($desconto, 2, ',', '.');
+    $f = number_format($preco_final, 2, ',', '.');
+
+    echo $item["nome"] . ":\n";
+    echo "  Original: R$ $p | Desconto: {$desconto_pct}% (-R$ $d) | Final: R$ $f\n";
+}
+
+$total_fmt = number_format($total, 2, ',', '.');
+echo "\n========================\n";
+echo "TOTAL: R$ $total_fmt\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(3)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(4)">🏆 Concluir Módulo!</button>
+        <a class="nav-lesson-btn primary" href="modulos.html">Ver todos os módulos →</a>
+      </div>
+    </div><!-- /lesson-4 -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- XP BAR -->
+<div class="xp-bar-total">
+  <span class="xp-label">XP Total</span>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill-global"></div></div>
+  <span class="xp-count" id="xp-count">0 / 85 XP</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentLesson = 0;
+const totalLessons = 5;
+let completedLessons = new Set();
+let totalXP = 0;
+const maxXP = 85;
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+function goToLesson(idx) {
+  document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lesson-' + idx).classList.add('active');
+  document.getElementById('lb-' + idx).classList.add('active');
+  currentLesson = idx;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function completeLesson(idx) {
+  if (completedLessons.has(idx)) return;
+  completedLessons.add(idx);
+  document.getElementById('lb-' + idx).classList.add('completed');
+  updateProgress();
+  showToast('✅ Aula ' + (idx + 1) + ' concluída!');
+  if (idx < totalLessons - 1) {
+    setTimeout(() => goToLesson(idx + 1), 1200);
+  } else {
+    setTimeout(() => showToast('🏆 Módulo 3 completo! Parabéns!'), 400);
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((completedLessons.size / totalLessons) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+/* ══════════════════════════════════════
+   XP SYSTEM
+══════════════════════════════════════ */
+function addXP(amount) {
+  totalXP = Math.min(totalXP + amount, maxXP);
+  const pct = (totalXP / maxXP) * 100;
+  document.getElementById('xp-fill-global').style.width = pct + '%';
+  document.getElementById('xp-count').textContent = totalXP + ' / ' + maxXP + ' XP';
+}
+
+/* ══════════════════════════════════════
+   QUIZ
+══════════════════════════════════════ */
+function answerQuiz(el, result, actId) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o === el) o.classList.add(result === 'correct' ? 'correct' : 'wrong');
+    else if (result === 'wrong' && o.getAttribute('onclick') && o.getAttribute('onclick').includes('correct'))
+      o.classList.add('correct');
+  });
+  const fb  = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  if (result === 'correct') {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correto!</strong> Muito bem! Continue assim.';
+    xpEl.classList.add('show');
+    const xpMap = { '0-0': 10, '3-0': 20, '4-0': 25 };
+    addXP(xpMap[actId] || 10);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Não foi dessa vez.</strong> Releia o conteúdo e tente novamente.';
+  }
+}
+
+/* ══════════════════════════════════════
+   DRAG & DROP
+══════════════════════════════════════ */
+let draggedEl = null;
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.drag-chip').forEach(chip => {
+    chip.addEventListener('dragstart', () => { draggedEl = chip; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend',   () => chip.classList.remove('dragging'));
+  });
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const slot = zone.querySelector('.zone-slot');
+      if (slot.firstChild) {
+        const prev = slot.firstChild;
+        document.getElementById('drag-chips').appendChild(prev);
+        prev.classList.add('drag-chip');
+        prev.setAttribute('draggable','true');
+        addDragEvents(prev);
+      }
+      const placed = document.createElement('span');
+      placed.className = 'placed-chip';
+      placed.textContent = draggedEl.dataset.val;
+      placed.setAttribute('data-val', draggedEl.dataset.val);
+      placed.onclick = () => {
+        document.getElementById('drag-chips').appendChild(draggedEl);
+        draggedEl.style.display = '';
+        placed.remove();
+      };
+      slot.appendChild(placed);
+      draggedEl.style.display = 'none';
+    });
+  });
+});
+function addDragEvents(el) {
+  el.addEventListener('dragstart', () => { draggedEl = el; el.classList.add('dragging'); });
+  el.addEventListener('dragend',   () => el.classList.remove('dragging'));
+}
+function checkDrag() {
+  let allCorrect = true;
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    const slot   = zone.querySelector('.zone-slot');
+    const placed = slot.querySelector('.placed-chip');
+    if (!placed) { allCorrect = false; return; }
+    if (placed.dataset.val === zone.dataset.answer) zone.classList.add('correct-zone');
+    else { zone.classList.add('wrong-zone'); allCorrect = false; }
+  });
+  if (allCorrect) {
+    document.getElementById('xp-1-0').classList.add('show');
+    addXP(15);
+    showToast('🎯 Perfeito! +15 XP');
+  } else {
+    showToast('❌ Algumas posições estão erradas. Tente novamente!');
+  }
+}
+function resetDrag() {
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    zone.querySelector('.zone-slot').innerHTML = '';
+  });
+  document.querySelectorAll('.drag-chip').forEach(c => c.style.display = '');
+  document.getElementById('xp-1-0').classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   FILL IN THE BLANK
+══════════════════════════════════════ */
+function checkFitb(actId, answers) {
+  const ids = ['fitb-0','fitb-1','fitb-2','fitb-3'];
+  let allCorrect = true;
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('correct','wrong');
+    const val = el.value.trim().toLowerCase();
+    const ans = (answers[i] || '').toLowerCase();
+    if (val === ans) el.classList.add('correct');
+    else { el.classList.add('wrong'); allCorrect = false; }
+  });
+  const fb   = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-'  + actId);
+  if (allCorrect) {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Perfeito!</strong> Você preencheu todas as lacunas corretamente!';
+    xpEl.classList.add('show');
+    addXP(15);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ Algumas respostas estão erradas. Revise a sintaxe do laço for!';
+  }
+}
+function resetFitb(ids, fbId, xpId) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('correct','wrong'); }
+  });
+  const fb = document.getElementById(fbId);
+  if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  const xp = document.getElementById(xpId);
+  if (xp) xp.classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX (Emulado)
+══════════════════════════════════════ */
+function runCode(editorId) {
+  const code  = document.getElementById(editorId).value;
+  const outId = 'out-' + editorId;
+  const outEl = document.getElementById(outId);
+  outEl.classList.remove('error');
+  try {
+    const result = emulatePHP(code);
+    outEl.innerHTML = result.error
+      ? `<span style="color:var(--red)">⚠ ${result.error}</span>`
+      : (result.output || '<span style="color:var(--muted);font-style:italic">(sem saída)</span>');
+    if (result.error) outEl.classList.add('error');
+  } catch(e) {
+    outEl.classList.add('error');
+    outEl.innerHTML = `<span style="color:var(--red)">⚠ Erro: ${e.message}</span>`;
+  }
+}
+
+function emulatePHP(code) {
+  let clean = code
+    .replace(/<\?php/gi,'')
+    .replace(/<\?=/gi,'echo ')
+    .replace(/\?>/gi,'')
+    .trim();
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  const env = {
+    PHP_VERSION:'8.2.0', PHP_OS:'Linux',
+    PHP_INT_MAX:'9223372036854775807', PHP_INT_MIN:'-9223372036854775808',
+    PHP_FLOAT_MAX:'1.7976931348623E+308', PHP_EOL:'\\n',
+    DIRECTORY_SEPARATOR:'/', __DIR__:'/var/www/phpmaster',
+    __FILE__:'/var/www/phpmaster/script.php', __LINE__:1,
+  };
+
+  clean = clean.replace(/date\s*\(\s*['"]d\/m\/Y['"]\s*\)/g, `"${dateStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]H:i:s['"]\s*\)/g,   `"${timeStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]Y['"]\s*\)/g, `"${now.getFullYear()}"`);
+
+  Object.entries(env).forEach(([k,v]) => {
+    clean = clean.replace(new RegExp('\\b'+k+'\\b','g'), JSON.stringify(String(v)));
+  });
+
+  // Remove comments
+  clean = clean.replace(/\/\/[^\n]*/g,'');
+  clean = clean.replace(/#[^\n]*/g,'');
+  clean = clean.replace(/\/\*[\s\S]*?\*\//g,'');
+
+  // define / const
+  clean = clean.replace(/define\s*\(\s*'([^']+)'\s*,\s*([^)]+)\)\s*;/g, (_,n,v)=>`let ${n} = ${v.trim()};`);
+  clean = clean.replace(/define\s*\(\s*"([^"]+)"\s*,\s*([^)]+)\)\s*;/g, (_,n,v)=>`let ${n} = ${v.trim()};`);
+  clean = clean.replace(/\bconst\s+([A-Z_]+)\s*=/g,'let $1 =');
+
+  // number_format
+  clean = clean.replace(/number_format\s*\(([^,]+),\s*(\d+)\s*\)/g,
+    (_, val, dec) => `parseFloat(${val}).toFixed(${dec})`);
+  clean = clean.replace(/number_format\s*\(([^,]+),\s*(\d+)\s*,\s*'([^']*)'\s*,\s*'([^']*)'\s*\)/g,
+    (_, val, dec, ds, ts) => `parseFloat(${val}).toFixed(${dec}).replace('.','${ds}')`);
+
+  // array_sum
+  clean = clean.replace(/array_sum\s*\(([^)]+)\)/g, '($1.reduce((a,b)=>a+b,0))');
+
+  // implode
+  clean = clean.replace(/implode\s*\(\s*([^,]+),\s*([^)]+)\)/g, '($2.join($1))');
+
+  // var_export
+  clean = clean.replace(/var_export\s*\(([^,]+),\s*true\s*\)/g,'JSON.stringify($1)');
+
+  // gettype
+  clean = clean.replace(/gettype\s*\(([^)]+)\)/g,
+    '(typeof $1==="number"?(Number.isInteger($1)?"integer":"double"):typeof $1==="boolean"?"boolean":$1===null?"NULL":Array.isArray($1)?"array":typeof $1)');
+
+  // $var → _var
+  clean = clean.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g,'_$1');
+
+  // match expression
+  clean = clean.replace(/\bmatch\s*\(([^)]+)\)\s*\{([\s\S]*?)\};/g, (_, expr, body) => {
+    const cases = [];
+    const defaultMatch = body.match(/default\s*=>\s*([^,\n]+)/);
+    const pairReg = /([^=,\n]+?)\s*=>\s*([^,\n]+)/g;
+    let m;
+    while ((m = pairReg.exec(body)) !== null) {
+      const k = m[1].trim();
+      const v = m[2].trim();
+      if (k === 'default') continue;
+      cases.push(`${expr} == ${k} ? ${v}`);
+    }
+    const def = defaultMatch ? defaultMatch[1].trim() : 'null';
+    return `(${cases.join(' : ')} : ${def})`;
+  });
+
+  // echo / print
+  clean = clean.replace(/\bprint\b/g,'echo');
+  clean = clean.replace(/\becho\s+/g,'__out(');
+  clean = clean.replace(/(__out\([^;{}\n]+);/g,(_,inner)=>inner+');');
+
+  // PHP_EOL
+  clean = clean.replace(/PHP_EOL/g,'"\\n"');
+
+  // foreach
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\s*=>\s*(_\w+)\)/g,
+    'for (let [$2, $3] of Object.entries($1))');
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\)/g,
+    'for (let $2 of Object.values($1))');
+
+  // array()
+  clean = clean.replace(/array\s*\(/g,'[');
+
+  // Concatenation . → +  (careful not to break floats)
+  clean = clean.replace(/([^.=!<>])\.([^.=])/g,'$1+$2');
+
+  // push shorthand: _arr[] = val → _arr.push(val)
+  clean = clean.replace(/(_\w+)\[\]\s*=/g,'$1.push(');
+  clean = clean.replace(/(\.push\([^;]+);/g,(m,inner)=>inner+');');
+
+  // bool/null keywords already fine in JS
+
+  const js = `
+    let __output = '';
+    function __out(v) {
+      let s = v===null?'':v===true?'1':v===false?'':String(v);
+      __output += s.replace(/\\\\n/g,'\\n').replace(/\\\\t/g,'\\t');
+    }
+    ${clean}
+    __output;
+  `;
+
+  try {
+    const result = new Function(js)();
+    return { output: result != null ? String(result) : '' };
+  } catch(e) {
+    return { error: 'Parse Error: ' + e.message };
+  }
+}
+
+function clearSandbox(editorId, outId) {
+  document.getElementById(editorId).value = '';
+  const outEl = document.getElementById(outId);
+  outEl.innerHTML = '<span class="out-placeholder">Clique em "Executar" para ver a saída...</span>';
+  outEl.classList.remove('error');
+}
+
+/* ══════════════════════════════════════
+   GABARITO TOGGLE
+══════════════════════════════════════ */
+function toggleGab(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════
+   COPY CODE
+══════════════════════════════════════ */
+function copyCode(btn) {
+  const body = btn.closest('.code-block').querySelector('.cb-body');
+  navigator.clipboard.writeText(body.innerText.replace(/^\d+\t/gm,'').trim()).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR MOBILE DRAWER
+══════════════════════════════════════ */
+(function(){
+  const toggle  = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function openSidebar()  { sidebar.classList.add('open');    overlay.classList.add('open');    toggle.textContent = '✕'; }
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); toggle.textContent = '☰'; }
+
+  toggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+  overlay.addEventListener('click', closeSidebar);
+
+  document.querySelectorAll('.lesson-btn').forEach(btn => {
+    btn.addEventListener('click', () => { if (window.innerWidth <= 900) closeSidebar(); });
+  });
+})();
+</script>
+</body>
+</html>
