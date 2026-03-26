@@ -1,339 +1,495 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PHPMaster — Módulos</title>
-<link rel="stylesheet" href="style.css">
-<style>
-  #modulos { background: var(--bg2); }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHPMaster — Módulos</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      #modulos {
+        background: var(--bg2);
+      }
 
-  .modulos-intro { max-width: 600px; margin-bottom: 60px; }
-  .modulos-intro p { color: var(--muted); line-height: 1.7; }
+      .modulos-intro {
+        max-width: 600px;
+        margin-bottom: 60px;
+      }
+      .modulos-intro p {
+        color: var(--muted);
+        line-height: 1.7;
+      }
 
-  .progress-track {
-    display: flex; align-items: center;
-    margin-bottom: 50px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-  .track-step { display: flex; align-items: center; flex-shrink: 0; }
-  .track-dot {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: .75rem; font-weight: 700;
-    border: 2px solid var(--border);
-    color: var(--muted);
-    background: var(--bg);
-    position: relative; z-index: 1;
-  }
-  .track-dot.done { background: var(--php); border-color: var(--php); color: white; }
-  .track-dot.active { background: var(--accent); border-color: var(--accent); color: var(--bg); box-shadow: 0 0 15px rgba(0,229,255,0.5); }
-  .track-line { width: 50px; height: 2px; background: var(--border); flex-shrink: 0; }
-  .track-line.done { background: linear-gradient(90deg, var(--php), var(--accent)); }
+      .progress-track {
+        display: flex;
+        align-items: center;
+        margin-bottom: 50px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      .track-step {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .track-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 2px solid var(--border);
+        color: var(--muted);
+        background: var(--bg);
+        position: relative;
+        z-index: 1;
+      }
+      .track-dot.done {
+        background: var(--php);
+        border-color: var(--php);
+        color: white;
+      }
+      .track-dot.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--bg);
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+      }
+      .track-line {
+        width: 50px;
+        height: 2px;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+      .track-line.done {
+        background: linear-gradient(90deg, var(--php), var(--accent));
+      }
 
-  .modulos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+      .modulos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 24px;
+      }
 
-  .modulo-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
-    transition: all .35s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .modulo-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--php), var(--accent));
-    opacity: 0; transition: opacity .3s;
-  }
-  .modulo-card:hover { transform: translateY(-6px); border-color: rgba(124,77,255,.4); }
-  .modulo-card:hover::before { opacity: 1; }
+      .modulo-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        transition: all 0.35s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .modulo-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--php), var(--accent));
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .modulo-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(124, 77, 255, 0.4);
+      }
+      .modulo-card:hover::before {
+        opacity: 1;
+      }
 
-  .modulo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+      .modulo-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
 
-  .modulo-level {
-    font-family: 'Space Mono', monospace; font-size: .7rem;
-    padding: 4px 10px; border-radius: 50px; border: 1px solid;
-  }
-  .level-init  { color: var(--green);  border-color: rgba(105,255,180,.3); background: rgba(105,255,180,.08); }
-  .level-basic { color: var(--accent); border-color: rgba(0,229,255,.3);   background: rgba(0,229,255,.08); }
-  .level-inter { color: var(--yellow); border-color: rgba(255,209,102,.3); background: rgba(255,209,102,.08); }
-  .level-adv   { color: var(--php3);  border-color: rgba(255,107,107,.3); background: rgba(255,107,107,.08); }
-  .level-pro   { color: var(--php);   border-color: rgba(124,77,255,.3);  background: rgba(124,77,255,.08); }
+      .modulo-level {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border-radius: 50px;
+        border: 1px solid;
+      }
+      .level-init {
+        color: var(--green);
+        border-color: rgba(105, 255, 180, 0.3);
+        background: rgba(105, 255, 180, 0.08);
+      }
+      .level-basic {
+        color: var(--accent);
+        border-color: rgba(0, 229, 255, 0.3);
+        background: rgba(0, 229, 255, 0.08);
+      }
+      .level-inter {
+        color: var(--yellow);
+        border-color: rgba(255, 209, 102, 0.3);
+        background: rgba(255, 209, 102, 0.08);
+      }
+      .level-adv {
+        color: var(--php3);
+        border-color: rgba(255, 107, 107, 0.3);
+        background: rgba(255, 107, 107, 0.08);
+      }
+      .level-pro {
+        color: var(--php);
+        border-color: rgba(124, 77, 255, 0.3);
+        background: rgba(124, 77, 255, 0.08);
+      }
 
-  .modulo-num { font-family: 'Space Mono', monospace; font-size: .75rem; color: var(--muted); }
+      .modulo-num {
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
 
-  .modulo-icon-wrap {
-    width: 52px; height: 52px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem; margin-bottom: 16px;
-    background: rgba(124,77,255,.08);
-    border: 1px solid rgba(124,77,255,.15);
-  }
-  .modulo-title { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
-  .modulo-desc  { color: var(--muted); font-size: .9rem; line-height: 1.6; margin-bottom: 20px; }
+      .modulo-icon-wrap {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 16px;
+        background: rgba(124, 77, 255, 0.08);
+        border: 1px solid rgba(124, 77, 255, 0.15);
+      }
+      .modulo-title {
+        font-family: "Syne", sans-serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .modulo-desc {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
 
-  .modulo-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .topic-tag {
-    font-size: .72rem; font-family: 'Space Mono', monospace;
-    background: rgba(255,255,255,.04);
-    border: 1px solid var(--border);
-    border-radius: 6px; padding: 3px 8px; color: var(--muted);
-  }
+      .modulo-topics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .topic-tag {
+        font-size: 0.72rem;
+        font-family: "Space Mono", monospace;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 3px 8px;
+        color: var(--muted);
+      }
 
-  .modulo-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-top: 16px; border-top: 1px solid var(--border);
-    font-size: .82rem; color: var(--muted);
-  }
-  .modulo-footer span { display: flex; align-items: center; gap: 6px; }
+      .modulo-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .modulo-footer span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
 
-  .arrow-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.2);
-    color: var(--accent); display: flex; align-items: center; justify-content: center;
-    font-size: .9rem; cursor: pointer; transition: all .2s;
-  }
-  .arrow-btn a{
-    text-decoration: none;
-    color: var(--accent); display: flex; align-items: center; justify-content: center;
-  }
-  .modulo-card:hover .arrow-btn { background: var(--accent); color: var(--bg); }
+      .arrow-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(0, 229, 255, 0.1);
+        border: 1px solid rgba(0, 229, 255, 0.2);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
 
-  @media (max-width: 900px) { .modulos-grid { grid-template-columns: 1fr; } }
-</style>
-</head>
-<body>
+      .modulo-card:hover .arrow-btn {
+        background: var(--accent);
+        color: var(--bg);
+        text-decoration: none;
+      }
 
-<div class="glow-blob glow-1"></div>
-<div class="glow-blob glow-2"></div>
-<canvas class="particle-canvas" id="particles"></canvas>
+      @media (max-width: 900px) {
+        .modulos-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+    <canvas class="particle-canvas" id="particles"></canvas>
 
-<nav>
-  <a class="logo" href="index.html">PHP<span>Master</span></a>
-  <ul class="nav-links">
-    <li><a href="index.html">Início</a></li>
-    <li><a href="motivacoes.html">Motivações</a></li>
-    <li><a href="modulos.html" class="active">Módulos</a></li>
-    <li><a href="contato.html" class="nav-cta">Contato</a></li>
-  </ul>
-</nav>
+    <nav>
+      <a class="logo" href="index.html">PHP<span>Master</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="motivacoes.html">Motivações</a></li>
+        <li><a href="modulos.html" class="active">Módulos</a></li>
+        <li><a href="contato.html" class="nav-cta">Contato</a></li>
+      </ul>
+    </nav>
 
-<section id="modulos">
-  <p class="section-label">// trilha de aprendizado</p>
-  <h2 class="section-title">Módulos do <em>Curso</em></h2>
-  <div class="modulos-intro">
-    <p>Do zero absoluto ao desenvolvedor avançado. Cada módulo se apoia no anterior, garantindo uma evolução sólida e contínua no seu aprendizado.</p>
-  </div>
-
-  <div class="progress-track">
-    <div class="track-step"><div class="track-dot done">01</div></div>
-    <div class="track-line done"></div>
-    <div class="track-step"><div class="track-dot active">02</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">03</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">04</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">05</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">06</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">07</div></div>
-    <div class="track-line"></div>
-    <div class="track-step"><div class="track-dot">08</div></div>
-  </div>
-
-  <div class="modulos-grid">
-
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-init">Iniciante</span>
-        <span class="modulo-num">MOD 01</span>
+    <section id="modulos">
+      <p class="section-label">// trilha de aprendizado</p>
+      <h2 class="section-title">Módulos do <em>Curso</em></h2>
+      <div class="modulos-intro">
+        <p>
+          Do zero absoluto ao desenvolvedor avançado. Cada módulo se apoia no
+          anterior, garantindo uma evolução sólida e contínua no seu
+          aprendizado.
+        </p>
       </div>
-      <div class="modulo-icon-wrap">🌱</div>
-      <div class="modulo-title">Introdução ao PHP</div>
-      <div class="modulo-desc">Entenda o que é PHP, como funciona o ambiente de desenvolvimento e escreva seus primeiros scripts.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">O que é PHP</span>
-        <span class="topic-tag">Instalação (XAMPP)</span>
-        <span class="topic-tag">Hello World</span>
-        <span class="topic-tag">Como PHP funciona</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 5 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-init">Iniciante</span>
-        <span class="modulo-num">MOD 02</span>
+      <div class="progress-track">
+        <div class="track-step"><div class="track-dot done">01</div></div>
+        <div class="track-line done"></div>
+        <div class="track-step"><div class="track-dot active">02</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">03</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">04</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">05</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">06</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">07</div></div>
+        <div class="track-line"></div>
+        <div class="track-step"><div class="track-dot">08</div></div>
       </div>
-      <div class="modulo-icon-wrap">🔤</div>
-      <div class="modulo-title">Variáveis e Tipos de Dados</div>
-      <div class="modulo-desc">Domine como o PHP armazena e manipula informações: strings, números, booleanos e mais.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">$variáveis</span>
-        <span class="topic-tag">Strings</span>
-        <span class="topic-tag">Int / Float</span>
-        <span class="topic-tag">Boolean</span>
-        <span class="topic-tag">Arrays</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 6 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-basic">Básico</span>
-        <span class="modulo-num">MOD 03</span>
-      </div>
-      <div class="modulo-icon-wrap">🔀</div>
-      <div class="modulo-title">Estruturas de Controle</div>
-      <div class="modulo-desc">Aprenda a tomar decisões e repetir ações dentro dos seus programas com lógica de programação.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">if / else</span>
-        <span class="topic-tag">switch</span>
-        <span class="topic-tag">for / while</span>
-        <span class="topic-tag">foreach</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 5 aulas</span>
-        <div class="arrow-btn"><a href="modulo-3.html">→</a></div>
-      </div>
-    </div>
+      <div class="modulos-grid">
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-init">Iniciante</span>
+            <span class="modulo-num">MOD 01</span>
+          </div>
+          <div class="modulo-icon-wrap">🌱</div>
+          <div class="modulo-title">Introdução ao PHP</div>
+          <div class="modulo-desc">
+            Entenda o que é PHP, como funciona o ambiente de desenvolvimento e
+            escreva seus primeiros scripts.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">O que é PHP</span>
+            <span class="topic-tag">Instalação (XAMPP)</span>
+            <span class="topic-tag">Hello World</span>
+            <span class="topic-tag">Como PHP funciona</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 5 aulas</span>
+            <div class="arrow-btn">
+              <a class="arrow-btn" href="modulo-1.html">→</a>
+            </div>
+          </div>
+        </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-basic">Básico</span>
-        <span class="modulo-num">MOD 04</span>
-      </div>
-      <div class="modulo-icon-wrap">⚙️</div>
-      <div class="modulo-title">Funções e Escopo</div>
-      <div class="modulo-desc">Organize seu código com funções reutilizáveis, parâmetros, retornos e entenda o escopo de variáveis.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">function()</span>
-        <span class="topic-tag">Parâmetros</span>
-        <span class="topic-tag">Return</span>
-        <span class="topic-tag">Funções nativas</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 5 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-init">Iniciante</span>
+            <span class="modulo-num">MOD 02</span>
+          </div>
+          <div class="modulo-icon-wrap">🔤</div>
+          <div class="modulo-title">Variáveis e Tipos de Dados</div>
+          <div class="modulo-desc">
+            Domine como o PHP armazena e manipula informações: strings, números,
+            booleanos e mais.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">$variáveis</span>
+            <span class="topic-tag">Strings</span>
+            <span class="topic-tag">Int / Float</span>
+            <span class="topic-tag">Boolean</span>
+            <span class="topic-tag">Arrays</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 6 aulas</span>
+            <div class="arrow-btn">→</div>
+          </div>
+        </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-inter">Intermediário</span>
-        <span class="modulo-num">MOD 05</span>
-      </div>
-      <div class="modulo-icon-wrap">🗄️</div>
-      <div class="modulo-title">PHP com MySQL</div>
-      <div class="modulo-desc">Conecte seu PHP a bancos de dados reais. Crie, leia, atualize e delete registros com PDO e MySQLi.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">PDO</span>
-        <span class="topic-tag">CRUD</span>
-        <span class="topic-tag">SQL básico</span>
-        <span class="topic-tag">Consultas</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 7 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-basic">Básico</span>
+            <span class="modulo-num">MOD 03</span>
+          </div>
+          <div class="modulo-icon-wrap">🔀</div>
+          <div class="modulo-title">Estruturas de Controle</div>
+          <div class="modulo-desc">
+            Aprenda a tomar decisões e repetir ações dentro dos seus programas
+            com lógica de programação.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">if / else</span>
+            <span class="topic-tag">switch</span>
+            <span class="topic-tag">for / while</span>
+            <span class="topic-tag">foreach</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 5 aulas</span>
+            <a class="arrow-btn" href="modulo-3.html">→</a>
+          </div>
+        </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-inter">Intermediário</span>
-        <span class="modulo-num">MOD 06</span>
-      </div>
-      <div class="modulo-icon-wrap">🧩</div>
-      <div class="modulo-title">Orientação a Objetos</div>
-      <div class="modulo-desc">Escreva PHP moderno com POO: classes, objetos, herança, encapsulamento e polimorfismo.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">Classes</span>
-        <span class="topic-tag">Herança</span>
-        <span class="topic-tag">Interfaces</span>
-        <span class="topic-tag">Namespaces</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 8 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-basic">Básico</span>
+            <span class="modulo-num">MOD 04</span>
+          </div>
+          <div class="modulo-icon-wrap">⚙️</div>
+          <div class="modulo-title">Funções e Escopo</div>
+          <div class="modulo-desc">
+            Organize seu código com funções reutilizáveis, parâmetros, retornos
+            e entenda o escopo de variáveis.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">function()</span>
+            <span class="topic-tag">Parâmetros</span>
+            <span class="topic-tag">Return</span>
+            <span class="topic-tag">Funções nativas</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 5 aulas</span>
+            <a class="arrow-btn" href="modulo-04.html">→</a>
+          </div>
+        </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-adv">Avançado</span>
-        <span class="modulo-num">MOD 07</span>
-      </div>
-      <div class="modulo-icon-wrap">🔐</div>
-      <div class="modulo-title">Segurança e Boas Práticas</div>
-      <div class="modulo-desc">Proteja suas aplicações contra ataques comuns como SQL Injection, XSS e CSRF. Criptografia e autenticação.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">SQL Injection</span>
-        <span class="topic-tag">XSS</span>
-        <span class="topic-tag">Hashing</span>
-        <span class="topic-tag">Sessions</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 6 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-inter">Intermediário</span>
+            <span class="modulo-num">MOD 05</span>
+          </div>
+          <div class="modulo-icon-wrap">🗄️</div>
+          <div class="modulo-title">PHP com MySQL</div>
+          <div class="modulo-desc">
+            Conecte seu PHP a bancos de dados reais. Crie, leia, atualize e
+            delete registros com PDO e MySQLi.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">PDO</span>
+            <span class="topic-tag">CRUD</span>
+            <span class="topic-tag">SQL básico</span>
+            <span class="topic-tag">Consultas</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 7 aulas</span>
+            <div class="arrow-btn">→</div>
+          </div>
+        </div>
 
-    <div class="modulo-card">
-      <div class="modulo-header">
-        <span class="modulo-level level-pro">Expert</span>
-        <span class="modulo-num">MOD 08</span>
-      </div>
-      <div class="modulo-icon-wrap">🚀</div>
-      <div class="modulo-title">APIs REST com PHP</div>
-      <div class="modulo-desc">Construa APIs RESTful profissionais, consuma serviços externos e integre com front-ends modernos.</div>
-      <div class="modulo-topics">
-        <span class="topic-tag">REST API</span>
-        <span class="topic-tag">JSON</span>
-        <span class="topic-tag">JWT</span>
-        <span class="topic-tag">cURL</span>
-        <span class="topic-tag">Projeto final</span>
-      </div>
-      <div class="modulo-footer">
-        <span>📚 8 aulas</span>
-        <div class="arrow-btn">→</div>
-      </div>
-    </div>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-inter">Intermediário</span>
+            <span class="modulo-num">MOD 06</span>
+          </div>
+          <div class="modulo-icon-wrap">🧩</div>
+          <div class="modulo-title">Orientação a Objetos</div>
+          <div class="modulo-desc">
+            Escreva PHP moderno com POO: classes, objetos, herança,
+            encapsulamento e polimorfismo.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">Classes</span>
+            <span class="topic-tag">Herança</span>
+            <span class="topic-tag">Interfaces</span>
+            <span class="topic-tag">Namespaces</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 8 aulas</span>
+            <div class="arrow-btn">→</div>
+          </div>
+        </div>
 
-  </div>
-</section>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-adv">Avançado</span>
+            <span class="modulo-num">MOD 07</span>
+          </div>
+          <div class="modulo-icon-wrap">🔐</div>
+          <div class="modulo-title">Segurança e Boas Práticas</div>
+          <div class="modulo-desc">
+            Proteja suas aplicações contra ataques comuns como SQL Injection,
+            XSS e CSRF. Criptografia e autenticação.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">SQL Injection</span>
+            <span class="topic-tag">XSS</span>
+            <span class="topic-tag">Hashing</span>
+            <span class="topic-tag">Sessions</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 6 aulas</span>
+            <div class="arrow-btn">→</div>
+          </div>
+        </div>
 
-<footer>
-  <div class="footer-logo">PHP<span>Master</span></div>
-  <p>Projeto de Extensão Curricular — Engenharia de Software</p>
-  <p style="color:var(--muted);font-size:.8rem">Feito com ❤️ para a comunidade</p>
-</footer>
+        <div class="modulo-card">
+          <div class="modulo-header">
+            <span class="modulo-level level-pro">Expert</span>
+            <span class="modulo-num">MOD 08</span>
+          </div>
+          <div class="modulo-icon-wrap">🚀</div>
+          <div class="modulo-title">APIs REST com PHP</div>
+          <div class="modulo-desc">
+            Construa APIs RESTful profissionais, consuma serviços externos e
+            integre com front-ends modernos.
+          </div>
+          <div class="modulo-topics">
+            <span class="topic-tag">REST API</span>
+            <span class="topic-tag">JSON</span>
+            <span class="topic-tag">JWT</span>
+            <span class="topic-tag">cURL</span>
+            <span class="topic-tag">Projeto final</span>
+          </div>
+          <div class="modulo-footer">
+            <span>📚 8 aulas</span>
+            <div class="arrow-btn">→</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<script src="particles.js"></script>
-<script>
-  document.querySelectorAll('.modulo-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - .5) * 10;
-      const y = ((e.clientY - rect.top) / rect.height - .5) * -10;
-      card.style.transform = `translateY(-6px) perspective(600px) rotateY(${x}deg) rotateX(${y}deg)`;
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-  });
-</script>
-</body>
+    <footer>
+      <div class="footer-logo">PHP<span>Master</span></div>
+      <p>Projeto de Extensão Curricular — Engenharia de Software</p>
+      <p style="color: var(--muted); font-size: 0.8rem">
+        Feito com ❤️ para a comunidade
+      </p>
+    </footer>
+
+    <script src="particles.js"></script>
+    <script>
+      document.querySelectorAll(".modulo-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+          const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
+          card.style.transform = `translateY(-6px) perspective(600px) rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "";
+        });
+      });
+    </script>
+  </body>
 </html>
