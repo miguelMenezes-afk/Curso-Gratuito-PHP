@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Módulo 1: Introdução ao PHP</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════ */
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #0f1525;
+  --bg3:     #141c30;
+  --card:    #161e35;
+  --border:  #1f2d50;
+  --php:     #7c4dff;
+  --accent:  #00e5ff;
+  --text:    #e8eaf6;
+  --muted:   #8892b0;
+  --white:   #ffffff;
+  --green:   #69ffb4;
+  --yellow:  #ffd166;
+  --red:     #ff6b6b;
+  --radius:  16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ══════════════════════════════════════
+   BLOBS & PARTICLES
+══════════════════════════════════════ */
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1;}
+.glow-1{width:500px;height:500px;background:var(--php);top:-100px;right:-100px;}
+.glow-2{width:400px;height:400px;background:var(--accent);bottom:0;left:-100px;}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);text-decoration:none;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg)!important;padding:9px 20px;border-radius:50px;font-weight:700!important;}
+
+/* ══════════════════════════════════════
+   LAYOUT: SIDEBAR + MAIN
+══════════════════════════════════════ */
+.layout{display:block;min-height:100vh;padding-top:60px;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;top:60px;left:0;bottom:0;width:280px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;z-index:100;
+  padding:28px 0 60px;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.sidebar-header{padding:0 22px 20px;border-bottom:1px solid var(--border);}
+.mod-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:50px;padding:4px 12px;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--php);
+  margin-bottom:10px;
+}
+.sidebar-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3;color:var(--white);}
+.sidebar-progress{margin-top:14px;}
+.prog-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;}
+
+.sidebar-nav{padding:16px 0;}
+.sidebar-section{padding:8px 22px 4px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+.lesson-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 22px;
+  background:none;border:none;cursor:pointer;
+  text-align:left;transition:all .2s;
+  border-left:3px solid transparent;
+}
+.lesson-btn:hover{background:rgba(255,255,255,.04);}
+.lesson-btn.active{background:rgba(124,77,255,.1);border-left-color:var(--php);}
+.lesson-btn.completed{border-left-color:var(--green);}
+
+.l-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+}
+.lesson-btn.active .l-icon{background:rgba(124,77,255,.2);border-color:rgba(124,77,255,.5);}
+.lesson-btn.completed .l-icon{background:rgba(105,255,180,.1);border-color:rgba(105,255,180,.3);}
+
+.l-info{flex:1;}
+.l-num{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.l-title{font-size:.88rem;font-weight:500;color:var(--text);margin-top:1px;}
+.lesson-btn.active .l-title{color:var(--white);font-weight:600;}
+
+.l-check{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .2s;}
+.lesson-btn.completed .l-check{opacity:1;}
+
+/* ── MAIN CONTENT ── */
+.main{margin-left:280px;min-height:100vh;max-width:100%;overflow-x:hidden;}
+
+/* ══════════════════════════════════════
+   LESSON PANEL
+══════════════════════════════════════ */
+.lesson-panel{display:none;animation:fadeUp .4s ease;}
+.lesson-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.lesson-hero{
+  padding:48px 6% 36px;
+  background:linear-gradient(135deg,rgba(124,77,255,.06),rgba(0,229,255,.04));
+  border-bottom:1px solid var(--border);
+}
+.lesson-body{padding:48px 6%;}
+.lesson-hero > *,.lesson-body > *{max-width:900px;}
+.lesson-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lesson-num-tag{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);padding:4px 10px;border-radius:50px;}
+.lesson-dur{font-size:.8rem;color:var(--muted);}
+.lesson-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-1px;margin-bottom:12px;}
+.lesson-title em{font-style:normal;color:var(--accent);}
+.lesson-desc{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px;}
+
+/* ── CONTENT BLOCKS ── */
+.content-block{margin-bottom:40px;}
+
+.block-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.block-title::before{
+  content:'';width:4px;height:22px;border-radius:2px;
+  background:linear-gradient(180deg,var(--php),var(--accent));
+  display:block;flex-shrink:0;
+}
+
+.prose{color:var(--muted);line-height:1.85;font-size:1rem;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose em{color:var(--accent);font-style:normal;}
+.prose p{margin-bottom:14px;}
+.prose ul{padding-left:20px;margin-bottom:14px;}
+.prose ul li{margin-bottom:8px;}
+.prose a{color:var(--accent);text-decoration:none;}
+
+/* CALLOUT BOXES */
+.callout{
+  border-radius:14px;padding:20px 22px;margin:24px 0;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.callout-info{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.callout-tip{background:rgba(105,255,180,.06);border:1px solid rgba(105,255,180,.2);}
+.callout-warn{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;font-size:.9rem;margin-bottom:4px;color:var(--white);}
+.callout-info .callout-body strong{color:var(--accent);}
+.callout-tip .callout-body strong{color:var(--green);}
+.callout-warn .callout-body strong{color:var(--yellow);}
+.callout-body p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+
+/* CODE BLOCKS */
+.code-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin:20px 0;
+}
+.cb-header{
+  background:var(--bg3);padding:11px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.cb-dots{display:flex;gap:6px;}
+.cb-dot{width:10px;height:10px;border-radius:50%;}
+.cb-dot:nth-child(1){background:#ff5f57;}
+.cb-dot:nth-child(2){background:#febc2e;}
+.cb-dot:nth-child(3){background:#28c840;}
+.cb-lang{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.cb-copy{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:3px 10px;cursor:pointer;transition:all .2s;
+}
+.cb-copy:hover{color:var(--accent);border-color:var(--accent);}
+.cb-body{
+  padding:22px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.85;overflow-x:auto;
+}
+.c-tag{color:#ff6b9d;} .c-var{color:#82aaff;} .c-str{color:#c3e88d;}
+.c-kw{color:#c792ea;}  .c-fn{color:#89ddff;}  .c-num{color:#f78c6c;}
+.c-cmt{color:#546e7a;font-style:italic;} .c-out{color:#ffd166;}
+.ln{color:#2d3d6b;user-select:none;margin-right:16px;}
+
+/* ── DIVIDER ── */
+.section-divider{
+  display:flex;align-items:center;gap:14px;margin:48px 0 36px;
+}
+.section-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.section-divider span{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--muted);letter-spacing:2px;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   INTERACTIVE ACTIVITY
+══════════════════════════════════════ */
+.activity-card{
+  background:var(--card);border:1px solid rgba(0,229,255,.25);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(0,229,255,.05);
+}
+.activity-header{
+  background:linear-gradient(135deg,rgba(124,77,255,.15),rgba(0,229,255,.1));
+  padding:20px 28px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid rgba(0,229,255,.15);
+}
+.activity-icon{font-size:1.6rem;}
+.activity-header-info{flex:1;}
+.activity-tag{
+  font-family:'Space Mono',monospace;font-size:.67rem;
+  color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+}
+.activity-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+.activity-body{padding:28px;}
+
+/* QUIZ */
+.quiz-question{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:12px;padding:14px 18px;cursor:pointer;
+  transition:all .2s;font-size:.95rem;
+}
+.quiz-opt:hover{border-color:var(--php);background:rgba(124,77,255,.06);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(105,255,180,.08);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+.quiz-opt-letter{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;
+  transition:all .2s;
+}
+.quiz-opt.correct .quiz-opt-letter{background:var(--green);color:var(--bg);border-color:var(--green);}
+.quiz-opt.wrong .quiz-opt-letter{background:var(--red);color:var(--white);border-color:var(--red);}
+.quiz-feedback{
+  padding:14px 18px;border-radius:12px;font-size:.9rem;
+  display:none;margin-bottom:16px;line-height:1.5;
+}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct-fb{background:rgba(105,255,180,.08);border:1px solid rgba(105,255,180,.3);color:var(--green);}
+.quiz-feedback.wrong-fb{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+
+/* DRAG & DROP */
+.drag-area{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.drag-chip{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 16px;
+  font-family:'Space Mono',monospace;font-size:.8rem;
+  cursor:grab;user-select:none;transition:all .2s;
+  color:var(--accent);
+}
+.drag-chip:hover{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drag-chip.dragging{opacity:.4;}
+.drop-zones{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.drop-zone{
+  min-height:50px;border:2px dashed var(--border);
+  border-radius:12px;padding:10px 16px;
+  display:flex;align-items:center;gap:12px;
+  transition:all .2s;font-size:.9rem;color:var(--muted);
+}
+.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drop-zone .zone-label{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);min-width:120px;}
+.drop-zone .placed-chip{
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:6px;padding:5px 12px;font-family:'Space Mono',monospace;
+  font-size:.8rem;color:var(--php);cursor:pointer;
+}
+.drop-zone.correct-zone{border-color:var(--green);background:rgba(105,255,180,.06);}
+.drop-zone.wrong-zone{border-color:var(--red);background:rgba(255,107,107,.06);}
+
+/* FILL IN THE BLANK */
+.fitb-sentence{
+  font-size:1rem;line-height:2.2;color:var(--text);margin-bottom:20px;
+}
+.fitb-input{
+  display:inline-block;background:var(--bg2);
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:4px 12px;font-family:'Space Mono',monospace;
+  font-size:.85rem;color:var(--accent);outline:none;
+  width:140px;text-align:center;transition:all .2s;
+  vertical-align:middle;
+}
+.fitb-input:focus{border-color:var(--accent);}
+.fitb-input.correct{border-color:var(--green);color:var(--green);}
+.fitb-input.wrong{border-color:var(--red);color:var(--red);}
+
+/* XP / PROGRESS REWARD */
+.xp-reward{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(105,255,180,.08),rgba(0,229,255,.05));
+  border:1px solid rgba(105,255,180,.25);border-radius:12px;
+  padding:14px 20px;margin-top:16px;display:none;
+}
+.xp-reward.show{display:flex;}
+.xp-icon{font-size:1.5rem;}
+.xp-text{font-size:.9rem;}
+.xp-text strong{color:var(--green);}
+
+/* ACTIVITY ACTIONS */
+.activity-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.act-btn{
+  padding:10px 22px;border-radius:10px;font-family:'Syne',sans-serif;
+  font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s;border:none;
+}
+.act-btn-primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);}
+.act-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3);}
+.act-btn-secondary{background:var(--bg2);color:var(--muted);border:1px solid var(--border);}
+.act-btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX
+══════════════════════════════════════ */
+.sandbox-wrap{
+  background:var(--bg2);border:1px solid rgba(124,77,255,.3);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(124,77,255,.07);
+}
+.sandbox-header{
+  background:var(--bg3);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.sandbox-title{display:flex;align-items:center;gap:10px;}
+.sandbox-title .s-dots{display:flex;gap:5px;}
+.sandbox-title .s-dot{width:10px;height:10px;border-radius:50%;}
+.s-dot:nth-child(1){background:#ff5f57;}
+.s-dot:nth-child(2){background:#febc2e;}
+.s-dot:nth-child(3){background:#28c840;}
+.sandbox-title span{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;}
+.sandbox-actions{display:flex;gap:10px;align-items:center;}
+.sandbox-tag{
+  font-family:'Space Mono',monospace;font-size:.68rem;
+  color:var(--php);background:rgba(124,77,255,.12);
+  border:1px solid rgba(124,77,255,.3);border-radius:50px;padding:4px 10px;
+}
+.run-btn{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;padding:9px 20px;border-radius:8px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;
+  cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;
+}
+.run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.35);}
+.run-btn:active{transform:scale(.97);}
+
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sandbox-editor-wrap{border-right:1px solid var(--border);}
+.sandbox-pane-label{
+  padding:10px 18px;background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+.sandbox-pane-label .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.sandbox-editor{
+  width:100%;min-height:200px;padding:20px;resize:none;
+  background:transparent;border:none;outline:none;
+  font-family:'Space Mono',monospace;font-size:.83rem;
+  line-height:1.8;color:var(--text);tab-size:2;
+}
+.sandbox-output{
+  padding:20px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.8;min-height:200px;
+  color:var(--green);white-space:pre-wrap;word-break:break-word;
+}
+.sandbox-output.error{color:var(--red);}
+.sandbox-output .out-placeholder{color:var(--muted);font-style:italic;}
+
+.sandbox-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  font-size:.78rem;color:var(--muted);
+}
+.sandbox-note{font-family:'Space Mono',monospace;}
+.sandbox-clear{
+  margin-left:auto;background:none;border:1px solid var(--border);
+  color:var(--muted);border-radius:6px;padding:4px 12px;
+  font-size:.75rem;cursor:pointer;transition:all .2s;
+}
+.sandbox-clear:hover{border-color:var(--red);color:var(--red);}
+
+/* ══════════════════════════════════════
+   EXERCISES
+══════════════════════════════════════ */
+.exercises-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:36px;margin-top:48px;
+}
+.ex-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  padding-bottom:20px;border-bottom:1px solid var(--border);
+}
+.ex-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.ex-header-info{}
+.ex-header-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;}
+.ex-header-info p{color:var(--muted);font-size:.88rem;margin-top:3px;}
+
+.exercise{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.exercise:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ex-num{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--yellow);margin-bottom:8px;letter-spacing:1px;
+}
+.ex-question{font-size:.98rem;line-height:1.65;color:var(--text);margin-bottom:16px;}
+.ex-question strong{color:var(--accent);}
+
+/* GABARITO */
+.gabarito-toggle{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:9px 16px;color:var(--muted);
+  font-size:.83rem;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;
+  margin-top:12px;
+}
+.gabarito-toggle:hover{border-color:var(--yellow);color:var(--yellow);}
+.gabarito-toggle .arrow{transition:transform .25s;}
+.gabarito-toggle.open .arrow{transform:rotate(180deg);}
+.gabarito-body{
+  margin-top:14px;padding:20px;
+  background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.2);
+  border-radius:12px;display:none;animation:fadeUp .3s ease;
+}
+.gabarito-body.open{display:block;}
+.gabarito-body .gab-label{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);
+  letter-spacing:2px;margin-bottom:12px;
+}
+.gabarito-body .prose{font-size:.9rem;}
+
+/* ══════════════════════════════════════
+   LESSON NAVIGATION
+══════════════════════════════════════ */
+.lesson-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 6%;border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.nav-lesson-btn{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;cursor:pointer;
+  transition:all .25s;text-decoration:none;
+  font-size:.9rem;color:var(--muted);
+}
+.nav-lesson-btn:hover{border-color:var(--accent);color:var(--text);}
+.nav-lesson-btn.primary{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;font-weight:700;
+}
+.nav-lesson-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.3);color:var(--bg);}
+.nav-lesson-btn.disabled{opacity:.3;pointer-events:none;}
+
+.complete-btn{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--green),#00b88a);
+  color:var(--bg);border:none;border-radius:12px;padding:12px 24px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .25s;
+}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(105,255,180,.3);}
+
+/* ══════════════════════════════════════
+   XP BAR TOTAL
+══════════════════════════════════════ */
+.xp-bar-total{
+  position:fixed;bottom:0;left:280px;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:12px 5%;display:flex;align-items:center;gap:16px;
+  z-index:50;
+}
+.xp-label{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;width:0%;}
+.xp-count{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);white-space:nowrap;}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:60px;right:28px;
+  background:var(--card);border:1px solid var(--green);color:var(--green);
+  border-radius:14px;padding:14px 20px;font-size:.88rem;font-weight:500;
+  z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+
+/* ── Botão hambúrguer (só visível em mobile) ── */
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;cursor:pointer;
+  color:var(--muted);font-size:1.1rem;line-height:1;
+  transition:all .2s;
+}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Overlay escuro quando sidebar aberta */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:99;
+}
+.sidebar-overlay.open{display:block;}
+
+@media(max-width:900px){
+  /* Nav */
+  .menu-toggle{display:block;}
+  .nav-links li:not(:last-child){display:none;}
+
+  /* Layout */
+  .layout{grid-template-columns:1fr;}
+  .main{margin-left:0;}
+
+  /* Sidebar: vira drawer deslizante */
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .3s ease;
+    width:min(280px, 85vw);
+    z-index:150;
+  }
+  .sidebar.open{transform:translateX(0);}
+
+  /* Conteúdo */
+  .lesson-hero,.lesson-body{padding-left:5%;padding-right:5%;}
+
+  /* Sandbox: empilha editor em cima da saída */
+  .sandbox-grid{grid-template-columns:1fr;}
+  .sandbox-editor-wrap{border-right:none;border-bottom:1px solid var(--border);}
+
+  /* XP bar */
+  .xp-bar-total{left:0;}
+
+  /* Navegação entre aulas */
+  .lesson-nav{flex-wrap:wrap;gap:10px;padding:20px 5%;}
+  .nav-lesson-btn{flex:1;min-width:120px;justify-content:center;}
+
+  /* Drop zones */
+  .drop-zone .zone-label{min-width:80px;font-size:.68rem;}
+
+  /* Fill in the blank */
+  .fitb-input{width:100px;font-size:.78rem;}
+
+  /* Exercícios */
+  .exercises-section{padding:24px 18px;}
+
+  /* Callout */
+  .callout{flex-direction:column;gap:8px;}
+}
+
+@media(max-width:480px){
+  /* Título da aula */
+  .lesson-title{font-size:1.5rem;}
+
+  /* Sandbox header: empilha actions */
+  .sandbox-header{flex-wrap:wrap;gap:8px;}
+  .sandbox-actions{flex-wrap:wrap;}
+
+  /* Atividades */
+  .activity-header{flex-wrap:wrap;}
+  .activity-body{padding:18px;}
+
+  /* Botões de atividade */
+  .activity-actions{flex-direction:column;}
+  .act-btn{width:100%;text-align:center;}
+
+  /* Navegação entre aulas */
+  .nav-lesson-btn span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu de aulas">☰</button>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="mod-badge">📦 MOD 01</div>
+      <h2>Introdução ao PHP</h2>
+      <div class="sidebar-progress">
+        <div class="prog-label"><span>Progresso</span><span id="prog-pct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Aulas</div>
+      <button class="lesson-btn active" onclick="goToLesson(0)" id="lb-0">
+        <div class="l-icon">🌐</div>
+        <div class="l-info">
+          <div class="l-num">AULA 01</div>
+          <div class="l-title">O que é PHP?</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(1)" id="lb-1">
+        <div class="l-icon">⚙️</div>
+        <div class="l-info">
+          <div class="l-num">AULA 02</div>
+          <div class="l-title">Instalação (XAMPP)</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(2)" id="lb-2">
+        <div class="l-icon">👋</div>
+        <div class="l-info">
+          <div class="l-num">AULA 03</div>
+          <div class="l-title">Hello World!</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(3)" id="lb-3">
+        <div class="l-icon">🔄</div>
+        <div class="l-info">
+          <div class="l-num">AULA 04</div>
+          <div class="l-title">Como PHP Funciona</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(4)" id="lb-4">
+        <div class="l-icon">🏁</div>
+        <div class="l-info">
+          <div class="l-num">AULA 05</div>
+          <div class="l-title">Sintaxe e Estrutura</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ AULA 1 ══════════ -->
+    <div class="lesson-panel active" id="lesson-0">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 01 / 05</span>
+          <span class="lesson-dur">⏱ ~15 min</span>
+        </div>
+        <h1 class="lesson-title">O que é <em>PHP</em>?</h1>
+        <p class="lesson-desc">Entenda a história, a finalidade e por que PHP continua sendo uma das linguagens mais relevantes do desenvolvimento web.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <!-- BLOCO 1 -->
+        <div class="content-block">
+          <h2 class="block-title">A história do PHP</h2>
+          <div class="prose">
+            <p>PHP nasceu em <strong>1994</strong> quando Rasmus Lerdorf criou um conjunto de scripts em linguagem C para monitorar acessos ao seu currículo online. Ele chamou esse conjunto de <em>Personal Home Page Tools</em> — daí a sigla <strong>PHP</strong>.</p>
+            <p>Com o tempo, a linguagem evoluiu muito. Hoje, PHP significa <strong>PHP: Hypertext Preprocessor</strong> (um acrônimo recursivo, bem ao estilo dos programadores!). Na versão atual — <strong>PHP 8</strong> — a linguagem é moderna, rápida e cheia de recursos avançados.</p>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Curiosidade</strong>
+              <p>PHP é usado por <strong>78%</strong> dos sites que possuem um servidor back-end identificável — incluindo WordPress, Facebook (em suas origens) e Wikipedia.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCO 2 -->
+        <div class="content-block">
+          <h2 class="block-title">Para que serve o PHP?</h2>
+          <div class="prose">
+            <p>PHP é uma linguagem de programação <strong>server-side</strong> (lado do servidor), ou seja, o código PHP é executado no servidor web, e o resultado enviado ao navegador do usuário é apenas <strong>HTML puro</strong>.</p>
+            <p>Com PHP você pode:</p>
+            <ul>
+              <li>Criar páginas web dinâmicas (conteúdo que muda conforme o usuário)</li>
+              <li>Conectar e manipular bancos de dados (MySQL, PostgreSQL etc.)</li>
+              <li>Processar formulários, logins e cadastros</li>
+              <li>Criar APIs REST para aplicações mobile e SPAs</li>
+              <li>Gerenciar arquivos, sessões e cookies</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- BLOCO 3 -->
+        <div class="content-block">
+          <h2 class="block-title">PHP vs outras linguagens</h2>
+          <div class="prose">
+            <p>PHP não é a única linguagem back-end — existem também <strong>Python</strong> (Django/Flask), <strong>Node.js</strong> (JavaScript), <strong>Ruby on Rails</strong> e <strong>Java</strong>. Mas PHP tem vantagens claras:</p>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✅</div>
+            <div class="callout-body">
+              <strong>Vantagens do PHP</strong>
+              <p>Hosting barato e amplamente disponível · Curva de aprendizado suave · Enorme ecossistema (WordPress, Laravel, Symfony) · Integração nativa com MySQL · Documentação excelente em português.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 1: QUIZ -->
+        <div class="activity-card" id="act-0-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz rápido · +10 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">O que significa a sigla PHP nos dias de hoje?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">A</div> Personal Home Page</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','0-0')"><div class="quiz-opt-letter">B</div> PHP: Hypertext Preprocessor</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">C</div> Public Hypertext Protocol</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">D</div> Page Hyper Processor</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-0-0"></div>
+            <div class="xp-reward" id="xp-0-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+10 XP ganhos!</strong> PHP é um acrônimo recursivo.</div></div>
+          </div>
+        </div>
+
+        <!-- BLOCO 4 -->
+        <div class="content-block" style="margin-top:40px;">
+          <h2 class="block-title">Onde o PHP é executado?</h2>
+          <div class="prose">
+            <p>Para que o PHP funcione, você precisa de um <strong>servidor web</strong> com o módulo PHP instalado. O fluxo é simples:</p>
+            <ol style="padding-left:20px;margin-bottom:14px;">
+              <li style="margin-bottom:8px;">O usuário acessa uma URL no navegador</li>
+              <li style="margin-bottom:8px;">O servidor web recebe a requisição e repassa ao interpretador PHP</li>
+              <li style="margin-bottom:8px;">O PHP processa o código, consulta o banco de dados se necessário</li>
+              <li style="margin-bottom:8px;">O resultado (HTML) é enviado de volta ao navegador</li>
+            </ol>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Importante</strong>
+              <p>Abrir um arquivo <code style="font-family:'Space Mono',monospace;color:var(--yellow);">.php</code> diretamente no navegador <strong>não funciona</strong>. Você precisa de um servidor local como XAMPP — veremos isso na próxima aula!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 1 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Questões de fixação do conteúdo desta aula</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique com suas próprias palavras a diferença entre uma linguagem <strong>client-side</strong> (como JavaScript no navegador) e uma linguagem <strong>server-side</strong> (como PHP). Dê um exemplo de situação em que cada uma seria mais adequada.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Client-side:</strong> o código é executado no próprio navegador do usuário. JavaScript é o exemplo clássico — ele roda sem precisar de servidor. É ideal para <em>interatividade visual</em> (animações, validações de formulário em tempo real, manipulação do DOM).</p>
+                <p><strong>Server-side:</strong> o código roda no servidor antes de enviar a resposta ao navegador. PHP é server-side. É ideal quando você precisa <em>acessar dados privados</em> — como consultar um banco de dados, verificar senhas ou processar pagamentos.</p>
+                <p>Exemplo: ao fazer login numa rede social, o JavaScript valida se o campo de e-mail está no formato correto (client-side), mas quem verifica se a senha bate com o banco de dados é o PHP (server-side).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Cite <strong>três exemplos reais</strong> de sistemas ou sites conhecidos que utilizam PHP no back-end e explique brevemente o que cada um deles faz.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>1. WordPress</strong> — O sistema de gerenciamento de conteúdo (CMS) mais usado do mundo. Permite criar blogs, portfólios e e-commerces sem necessidade de saber programar. É totalmente desenvolvido em PHP.</p>
+                <p><strong>2. Wikipedia</strong> — A enciclopédia colaborativa online. O MediaWiki, software que sustenta a Wikipedia, é escrito em PHP e gerencia milhões de páginas e edições diárias.</p>
+                <p><strong>3. Magento / WooCommerce</strong> — Plataformas de e-commerce muito utilizadas por lojas virtuais em todo o mundo, desenvolvidas em PHP.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Descreva o fluxo completo de uma requisição web PHP: o que acontece desde o momento em que o usuário digita uma URL até ver a página no navegador? Liste pelo menos <strong>4 etapas</strong>.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>1.</strong> O usuário digita a URL e pressiona Enter — o navegador envia uma requisição HTTP para o servidor.</p>
+                <p><strong>2.</strong> O servidor web (Apache ou Nginx) recebe a requisição e identifica que o arquivo solicitado é <code style="font-family:'Space Mono',monospace;">.php</code>.</p>
+                <p><strong>3.</strong> O servidor repassa o arquivo para o <em>interpretador PHP</em>, que executa o código linha por linha.</p>
+                <p><strong>4.</strong> Se necessário, o PHP consulta o banco de dados (MySQL, por exemplo) para buscar informações dinâmicas.</p>
+                <p><strong>5.</strong> O PHP gera o HTML final com os dados processados e o devolve ao servidor web.</p>
+                <p><strong>6.</strong> O servidor web envia a resposta HTTP (com o HTML) de volta ao navegador do usuário, que então renderiza a página.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /lesson-body -->
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn disabled">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(0)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(1)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-0 -->
+
+    <!-- ══════════ AULA 2 ══════════ -->
+    <div class="lesson-panel" id="lesson-1">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 02 / 05</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title">Instalação com <em>XAMPP</em></h1>
+        <p class="lesson-desc">Configure seu ambiente de desenvolvimento local em minutos usando o XAMPP — a maneira mais fácil de rodar PHP no seu computador.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é o XAMPP?</h2>
+          <div class="prose">
+            <p>XAMPP é um pacote gratuito que instala de uma vez tudo que você precisa para rodar PHP localmente: o servidor web <strong>Apache</strong>, o banco de dados <strong>MySQL (MariaDB)</strong>, o interpretador <strong>PHP</strong> e mais. O nome é uma sigla:</p>
+            <ul>
+              <li><strong>X</strong> — Cross-platform (funciona no Windows, Mac e Linux)</li>
+              <li><strong>A</strong> — Apache (servidor web)</li>
+              <li><strong>M</strong> — MariaDB/MySQL (banco de dados)</li>
+              <li><strong>P</strong> — PHP</li>
+              <li><strong>P</strong> — Perl</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Passo a passo: instalando o XAMPP</h2>
+          <div class="prose">
+            <p><strong>Passo 1 — Download:</strong> Acesse <a href="https://www.apachefriends.org" target="_blank">apachefriends.org</a> e baixe a versão mais recente do XAMPP para seu sistema operacional.</p>
+            <p><strong>Passo 2 — Instalação:</strong> Execute o instalador e siga os passos. Mantenha as opções padrão (Apache e MySQL marcados).</p>
+            <p><strong>Passo 3 — Iniciar serviços:</strong> Abra o <em>XAMPP Control Panel</em> e clique em <strong>Start</strong> ao lado de <strong>Apache</strong>. O botão ficará verde.</p>
+            <p><strong>Passo 4 — Testar:</strong> Abra o navegador e acesse <code style="font-family:'Space Mono',monospace;color:var(--accent);">http://localhost</code>. Se aparecer a tela de boas-vindas do XAMPP, funcionou!</p>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">📁</div>
+            <div class="callout-body">
+              <strong>Onde colocar seus arquivos PHP?</strong>
+              <p>No Windows: <code style="font-family:'Space Mono',monospace;">C:\xampp\htdocs\</code><br>
+              No Mac: <code style="font-family:'Space Mono',monospace;">/Applications/XAMPP/htdocs/</code><br>
+              Crie uma pasta com o nome do seu projeto dentro de <strong>htdocs</strong> e acesse via <code style="font-family:'Space Mono',monospace;">http://localhost/seu-projeto/</code></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Verificando a instalação do PHP</h2>
+          <div class="prose">
+            <p>Crie um arquivo chamado <code style="font-family:'Space Mono',monospace;color:var(--accent);">info.php</code> dentro da pasta <strong>htdocs</strong> com o seguinte conteúdo:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · info.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-fn">phpinfo</span>();<br>
+<span class="ln">3</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="prose">
+            <p>Acesse <code style="font-family:'Space Mono',monospace;color:var(--accent);">http://localhost/info.php</code> — será exibida uma página completa com todas as informações da sua instalação PHP.</p>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">🔒</div>
+            <div class="callout-body">
+              <strong>Segurança</strong>
+              <p>Nunca deixe o arquivo <code style="font-family:'Space Mono',monospace;">phpinfo.php</code> em um servidor de produção! Ele expõe informações sensíveis do servidor.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 2: DRAG & DROP -->
+        <div class="activity-card" id="act-1-0">
+          <div class="activity-header">
+            <div class="activity-icon">🎯</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Arrastar e Soltar · +15 XP</div>
+              <h3>Monte a sigla XAMPP!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Arraste cada tecnologia para a letra correta da sigla XAMPP.</p>
+            <div class="drag-area" id="drag-chips">
+              <div class="drag-chip" draggable="true" data-val="Apache">Apache</div>
+              <div class="drag-chip" draggable="true" data-val="PHP">PHP</div>
+              <div class="drag-chip" draggable="true" data-val="MariaDB">MariaDB</div>
+              <div class="drag-chip" draggable="true" data-val="Cross-platform">Cross-platform</div>
+              <div class="drag-chip" draggable="true" data-val="Perl">Perl</div>
+            </div>
+            <div class="drop-zones" id="drop-zones">
+              <div class="drop-zone" data-answer="Cross-platform"><span class="zone-label">X =</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="Apache"><span class="zone-label">A =</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="MariaDB"><span class="zone-label">M =</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="PHP"><span class="zone-label">P =</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="Perl"><span class="zone-label">P =</span><span class="zone-slot"></span></div>
+            </div>
+            <div class="xp-reward" id="xp-1-0"><div class="xp-icon">🏆</div><div class="xp-text">Perfeito! <strong>+15 XP ganhos!</strong> Você dominou a sigla XAMPP!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkDrag()">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetDrag()">Resetar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 2 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Questões de fixação do conteúdo desta aula</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">O que significa cada letra da sigla <strong>XAMPP</strong>? Por que o "X" representa "Cross-platform"?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>X</strong> = Cross-platform (multiplataforma) · <strong>A</strong> = Apache · <strong>M</strong> = MariaDB (MySQL) · <strong>P</strong> = PHP · <strong>P</strong> = Perl.</p>
+                <p>O "X" representa cross-platform porque o XAMPP funciona em <em>múltiplos sistemas operacionais</em>: Windows, macOS e Linux, sem necessidade de configurações específicas para cada um.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Qual é a função da pasta <strong>htdocs</strong> no XAMPP? Por que seus arquivos PHP devem ficar obrigatoriamente dentro dela?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>A pasta <strong>htdocs</strong> é a "raiz do documento" (<em>document root</em>) do servidor Apache. É a pasta que o Apache "enxerga" como pública — todo arquivo colocado ali pode ser acessado via <code style="font-family:'Space Mono',monospace;">http://localhost/</code>.</p>
+                <p>Os arquivos PHP precisam estar dentro de htdocs porque o interpretador PHP só é acionado quando uma requisição passa pelo servidor Apache. Abrir um arquivo .php diretamente no navegador (com <code style="font-family:'Space Mono',monospace;">file://...</code>) não funcionará — o código PHP será mostrado como texto puro, não executado.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Crie um arquivo <code style="font-family:'Space Mono',monospace;color:var(--accent);">meu_php.php</code> dentro do htdocs com a função <code style="font-family:'Space Mono',monospace;color:var(--accent);">phpinfo()</code>. Acesse-o pelo navegador e identifique: qual é a versão do PHP instalada e quais extensões estão habilitadas? Use o ambiente de código abaixo para experimentar.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>O código do arquivo deve ser:</p>
+                <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);margin-top:10px;">&lt;?php
+phpinfo();
+?&gt;</pre>
+                <p style="margin-top:12px;">Após acessar <code style="font-family:'Space Mono',monospace;">http://localhost/meu_php.php</code>, a versão do PHP estará no topo da página (ex: <em>PHP Version 8.2.x</em>). As extensões habilitadas aparecem na seção "Configuration" — extensões comuns incluem: <strong>mysqli, pdo, curl, gd, mbstring</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(0)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(1)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(2)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-1 -->
+
+    <!-- ══════════ AULA 3 ══════════ -->
+    <div class="lesson-panel" id="lesson-2">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 03 / 05</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Hello, World!</em></h1>
+        <p class="lesson-desc">Escreva seu primeiro código PHP e entenda a estrutura básica de um script. Aqui começa sua jornada como desenvolvedor PHP.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Estrutura básica de um arquivo PHP</h2>
+          <div class="prose">
+            <p>Todo código PHP deve estar dentro das <strong>tags PHP</strong>. Elas informam ao servidor onde o código PHP começa e termina:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · estrutura.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// Seu código PHP fica aqui</span><br>
+<span class="ln">3</span><span class="c-cmt">// Comentários começam com //</span><br>
+<span class="ln">4</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Dica profissional</strong>
+              <p>Em arquivos que contêm <em>apenas</em> código PHP (sem HTML), é recomendado <strong>omitir a tag de fechamento</strong> <code style="font-family:'Space Mono',monospace;">?&gt;</code>. Isso evita erros causados por espaços em branco acidentais após o fechamento.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Seu primeiro Hello World!</h2>
+          <div class="prose">
+            <p>A função <code style="font-family:'Space Mono',monospace;color:var(--accent);">echo</code> é a mais básica do PHP — ela simplesmente <strong>imprime texto</strong> na tela. Veja o programa mais famoso da programação:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · hello.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-fn">echo</span> <span class="c-str">"Hello, World!"</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt">// Você também pode usar aspas simples</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-str">'Olá, PHP!'</span>;<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Saída: Hello, World!Olá, PHP!</span>
+            </div>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Não esqueça o ponto e vírgula!</strong>
+              <p>Em PHP, cada instrução termina com <code style="font-family:'Space Mono',monospace;">;</code>. Esquecer o ponto e vírgula é o erro mais comum de iniciantes e causa um <em>Parse error</em>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Misturando PHP com HTML</h2>
+          <div class="prose">
+            <p>Uma das grandes forças do PHP é poder ser misturado com HTML. O PHP gera o conteúdo dinâmico e o HTML cuida da estrutura visual:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP + HTML · pagina.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span>&lt;!DOCTYPE html&gt;<br>
+<span class="ln">2</span>&lt;html&gt;<br>
+<span class="ln">3</span>&lt;body&gt;<br>
+<span class="ln">4</span>&nbsp;&nbsp;&lt;h1&gt;<span class="c-tag">&lt;?php</span> <span class="c-fn">echo</span> <span class="c-str">"Bem-vindo!"</span>; <span class="c-tag">?&gt;</span>&lt;/h1&gt;<br>
+<span class="ln">5</span>&nbsp;&nbsp;&lt;p&gt;Data de hoje: <span class="c-tag">&lt;?=</span> <span class="c-fn">date</span>(<span class="c-str">'d/m/Y'</span>) <span class="c-tag">?&gt;</span>&lt;/p&gt;<br>
+<span class="ln">6</span>&lt;/body&gt;<br>
+<span class="ln">7</span>&lt;/html&gt;
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">⚡</div>
+            <div class="callout-body">
+              <strong>Atalho: &lt;?= ?&gt;</strong>
+              <p>A tag <code style="font-family:'Space Mono',monospace;">&lt;?= valor ?&gt;</code> é um atalho para <code style="font-family:'Space Mono',monospace;">&lt;?php echo valor; ?&gt;</code>. Muito usado em templates HTML.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 3 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>ambiente-php.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-3')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-3" spellcheck="false">&lt;?php
+
+// Escreva aqui seu código PHP!
+// Experimente o echo, print e date()
+
+echo "Hello, World!\n";
+echo "Meu primeiro PHP funciona! 🚀\n";
+
+// Que tal mostrar a data de hoje?
+echo "Hoje é: " . date('d/m/Y');
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-3"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Dica: use \n para quebrar linha no echo</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-3','out-sb-3')">Limpar</button>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 3: FILL IN THE BLANK -->
+        <div class="activity-card" id="act-2-0">
+          <div class="activity-header">
+            <div class="activity-icon">✏️</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Complete o código · +15 XP</div>
+              <h3>Preencha as lacunas!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:20px;font-size:.95rem;">Complete o código PHP para exibir a mensagem corretamente.</p>
+            <div class="fitb-sentence">
+              <input class="fitb-input" id="fitb-0" placeholder="tag" data-answer="<?php"> Olá, mundo! <input class="fitb-input" id="fitb-1" placeholder="tag" data-answer="?>"><br><br>
+              <input class="fitb-input" id="fitb-2" placeholder="função" data-answer="echo"> <span style="color:var(--c-str,#c3e88d)">"Meu primeiro PHP!"</span><input class="fitb-input" id="fitb-3" placeholder="símbolo" data-answer=";"  style="width:60px;">
+            </div>
+            <div class="quiz-feedback" id="qfb-2-0"></div>
+            <div class="xp-reward" id="xp-2-0"><div class="xp-icon">⭐</div><div class="xp-text">Excelente! <strong>+15 XP!</strong> Você já conhece a estrutura básica do PHP!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkFitb('2-0',['<?php','?>','echo',';'])">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetFitb(['fitb-0','fitb-1','fitb-2','fitb-3'],'qfb-2-0','xp-2-0')">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 3 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique os conceitos desta aula no ambiente de código acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Usando o ambiente de código acima, escreva um script PHP que exiba seu nome, sua idade e sua cidade, cada informação em uma linha separada. Use o comando <strong>echo</strong> com <code style="font-family:'Space Mono',monospace;color:var(--accent);">\n</code> para quebrar a linha.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+echo "Nome: Ana Silva\n";
+echo "Idade: 22 anos\n";
+echo "Cidade: São Paulo\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Qual a diferença entre <strong>aspas duplas</strong> (<code style="font-family:'Space Mono',monospace;color:var(--accent);">" "</code>) e <strong>aspas simples</strong> (<code style="font-family:'Space Mono',monospace;color:var(--accent);">' '</code>) no echo do PHP? Teste no ambiente acima e descreva o comportamento observado.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Aspas duplas</strong> (" "): interpretam variáveis e caracteres especiais (<code style="font-family:'Space Mono',monospace;">\n</code>, <code style="font-family:'Space Mono',monospace;">\t</code>) dentro da string. Ex: <code style="font-family:'Space Mono',monospace;">echo "Olá, $nome";</code> exibirá o valor da variável.</p>
+                <p><strong>Aspas simples</strong> (' '): tratam tudo como texto literal — variáveis e escapes <strong>não</strong> são interpretados. Ex: <code style="font-family:'Space Mono',monospace;">echo 'Olá, $nome';</code> exibirá literalmente <em>$nome</em>.</p>
+                <p>Aspas simples são ligeiramente mais rápidas, mas a diferença é insignificante na prática.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Usando o ambiente de código, crie um script PHP que exiba uma <strong>tabela HTML</strong> com 3 linhas de dados (nome, profissão, linguagem favorita). O PHP deve gerar o HTML da tabela via echo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+echo "&lt;table border='1'&gt;\n";
+echo "&lt;tr&gt;&lt;th&gt;Nome&lt;/th&gt;&lt;th&gt;Profissão&lt;/th&gt;&lt;th&gt;Linguagem&lt;/th&gt;&lt;/tr&gt;\n";
+echo "&lt;tr&gt;&lt;td&gt;Ana&lt;/td&gt;&lt;td&gt;Dev&lt;/td&gt;&lt;td&gt;PHP&lt;/td&gt;&lt;/tr&gt;\n";
+echo "&lt;tr&gt;&lt;td&gt;Carlos&lt;/td&gt;&lt;td&gt;Designer&lt;/td&gt;&lt;td&gt;JavaScript&lt;/td&gt;&lt;/tr&gt;\n";
+echo "&lt;tr&gt;&lt;td&gt;Maria&lt;/td&gt;&lt;td&gt;DBA&lt;/td&gt;&lt;td&gt;SQL&lt;/td&gt;&lt;/tr&gt;\n";
+echo "&lt;/table&gt;\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(1)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(2)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(3)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-2 -->
+
+    <!-- ══════════ AULA 4 ══════════ -->
+    <div class="lesson-panel" id="lesson-3">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 04 / 05</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title">Como o <em>PHP Funciona</em></h1>
+        <p class="lesson-desc">Entenda o ciclo de vida de uma requisição PHP, o papel do interpretador e como o PHP transforma código em páginas web dinâmicas.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O ciclo de vida de uma requisição</h2>
+          <div class="prose">
+            <p>Quando você acessa um site PHP, ocorre uma sequência precisa de eventos. Vamos entender cada etapa:</p>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">🔄</div>
+            <div class="callout-body">
+              <strong>Fluxo completo da requisição</strong>
+              <p><strong>1.</strong> Navegador envia HTTP Request → <strong>2.</strong> Servidor Apache recebe → <strong>3.</strong> Apache aciona o interpretador PHP → <strong>4.</strong> PHP executa o script → <strong>5.</strong> PHP consulta o BD (opcional) → <strong>6.</strong> PHP gera HTML → <strong>7.</strong> Apache envia HTTP Response → <strong>8.</strong> Navegador renderiza a página.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">O Interpretador PHP (Zend Engine)</h2>
+          <div class="prose">
+            <p>O PHP usa o <strong>Zend Engine</strong> como seu motor de interpretação. Diferente de linguagens compiladas (como C ou Java), o PHP é <em>interpretado</em> — o código é lido e executado diretamente, linha por linha, a cada requisição.</p>
+            <p>O processo interno do Zend Engine tem 4 fases:</p>
+            <ul>
+              <li><strong>Lexing (Tokenização):</strong> o código é quebrado em "tokens" (palavras-chave, operadores, strings...)</li>
+              <li><strong>Parsing:</strong> os tokens são organizados em uma árvore sintática (AST)</li>
+              <li><strong>Compilation:</strong> a AST é transformada em opcodes (bytecode)</li>
+              <li><strong>Execution:</strong> o Zend Engine executa os opcodes e gera a saída</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">PHP é stateless — sem memória entre requisições</h2>
+          <div class="prose">
+            <p>Uma característica crucial do PHP é que ele é <strong>stateless</strong>: cada requisição é tratada de forma independente. O PHP não "lembra" de uma requisição para outra. Isso significa que:</p>
+            <ul>
+              <li>Variáveis criadas em uma requisição desaparecem quando ela termina</li>
+              <li>Para persistir dados entre requisições, usamos <strong>sessions</strong>, <strong>cookies</strong> ou <strong>banco de dados</strong></li>
+              <li>Cada usuário que acessa o site gera sua própria execução independente do PHP</li>
+            </ul>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">🧠</div>
+            <div class="callout-body">
+              <strong>Por que isso importa?</strong>
+              <p>Entender o stateless ajuda a compreender por que sistemas de login precisam de <em>sessões</em> e por que carrinhos de compra precisam ser salvos no banco de dados.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Modo CLI: PHP na linha de comando</h2>
+          <div class="prose">
+            <p>PHP não serve apenas para web! Você pode executar scripts PHP direto no terminal, sem precisar de um servidor web:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">Terminal / CMD</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="c-cmt"># Executar um arquivo PHP</span><br>
+<span class="c-fn">php</span> hello.php<br>
+<br>
+<span class="c-cmt"># Executar código PHP diretamente</span><br>
+<span class="c-fn">php</span> -r <span class="c-str">"echo 'Olá do terminal!';"</span><br>
+<br>
+<span class="c-cmt"># Verificar versão do PHP</span><br>
+<span class="c-fn">php</span> --version
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 4: QUIZ MÚLTIPLA ESCOLHA -->
+        <div class="activity-card" id="act-3-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧩</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Desafio conceitual · +20 XP</div>
+              <h3>PHP é stateless — o que isso significa?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Um usuário faz login em um site PHP e depois acessa outra página. O que acontece com as informações do usuário?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">A</div> O PHP lembra automaticamente do usuário em todas as páginas.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','3-0')"><div class="quiz-opt-letter">B</div> As variáveis da página de login somem; é necessário usar sessões para persistir os dados.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">C</div> O Apache salva os dados automaticamente entre as requisições.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">D</div> O PHP armazena tudo na memória RAM do servidor permanentemente.</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-3-0"></div>
+            <div class="xp-reward" id="xp-3-0"><div class="xp-icon">🎉</div><div class="xp-text">Correto! <strong>+20 XP!</strong> Esse é um dos conceitos mais importantes do PHP!</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 4 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>ciclo-php.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-4')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-4" spellcheck="false">&lt;?php
+
+// Entendendo o PHP!
+// Experimente funções de informação do sistema
+
+// Versão do PHP
+echo "Versão PHP: " . PHP_VERSION . "\n";
+
+// Sistema operacional
+echo "Sistema: " . PHP_OS . "\n";
+
+// Diretório atual
+echo "Diretório: " . __DIR__ . "\n";
+
+// Data e hora atual
+echo "Agora: " . date('d/m/Y H:i:s') . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-4"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 PHP_VERSION, PHP_OS e __DIR__ são constantes predefinidas</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-4','out-sb-4')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 4 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Consolidando o entendimento do ciclo PHP</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique o que significa PHP ser uma linguagem <strong>interpretada</strong> em contraste com linguagens <strong>compiladas</strong>. Quais são as vantagens e desvantagens desse modelo para desenvolvimento web?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Linguagens compiladas</strong> (C, Java, Go): o código-fonte é transformado em código de máquina <em>antes</em> da execução. São geralmente mais rápidas em runtime, mas precisam ser recompiladas a cada mudança.</p>
+                <p><strong>PHP (interpretada):</strong> o código é lido e executado linha por linha a cada requisição pelo Zend Engine.</p>
+                <p><strong>Vantagens para web:</strong> facilidade de deploy (basta subir os arquivos), desenvolvimento ágil (mudanças imediatas sem compilar), portabilidade.</p>
+                <p><strong>Desvantagens:</strong> pode ser mais lento que código compilado (mitigado por OPcache no PHP 8), e erros podem aparecer apenas em runtime.</p>
+                <p><em>OPcache:</em> o PHP moderno usa cache de opcodes (bytecode) para evitar reinterpretar o mesmo arquivo repetidamente, aproximando a performance de código compilado.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Um desenvolvedor novato criou uma variável <code style="font-family:'Space Mono',monospace;color:var(--accent);">$usuario_logado = true</code> na página de login e ficou surpreso que ela não estava disponível na página de perfil. Explique por que isso acontece e como resolver o problema corretamente.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Isso acontece porque PHP é <strong>stateless</strong>: cada requisição HTTP gera uma execução PHP completamente independente. Quando a página de login termina, todas as variáveis definidas nela são destruídas da memória.</p>
+                <p><strong>Solução: usar Sessions.</strong> As sessions permitem armazenar dados do usuário no servidor que persistem entre requisições:</p>
+                <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;margin-top:10px;">&lt;?php
+// Na página de login:
+session_start();
+$_SESSION['usuario_logado'] = true;
+$_SESSION['nome'] = 'Ana';
+
+// Na página de perfil:
+session_start();
+if ($_SESSION['usuario_logado']) {
+    echo "Bem-vinda, " . $_SESSION['nome'];
+}
+?&gt;</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Usando o ambiente de código desta aula, explore as constantes predefinidas do PHP. Exiba no mínimo <strong>5 constantes</strong> diferentes (além das já presentes no exemplo). Pesquise na documentação oficial <a href="https://php.net" target="_blank" style="color:var(--accent);">php.net</a> quais constantes estão disponíveis.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+echo "Versão PHP: "     . PHP_VERSION   . "\n";
+echo "Sistema: "        . PHP_OS        . "\n";
+echo "Max Int: "        . PHP_INT_MAX   . "\n";
+echo "Min Int: "        . PHP_INT_MIN   . "\n";
+echo "Float máx: "      . PHP_FLOAT_MAX . "\n";
+echo "EOL: "            . PHP_EOL; // quebra de linha do SO
+echo "Separador: "      . DIRECTORY_SEPARATOR . "\n";
+echo "Arquivo atual: "  . __FILE__      . "\n";
+echo "Linha atual: "    . __LINE__      . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(2)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(3)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(4)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-3 -->
+
+    <!-- ══════════ AULA 5 ══════════ -->
+    <div class="lesson-panel" id="lesson-4">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 05 / 05</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title">Sintaxe e <em>Estrutura PHP</em></h1>
+        <p class="lesson-desc">Domine os elementos fundamentais da sintaxe PHP: comentários, tipos de dados básicos, constantes e as boas práticas de escrita de código.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Comentários no PHP</h2>
+          <div class="prose">
+            <p>Comentários são trechos de código ignorados pelo interpretador. Servem para documentar e explicar o código:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · comentarios.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Comentário de linha única (estilo C++)</span><br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt"># Comentário de linha única (estilo Shell)</span><br>
+<span class="ln">6</span><br>
+<span class="ln">7</span><span class="c-cmt">/*</span><br>
+<span class="ln">8</span><span class="c-cmt"> * Comentário de</span><br>
+<span class="ln">9</span><span class="c-cmt"> * múltiplas linhas</span><br>
+<span class="ln">10</span><span class="c-cmt"> */</span><br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-str">"Este código é executado"</span>; <span class="c-cmt">// Este comentário não</span><br>
+<span class="ln">13</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Tipos de dados primitivos</h2>
+          <div class="prose">
+            <p>PHP possui 8 tipos primitivos de dados, divididos em 3 categorias:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · tipos.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// TIPOS ESCALARES</span><br>
+<span class="ln">4</span><span class="c-var">$inteiro</span>   = <span class="c-num">42</span>;          <span class="c-cmt">// int</span><br>
+<span class="ln">5</span><span class="c-var">$decimal</span>   = <span class="c-num">3.14</span>;        <span class="c-cmt">// float</span><br>
+<span class="ln">6</span><span class="c-var">$texto</span>     = <span class="c-str">"PHP rocks"</span>;  <span class="c-cmt">// string</span><br>
+<span class="ln">7</span><span class="c-var">$verdadeiro</span> = <span class="c-kw">true</span>;         <span class="c-cmt">// bool</span><br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-cmt">// TIPOS COMPOSTOS</span><br>
+<span class="ln">10</span><span class="c-var">$lista</span> = [<span class="c-str">"PHP"</span>, <span class="c-str">"MySQL"</span>, <span class="c-str">"HTML"</span>]; <span class="c-cmt">// array</span><br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// TIPO ESPECIAL</span><br>
+<span class="ln">13</span><span class="c-var">$vazio</span> = <span class="c-kw">null</span>;              <span class="c-cmt">// null</span><br>
+<span class="ln">14</span><br>
+<span class="ln">15</span><span class="c-cmt">// Verificar tipo com gettype()</span><br>
+<span class="ln">16</span><span class="c-fn">echo</span> <span class="c-fn">gettype</span>(<span class="c-var">$inteiro</span>);    <span class="c-cmt">// "integer"</span><br>
+<span class="ln">17</span><span class="c-fn">echo</span> <span class="c-fn">gettype</span>(<span class="c-var">$texto</span>);      <span class="c-cmt">// "string"</span><br>
+<span class="ln">18</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Constantes: valores que não mudam</h2>
+          <div class="prose">
+            <p>Ao contrário das variáveis, <strong>constantes</strong> têm um valor fixo definido uma única vez e nunca podem ser alteradas durante a execução. Por convenção, seus nomes são escritos em <em>CAIXA ALTA</em>:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · constantes.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Definindo constantes</span><br>
+<span class="ln">4</span><span class="c-fn">define</span>(<span class="c-str">'VERSAO_APP'</span>, <span class="c-str">'1.0.0'</span>);<br>
+<span class="ln">5</span><span class="c-fn">define</span>(<span class="c-str">'PI'</span>, <span class="c-num">3.14159</span>);<br>
+<span class="ln">6</span><span class="c-fn">define</span>(<span class="c-str">'MAX_TENTATIVAS'</span>, <span class="c-num">3</span>);<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Forma moderna (PHP 5.3+)</span><br>
+<span class="ln">9</span><span class="c-kw">const</span> NOME_SITE = <span class="c-str">'PHPMaster'</span>;<br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> VERSAO_APP;      <span class="c-cmt">// 1.0.0</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> NOME_SITE;       <span class="c-cmt">// PHPMaster</span><br>
+<span class="ln">13</span><span class="c-cmt">// Constantes não usam $ !</span><br>
+<span class="ln">14</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Variável vs Constante</strong>
+              <p>Variáveis começam com <code style="font-family:'Space Mono',monospace;">$</code> e podem mudar de valor. Constantes <strong>não</strong> têm <code style="font-family:'Space Mono',monospace;">$</code>, são acessíveis em qualquer escopo e seu valor nunca muda.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Boas práticas de nomenclatura</h2>
+          <div class="prose">
+            <p>Um código limpo e legível é fundamental. O PHP segue convenções importantes:</p>
+            <ul>
+              <li><strong>Variáveis:</strong> <code style="font-family:'Space Mono',monospace;color:var(--accent);">$minha_variavel</code> ou <code style="font-family:'Space Mono',monospace;color:var(--accent);">$minhaVariavel</code> (snake_case ou camelCase)</li>
+              <li><strong>Funções:</strong> <code style="font-family:'Space Mono',monospace;color:var(--accent);">minha_funcao()</code> (snake_case, padrão PHP)</li>
+              <li><strong>Classes:</strong> <code style="font-family:'Space Mono',monospace;color:var(--accent);">MinhaClasse</code> (PascalCase)</li>
+              <li><strong>Constantes:</strong> <code style="font-family:'Space Mono',monospace;color:var(--accent);">MINHA_CONSTANTE</code> (UPPER_SNAKE_CASE)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- ATIVIDADE 5: QUIZ FINAL -->
+        <div class="activity-card" id="act-4-0">
+          <div class="activity-header">
+            <div class="activity-icon">🏆</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz Final do Módulo · +25 XP</div>
+              <h3>Desafio Final — Módulo 1</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual das opções abaixo está <strong>INCORRETA</strong> sobre variáveis e constantes em PHP?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">A</div> Variáveis em PHP sempre começam com o símbolo $.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">B</div> Constantes podem ser acessadas em qualquer escopo sem usar $.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','4-0')"><div class="quiz-opt-letter">C</div> Em PHP, constantes também usam o símbolo $ assim como variáveis.</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">D</div> O valor de uma constante não pode ser alterado após ser definido.</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-4-0"></div>
+            <div class="xp-reward" id="xp-4-0"><div class="xp-icon">🎓</div><div class="xp-text"><strong>+25 XP!</strong> Módulo 1 concluído com maestria! Avance para o Módulo 2!</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 5 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>sintaxe-php.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-5')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-5" spellcheck="false">&lt;?php
+
+// Experimente os tipos de dados e constantes!
+
+define('CURSO', 'PHPMaster');
+define('VERSAO', '1.0');
+
+$nome     = "Desenvolvedor";
+$nivel    = 1;
+$ativo    = true;
+$nota     = 9.5;
+
+echo "=== " . CURSO . " v" . VERSAO . " ===\n\n";
+echo "Aluno: " . $nome . "\n";
+echo "Nível: " . $nivel . "\n";
+echo "Ativo: " . ($ativo ? 'Sim' : 'Não') . "\n";
+echo "Nota: "  . $nota . "\n\n";
+
+// Verificando tipos
+echo "Tipo de \$nivel: " . gettype($nivel) . "\n";
+echo "Tipo de \$nota:  " . gettype($nota)  . "\n";
+echo "Tipo de \$ativo: " . gettype($ativo) . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-5"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 gettype() retorna o tipo da variável como string</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-5','out-sb-5')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 5 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">🏁</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Finais — Módulo 1</h3>
+              <p>Consolide todo o aprendizado do Módulo 1</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Usando o ambiente de código acima, crie um script PHP que declare variáveis de <strong>todos os tipos primitivos</strong> (int, float, string, bool, null) e exiba o nome do tipo e o valor de cada uma usando <code style="font-family:'Space Mono',monospace;color:var(--accent);">gettype()</code>.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$inteiro = 42;
+$decimal = 3.14;
+$texto   = "PHP";
+$booleano = true;
+$nulo    = null;
+
+$vars = ['inteiro'=>$inteiro,'decimal'=>$decimal,
+         'texto'=>$texto,'booleano'=>$booleano,'nulo'=>$nulo];
+
+foreach ($vars as $nome => $valor) {
+    $tipo = gettype($valor);
+    $exibir = var_export($valor, true);
+    echo "$nome ($tipo): $exibir\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie um script PHP que simule um "cartão de visita digital". Defina constantes para o nome da empresa e o site, e variáveis para nome, cargo e e-mail. Exiba todas as informações formatadas de maneira legível.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+define('EMPRESA', 'TechSolutions LTDA');
+define('SITE', 'www.techsolutions.com.br');
+
+$nome  = "Ana Beatriz Silva";
+$cargo = "Desenvolvedora PHP Sênior";
+$email = "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b8d9d6d9f8ccdddbd0cbd7d4cdccd1d7d6cb96dbd7d596daca">[email&#160;protected]</a>";
+
+echo "╔══════════════════════════════════╗\n";
+echo "║      CARTÃO DE VISITA DIGITAL    ║\n";
+echo "╠══════════════════════════════════╣\n";
+echo "║  Nome:    $nome\n";
+echo "║  Cargo:   $cargo\n";
+echo "║  E-mail:  $email\n";
+echo "║  Empresa: " . EMPRESA . "\n";
+echo "║  Site:    " . SITE    . "\n";
+echo "╚══════════════════════════════════╝\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie um script PHP completo que exiba um <strong>relatório de diagnóstico</strong> do ambiente PHP, incluindo: versão do PHP, sistema operacional, data/hora atual formatada em português, e pelo menos 3 constantes predefinidas do PHP (além das básicas). Formate a saída de forma organizada.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+$dias  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+$meses = ['','Jan','Fev','Mar','Abr','Mai','Jun',
+          'Jul','Ago','Set','Out','Nov','Dez'];
+
+$dia_semana = $dias[date('w')];
+$dia  = date('d');
+$mes  = $meses[(int)date('n')];
+$ano  = date('Y');
+$hora = date('H:i:s');
+
+echo "╔═════════════════════════════════════╗\n";
+echo "║    DIAGNÓSTICO DO AMBIENTE PHP      ║\n";
+echo "╠═════════════════════════════════════╣\n";
+echo "║ Versão PHP:    " . PHP_VERSION   . "\n";
+echo "║ Sistema:       " . PHP_OS        . "\n";
+echo "║ Data:          $dia_semana, $dia/$mes/$ano\n";
+echo "║ Hora:          $hora\n";
+echo "╠═════════════════════════════════════╣\n";
+echo "║ INT máximo:    " . PHP_INT_MAX   . "\n";
+echo "║ Separador dir: " . DIRECTORY_SEPARATOR . "\n";
+echo "║ PHP_EOL:       (quebra de linha do SO)\n";
+echo "╚═════════════════════════════════════╝\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(3)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(4)">🏆 Concluir Módulo!</button>
+        <a class="nav-lesson-btn primary" href="modulos.html">Ver todos os módulos →</a>
+      </div>
+    </div><!-- /lesson-4 -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- XP BAR -->
+<div class="xp-bar-total">
+  <span class="xp-label">XP Total</span>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill-global"></div></div>
+  <span class="xp-count" id="xp-count">0 / 85 XP</span>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentLesson = 0;
+const totalLessons = 5;
+let completedLessons = new Set();
+let totalXP = 0;
+const maxXP = 85;
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+function goToLesson(idx) {
+  document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lesson-' + idx).classList.add('active');
+  document.getElementById('lb-' + idx).classList.add('active');
+  currentLesson = idx;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function completeLesson(idx) {
+  if (completedLessons.has(idx)) return;
+  completedLessons.add(idx);
+  document.getElementById('lb-' + idx).classList.add('completed');
+  updateProgress();
+  showToast('✅ Aula ' + (idx + 1) + ' concluída!');
+  if (idx < totalLessons - 1) {
+    setTimeout(() => goToLesson(idx + 1), 1200);
+  } else {
+    setTimeout(() => showToast('🏆 Módulo 1 completo! Parabéns!'), 400);
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((completedLessons.size / totalLessons) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+/* ══════════════════════════════════════
+   XP SYSTEM
+══════════════════════════════════════ */
+function addXP(amount) {
+  totalXP = Math.min(totalXP + amount, maxXP);
+  const pct = (totalXP / maxXP) * 100;
+  document.getElementById('xp-fill-global').style.width = pct + '%';
+  document.getElementById('xp-count').textContent = totalXP + ' / ' + maxXP + ' XP';
+}
+
+/* ══════════════════════════════════════
+   QUIZ
+══════════════════════════════════════ */
+function answerQuiz(el, result, actId) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o === el) o.classList.add(result === 'correct' ? 'correct' : 'wrong');
+    else if (result === 'wrong' && o.getAttribute('onclick') && o.getAttribute('onclick').includes('correct'))
+      o.classList.add('correct');
+  });
+  const fb = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  if (result === 'correct') {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correto!</strong> Muito bem! Continue assim.';
+    xpEl.classList.add('show');
+    const xpMap = { '0-0': 10, '3-0': 20, '4-0': 25 };
+    addXP(xpMap[actId] || 10);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Não foi dessa vez.</strong> Releia o conteúdo e tente novamente.';
+  }
+}
+
+/* ══════════════════════════════════════
+   DRAG & DROP
+══════════════════════════════════════ */
+let draggedEl = null;
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.drag-chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => { draggedEl = chip; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+  });
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const slot = zone.querySelector('.zone-slot');
+      // return previous chip to pool if slot occupied
+      if (slot.firstChild) {
+        const prev = slot.firstChild;
+        document.getElementById('drag-chips').appendChild(prev);
+        prev.classList.add('drag-chip');
+        prev.setAttribute('draggable', 'true');
+        addDragEvents(prev);
+      }
+      const placed = document.createElement('span');
+      placed.className = 'placed-chip';
+      placed.textContent = draggedEl.dataset.val;
+      placed.setAttribute('data-val', draggedEl.dataset.val);
+      placed.onclick = () => {
+        document.getElementById('drag-chips').appendChild(draggedEl);
+        draggedEl.style.display = '';
+        placed.remove();
+      };
+      slot.appendChild(placed);
+      draggedEl.style.display = 'none';
+    });
+  });
+});
+function addDragEvents(el) {
+  el.addEventListener('dragstart', e => { draggedEl = el; el.classList.add('dragging'); });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+}
+function checkDrag() {
+  let allCorrect = true;
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    const slot = zone.querySelector('.zone-slot');
+    const placed = slot.querySelector('.placed-chip');
+    if (!placed) { allCorrect = false; return; }
+    if (placed.dataset.val === zone.dataset.answer) zone.classList.add('correct-zone');
+    else { zone.classList.add('wrong-zone'); allCorrect = false; }
+  });
+  if (allCorrect) {
+    document.getElementById('xp-1-0').classList.add('show');
+    addXP(15);
+    showToast('🎯 Perfeito! +15 XP');
+  } else {
+    showToast('❌ Algumas posições estão erradas. Tente novamente!');
+  }
+}
+function resetDrag() {
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    const slot = zone.querySelector('.zone-slot');
+    slot.innerHTML = '';
+  });
+  document.querySelectorAll('.drag-chip').forEach(c => c.style.display = '');
+  document.getElementById('xp-1-0').classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   FILL IN THE BLANK
+══════════════════════════════════════ */
+function checkFitb(actId, answers) {
+  const ids = ['fitb-0','fitb-1','fitb-2','fitb-3'];
+  let allCorrect = true;
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('correct','wrong');
+    const val = el.value.trim().toLowerCase();
+    const ans = (answers[i] || '').toLowerCase();
+    if (val === ans) el.classList.add('correct');
+    else { el.classList.add('wrong'); allCorrect = false; }
+  });
+  const fb = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  if (allCorrect) {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Perfeito!</strong> Você preencheu todas as lacunas corretamente!';
+    xpEl.classList.add('show');
+    addXP(15);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ Algumas respostas estão erradas. Dica: lembre das tags de abertura e fechamento do PHP!';
+  }
+}
+function resetFitb(ids, fbId, xpId) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('correct','wrong'); }
+  });
+  const fb = document.getElementById(fbId);
+  if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  const xp = document.getElementById(xpId);
+  if (xp) xp.classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX (Emulado)
+══════════════════════════════════════ */
+function runCode(editorId) {
+  const code = document.getElementById(editorId).value;
+  const outId = 'out-' + editorId;
+  const outEl = document.getElementById(outId);
+  outEl.classList.remove('error');
+
+  try {
+    const result = emulatePHP(code);
+    outEl.innerHTML = result.error
+      ? `<span style="color:var(--red)">⚠ ${result.error}</span>`
+      : (result.output || '<span style="color:var(--muted);font-style:italic">(sem saída)</span>');
+    if (result.error) outEl.classList.add('error');
+  } catch(e) {
+    outEl.classList.add('error');
+    outEl.innerHTML = `<span style="color:var(--red)">⚠ Erro: ${e.message}</span>`;
+  }
+}
+
+function emulatePHP(code) {
+  // Strip PHP tags
+  let clean = code
+    .replace(/<\?php/gi, '')
+    .replace(/<\?=/gi, 'echo ')
+    .replace(/\?>/gi, '')
+    .trim();
+
+  let output = '';
+  const lines = clean.split('\n');
+
+  // Simulated environment
+  const env = {
+    PHP_VERSION: '8.2.0',
+    PHP_OS: 'Linux',
+    PHP_INT_MAX: '9223372036854775807',
+    PHP_INT_MIN: '-9223372036854775808',
+    PHP_FLOAT_MAX: '1.7976931348623E+308',
+    PHP_EOL: '\\n',
+    DIRECTORY_SEPARATOR: '/',
+    __DIR__: '/var/www/phpmaster',
+    __FILE__: '/var/www/phpmaster/script.php',
+    __LINE__: 1,
+  };
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // Replace date() calls
+  clean = clean.replace(/date\s*\(\s*['"]d\/m\/Y['"]\s*\)/g, `"${dateStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]d\/m\/Y H:i:s['"]\s*\)/g, `"${dateStr} ${timeStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]H:i:s['"]\s*\)/g, `"${timeStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]Y['"]\s*\)/g, `"${now.getFullYear()}"`);
+  clean = clean.replace(/date\s*\(\s*['"]w['"]\s*\)/g, `"${now.getDay()}"`);
+  clean = clean.replace(/date\s*\(\s*['"]d['"]\s*\)/g, `"${pad(now.getDate())}"`);
+  clean = clean.replace(/date\s*\(\s*['"]n['"]\s*\)/g, `"${now.getMonth()+1}"`);
+
+  // Replace PHP constants
+  Object.entries(env).forEach(([k,v]) => {
+    clean = clean.replace(new RegExp('\\b' + k + '\\b','g'), JSON.stringify(String(v)));
+  });
+
+  // Replace phpinfo()
+  clean = clean.replace(/phpinfo\s*\(\s*\)\s*;/g,
+    `echo "PHP Version: ${env.PHP_VERSION}\\nSystem: ${env.PHP_OS}\\nZend Engine: 4.2.0\\nOPcache: Enabled\\n(phpinfo() resumido no sandbox)";`);
+
+  // Transform PHP to JS
+  // Remove single-line comments
+  clean = clean.replace(/\/\/[^\n]*/g, '');
+  clean = clean.replace(/#[^\n]*/g, '');
+  // Multi-line comments
+  clean = clean.replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // define('CONST', val) → let CONST = val
+  clean = clean.replace(/define\s*\(\s*'([^']+)'\s*,\s*([^)]+)\)\s*;/g, (_, name, val) => `let ${name} = ${val.trim()};`);
+  clean = clean.replace(/define\s*\(\s*"([^"]+)"\s*,\s*([^)]+)\)\s*;/g, (_, name, val) => `let ${name} = ${val.trim()};`);
+  // const CONST = val;
+  clean = clean.replace(/\bconst\s+([A-Z_]+)\s*=/g, 'let $1 =');
+
+  // var_export($val, true)
+  clean = clean.replace(/var_export\s*\(([^,]+),\s*true\s*\)/g, 'JSON.stringify($1)');
+
+  // gettype()
+  clean = clean.replace(/gettype\s*\(([^)]+)\)/g, '(typeof $1 === "number" ? (Number.isInteger($1) ? "integer" : "double") : typeof $1 === "boolean" ? "boolean" : $1 === null ? "NULL" : typeof $1 === "object" ? "array" : typeof $1)');
+
+  // PHP variables $var → _var
+  clean = clean.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, '_$1');
+
+  // echo / print
+  clean = clean.replace(/\bprint\b/g, 'echo');
+  clean = clean.replace(/\becho\s+/g, '__out(');
+  // Add closing ) for echo statements
+  clean = clean.replace(/(__out\([^;{}\n]+);/g, (match, inner) => inner + ');');
+
+  // PHP_EOL
+  clean = clean.replace(/PHP_EOL/g, '"\\n"');
+
+  // String concatenation . → +
+  clean = clean.replace(/([^.])\.([^.])/g, '$1+$2');
+
+  // Ternary true/false
+  clean = clean.replace(/\btrue\b/g, 'true');
+  clean = clean.replace(/\bfalse\b/g, 'false');
+  clean = clean.replace(/\bnull\b/gi, 'null');
+
+  // foreach ($arr as $k => $v) / foreach ($arr as $v)
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\s*=>\s*(_\w+)\)/g,
+    'for (let [$2, $3] of Object.entries($1))');
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\)/g,
+    'for (let $2 of Object.values($1))');
+
+  // Array syntax [] and array()
+  clean = clean.replace(/array\s*\(/g, '[');
+
+  // function declarations
+  clean = clean.replace(/function\s+(_?\w+)/g, 'function $1');
+
+  // return
+  // no change needed
+
+  // Wrap in function to collect output
+  const js = `
+    let __output = '';
+    function __out(v) {
+      let s = v === null ? '' : v === true ? '1' : v === false ? '' : String(v);
+      __output += s.replace(/\\\\n/g, '\\n').replace(/\\\\t/g, '\\t');
+    }
+    ${clean}
+    __output;
+  `;
+
+  try {
+    // eslint-disable-next-line no-new-func
+    const result = new Function(js)();
+    return { output: result != null ? String(result) : '' };
+  } catch(e) {
+    return { error: 'Parse Error: ' + e.message };
+  }
+}
+
+function clearSandbox(editorId, outId) {
+  document.getElementById(editorId).value = '';
+  const outEl = document.getElementById(outId);
+  outEl.innerHTML = '<span class="out-placeholder">Clique em "Executar" para ver a saída...</span>';
+  outEl.classList.remove('error');
+}
+
+/* ══════════════════════════════════════
+   GABARITO TOGGLE
+══════════════════════════════════════ */
+function toggleGab(btn) {
+  btn.classList.toggle('open');
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════
+   COPY CODE
+══════════════════════════════════════ */
+function copyCode(btn) {
+  const body = btn.closest('.code-block').querySelector('.cb-body');
+  navigator.clipboard.writeText(body.innerText.replace(/^\d+\t/gm, '').trim()).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+/* ══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR MOBILE DRAWER
+══════════════════════════════════════ */
+(function(){
+  const toggle  = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    toggle.textContent = '✕';
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    toggle.textContent = '☰';
+  }
+
+  toggle.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+  overlay.addEventListener('click', closeSidebar);
+
+  // Fecha o drawer ao selecionar uma aula
+  document.querySelectorAll('.lesson-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.innerWidth <= 900) closeSidebar();
+    });
+  });
+})();
+</script>
+</body>
+</html>
