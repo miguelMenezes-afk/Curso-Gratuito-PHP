@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Módulo 2: Variáveis e Tipos de Dados</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════ */
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #0f1525;
+  --bg3:     #141c30;
+  --card:    #161e35;
+  --border:  #1f2d50;
+  --php:     #7c4dff;
+  --accent:  #00e5ff;
+  --text:    #e8eaf6;
+  --muted:   #8892b0;
+  --white:   #ffffff;
+  --green:   #69ffb4;
+  --yellow:  #ffd166;
+  --red:     #ff6b6b;
+  --radius:  16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ══════════════════════════════════════
+   BLOBS & PARTICLES
+══════════════════════════════════════ */
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1;}
+.glow-1{width:500px;height:500px;background:var(--php);top:-100px;right:-100px;}
+.glow-2{width:400px;height:400px;background:var(--accent);bottom:0;left:-100px;}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);text-decoration:none;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg)!important;padding:9px 20px;border-radius:50px;font-weight:700!important;}
+
+/* ══════════════════════════════════════
+   LAYOUT: SIDEBAR + MAIN
+══════════════════════════════════════ */
+.layout{display:block;min-height:100vh;padding-top:60px;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;top:60px;left:0;bottom:0;width:280px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;z-index:100;
+  padding:28px 0 60px;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.sidebar-header{padding:0 22px 20px;border-bottom:1px solid var(--border);}
+.mod-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:50px;padding:4px 12px;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--php);
+  margin-bottom:10px;
+}
+.sidebar-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3;color:var(--white);}
+.sidebar-progress{margin-top:14px;}
+.prog-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;}
+
+.sidebar-nav{padding:16px 0;}
+.sidebar-section{padding:8px 22px 4px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+.lesson-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 22px;
+  background:none;border:none;cursor:pointer;
+  text-align:left;transition:all .2s;
+  border-left:3px solid transparent;
+}
+.lesson-btn:hover{background:rgba(255,255,255,.04);}
+.lesson-btn.active{background:rgba(124,77,255,.1);border-left-color:var(--php);}
+.lesson-btn.completed{border-left-color:var(--green);}
+
+.l-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+}
+.lesson-btn.active .l-icon{background:rgba(124,77,255,.2);border-color:rgba(124,77,255,.5);}
+.lesson-btn.completed .l-icon{background:rgba(105,255,180,.1);border-color:rgba(105,255,180,.3);}
+
+.l-info{flex:1;}
+.l-num{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.l-title{font-size:.88rem;font-weight:500;color:var(--text);margin-top:1px;}
+.lesson-btn.active .l-title{color:var(--white);font-weight:600;}
+
+.l-check{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .2s;}
+.lesson-btn.completed .l-check{opacity:1;}
+
+/* ── MAIN CONTENT ── */
+.main{margin-left:280px;min-height:100vh;max-width:100%;overflow-x:hidden;}
+
+/* ══════════════════════════════════════
+   LESSON PANEL
+══════════════════════════════════════ */
+.lesson-panel{display:none;animation:fadeUp .4s ease;}
+.lesson-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.lesson-hero{
+  padding:48px 6% 36px;
+  background:linear-gradient(135deg,rgba(124,77,255,.06),rgba(0,229,255,.04));
+  border-bottom:1px solid var(--border);
+}
+.lesson-body{padding:48px 6%;}
+.lesson-hero > *,.lesson-body > *{max-width:900px;}
+.lesson-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lesson-num-tag{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);padding:4px 10px;border-radius:50px;}
+.lesson-dur{font-size:.8rem;color:var(--muted);}
+.lesson-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-1px;margin-bottom:12px;}
+.lesson-title em{font-style:normal;color:var(--accent);}
+.lesson-desc{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px;}
+
+/* ── CONTENT BLOCKS ── */
+.content-block{margin-bottom:40px;}
+
+.block-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.block-title::before{
+  content:'';width:4px;height:22px;border-radius:2px;
+  background:linear-gradient(180deg,var(--php),var(--accent));
+  display:block;flex-shrink:0;
+}
+
+.prose{color:var(--muted);line-height:1.85;font-size:1rem;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose em{color:var(--accent);font-style:normal;}
+.prose p{margin-bottom:14px;}
+.prose ul{padding-left:20px;margin-bottom:14px;}
+.prose ul li{margin-bottom:8px;}
+.prose ol{padding-left:20px;margin-bottom:14px;}
+.prose ol li{margin-bottom:8px;}
+.prose a{color:var(--accent);text-decoration:none;}
+
+/* CALLOUT BOXES */
+.callout{
+  border-radius:14px;padding:20px 22px;margin:24px 0;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.callout-info{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.callout-tip{background:rgba(105,255,180,.06);border:1px solid rgba(105,255,180,.2);}
+.callout-warn{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;font-size:.9rem;margin-bottom:4px;color:var(--white);}
+.callout-info .callout-body strong{color:var(--accent);}
+.callout-tip .callout-body strong{color:var(--green);}
+.callout-warn .callout-body strong{color:var(--yellow);}
+.callout-body p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+
+/* CODE BLOCKS */
+.code-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin:20px 0;
+}
+.cb-header{
+  background:var(--bg3);padding:11px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.cb-dots{display:flex;gap:6px;}
+.cb-dot{width:10px;height:10px;border-radius:50%;}
+.cb-dot:nth-child(1){background:#ff5f57;}
+.cb-dot:nth-child(2){background:#febc2e;}
+.cb-dot:nth-child(3){background:#28c840;}
+.cb-lang{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.cb-copy{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:3px 10px;cursor:pointer;transition:all .2s;
+}
+.cb-copy:hover{color:var(--accent);border-color:var(--accent);}
+.cb-body{
+  padding:22px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.85;overflow-x:auto;
+}
+.c-tag{color:#ff6b9d;} .c-var{color:#82aaff;} .c-str{color:#c3e88d;}
+.c-kw{color:#c792ea;}  .c-fn{color:#89ddff;}  .c-num{color:#f78c6c;}
+.c-cmt{color:#546e7a;font-style:italic;} .c-out{color:#ffd166;}
+.ln{color:#2d3d6b;user-select:none;margin-right:16px;}
+
+/* ── DIVIDER ── */
+.section-divider{
+  display:flex;align-items:center;gap:14px;margin:48px 0 36px;
+}
+.section-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.section-divider span{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--muted);letter-spacing:2px;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   INTERACTIVE ACTIVITY
+══════════════════════════════════════ */
+.activity-card{
+  background:var(--card);border:1px solid rgba(0,229,255,.25);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(0,229,255,.05);
+}
+.activity-header{
+  background:linear-gradient(135deg,rgba(124,77,255,.15),rgba(0,229,255,.1));
+  padding:20px 28px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid rgba(0,229,255,.15);
+}
+.activity-icon{font-size:1.6rem;}
+.activity-header-info{flex:1;}
+.activity-tag{
+  font-family:'Space Mono',monospace;font-size:.67rem;
+  color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+}
+.activity-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+.activity-body{padding:28px;}
+
+/* QUIZ */
+.quiz-question{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:12px;padding:14px 18px;cursor:pointer;
+  transition:all .2s;font-size:.95rem;
+}
+.quiz-opt:hover{border-color:var(--php);background:rgba(124,77,255,.06);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(105,255,180,.08);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+.quiz-opt-letter{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;
+  transition:all .2s;
+}
+.quiz-opt.correct .quiz-opt-letter{background:var(--green);color:var(--bg);border-color:var(--green);}
+.quiz-opt.wrong .quiz-opt-letter{background:var(--red);color:var(--white);border-color:var(--red);}
+.quiz-feedback{
+  padding:14px 18px;border-radius:12px;font-size:.9rem;
+  display:none;margin-bottom:16px;line-height:1.5;
+}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct-fb{background:rgba(105,255,180,.08);border:1px solid rgba(105,255,180,.3);color:var(--green);}
+.quiz-feedback.wrong-fb{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+
+/* DRAG & DROP */
+.drag-area{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.drag-chip{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 16px;
+  font-family:'Space Mono',monospace;font-size:.8rem;
+  cursor:grab;user-select:none;transition:all .2s;
+  color:var(--accent);
+}
+.drag-chip:hover{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drag-chip.dragging{opacity:.4;}
+.drop-zones{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.drop-zone{
+  min-height:50px;border:2px dashed var(--border);
+  border-radius:12px;padding:10px 16px;
+  display:flex;align-items:center;gap:12px;
+  transition:all .2s;font-size:.9rem;color:var(--muted);
+}
+.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drop-zone .zone-label{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);min-width:140px;}
+.drop-zone .placed-chip{
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:6px;padding:5px 12px;font-family:'Space Mono',monospace;
+  font-size:.8rem;color:var(--php);cursor:pointer;
+}
+.drop-zone.correct-zone{border-color:var(--green);background:rgba(105,255,180,.06);}
+.drop-zone.wrong-zone{border-color:var(--red);background:rgba(255,107,107,.06);}
+
+/* FILL IN THE BLANK */
+.fitb-sentence{
+  font-size:1rem;line-height:2.2;color:var(--text);margin-bottom:20px;
+}
+.fitb-input{
+  display:inline-block;background:var(--bg2);
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:4px 12px;font-family:'Space Mono',monospace;
+  font-size:.85rem;color:var(--accent);outline:none;
+  width:140px;text-align:center;transition:all .2s;
+  vertical-align:middle;
+}
+.fitb-input:focus{border-color:var(--accent);}
+.fitb-input.correct{border-color:var(--green);color:var(--green);}
+.fitb-input.wrong{border-color:var(--red);color:var(--red);}
+
+/* XP / PROGRESS REWARD */
+.xp-reward{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(105,255,180,.08),rgba(0,229,255,.05));
+  border:1px solid rgba(105,255,180,.25);border-radius:12px;
+  padding:14px 20px;margin-top:16px;display:none;
+}
+.xp-reward.show{display:flex;}
+.xp-icon{font-size:1.5rem;}
+.xp-text{font-size:.9rem;}
+.xp-text strong{color:var(--green);}
+
+/* ACTIVITY ACTIONS */
+.activity-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.act-btn{
+  padding:10px 22px;border-radius:10px;font-family:'Syne',sans-serif;
+  font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s;border:none;
+}
+.act-btn-primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);}
+.act-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3);}
+.act-btn-secondary{background:var(--bg2);color:var(--muted);border:1px solid var(--border);}
+.act-btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX
+══════════════════════════════════════ */
+.sandbox-wrap{
+  background:var(--bg2);border:1px solid rgba(124,77,255,.3);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(124,77,255,.07);
+}
+.sandbox-header{
+  background:var(--bg3);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.sandbox-title{display:flex;align-items:center;gap:10px;}
+.sandbox-title .s-dots{display:flex;gap:5px;}
+.sandbox-title .s-dot{width:10px;height:10px;border-radius:50%;}
+.s-dot:nth-child(1){background:#ff5f57;}
+.s-dot:nth-child(2){background:#febc2e;}
+.s-dot:nth-child(3){background:#28c840;}
+.sandbox-title span{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;}
+.sandbox-actions{display:flex;gap:10px;align-items:center;}
+.sandbox-tag{
+  font-family:'Space Mono',monospace;font-size:.68rem;
+  color:var(--php);background:rgba(124,77,255,.12);
+  border:1px solid rgba(124,77,255,.3);border-radius:50px;padding:4px 10px;
+}
+.run-btn{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;padding:9px 20px;border-radius:8px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;
+  cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;
+}
+.run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.35);}
+.run-btn:active{transform:scale(.97);}
+
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sandbox-editor-wrap{border-right:1px solid var(--border);}
+.sandbox-pane-label{
+  padding:10px 18px;background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+.sandbox-pane-label .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.sandbox-editor{
+  width:100%;min-height:200px;padding:20px;resize:none;
+  background:transparent;border:none;outline:none;
+  font-family:'Space Mono',monospace;font-size:.83rem;
+  line-height:1.8;color:var(--text);tab-size:2;
+}
+.sandbox-output{
+  padding:20px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.8;min-height:200px;
+  color:var(--green);white-space:pre-wrap;word-break:break-word;
+}
+.sandbox-output.error{color:var(--red);}
+.sandbox-output .out-placeholder{color:var(--muted);font-style:italic;}
+
+.sandbox-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  font-size:.78rem;color:var(--muted);
+}
+.sandbox-note{font-family:'Space Mono',monospace;}
+.sandbox-clear{
+  margin-left:auto;background:none;border:1px solid var(--border);
+  color:var(--muted);border-radius:6px;padding:4px 12px;
+  font-size:.75rem;cursor:pointer;transition:all .2s;
+}
+.sandbox-clear:hover{border-color:var(--red);color:var(--red);}
+
+/* ══════════════════════════════════════
+   EXERCISES
+══════════════════════════════════════ */
+.exercises-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:36px;margin-top:48px;
+}
+.ex-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  padding-bottom:20px;border-bottom:1px solid var(--border);
+}
+.ex-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.ex-header-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;}
+.ex-header-info p{color:var(--muted);font-size:.88rem;margin-top:3px;}
+
+.exercise{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.exercise:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ex-num{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--yellow);margin-bottom:8px;letter-spacing:1px;
+}
+.ex-question{font-size:.98rem;line-height:1.65;color:var(--text);margin-bottom:16px;}
+.ex-question strong{color:var(--accent);}
+
+/* GABARITO */
+.gabarito-toggle{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:9px 16px;color:var(--muted);
+  font-size:.83rem;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;
+  margin-top:12px;
+}
+.gabarito-toggle:hover{border-color:var(--yellow);color:var(--yellow);}
+.gabarito-toggle .arrow{transition:transform .25s;}
+.gabarito-toggle.open .arrow{transform:rotate(180deg);}
+.gabarito-body{
+  margin-top:14px;padding:20px;
+  background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.2);
+  border-radius:12px;display:none;animation:fadeUp .3s ease;
+}
+.gabarito-body.open{display:block;}
+.gabarito-body .gab-label{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);
+  letter-spacing:2px;margin-bottom:12px;
+}
+.gabarito-body .prose{font-size:.9rem;}
+
+/* ══════════════════════════════════════
+   LESSON NAVIGATION
+══════════════════════════════════════ */
+.lesson-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 6%;border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.nav-lesson-btn{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;cursor:pointer;
+  transition:all .25s;text-decoration:none;
+  font-size:.9rem;color:var(--muted);
+}
+.nav-lesson-btn:hover{border-color:var(--accent);color:var(--text);}
+.nav-lesson-btn.primary{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;font-weight:700;
+}
+.nav-lesson-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.3);color:var(--bg);}
+.nav-lesson-btn.disabled{opacity:.3;pointer-events:none;}
+
+.complete-btn{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--green),#00b88a);
+  color:var(--bg);border:none;border-radius:12px;padding:12px 24px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .25s;
+}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(105,255,180,.3);}
+
+/* ══════════════════════════════════════
+   XP BAR TOTAL
+══════════════════════════════════════ */
+.xp-bar-total{
+  position:fixed;bottom:0;left:280px;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:12px 5%;display:flex;align-items:center;gap:16px;
+  z-index:50;
+}
+.xp-label{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;width:0%;}
+.xp-count{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);white-space:nowrap;}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:60px;right:28px;
+  background:var(--card);border:1px solid var(--green);color:var(--green);
+  border-radius:14px;padding:14px 20px;font-size:.88rem;font-weight:500;
+  z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;cursor:pointer;
+  color:var(--muted);font-size:1.1rem;line-height:1;
+  transition:all .2s;
+}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:99;
+}
+.sidebar-overlay.open{display:block;}
+
+@media(max-width:900px){
+  .menu-toggle{display:block;}
+  .nav-links li:not(:last-child){display:none;}
+  .layout{grid-template-columns:1fr;}
+  .main{margin-left:0;}
+  .sidebar{transform:translateX(-100%);transition:transform .3s ease;width:min(280px,85vw);z-index:150;}
+  .sidebar.open{transform:translateX(0);}
+  .lesson-hero,.lesson-body{padding-left:5%;padding-right:5%;}
+  .sandbox-grid{grid-template-columns:1fr;}
+  .sandbox-editor-wrap{border-right:none;border-bottom:1px solid var(--border);}
+  .xp-bar-total{left:0;}
+  .lesson-nav{flex-wrap:wrap;gap:10px;padding:20px 5%;}
+  .nav-lesson-btn{flex:1;min-width:120px;justify-content:center;}
+  .drop-zone .zone-label{min-width:80px;font-size:.68rem;}
+  .fitb-input{width:100px;font-size:.78rem;}
+  .exercises-section{padding:24px 18px;}
+  .callout{flex-direction:column;gap:8px;}
+}
+
+@media(max-width:480px){
+  .lesson-title{font-size:1.5rem;}
+  .sandbox-header{flex-wrap:wrap;gap:8px;}
+  .sandbox-actions{flex-wrap:wrap;}
+  .activity-header{flex-wrap:wrap;}
+  .activity-body{padding:18px;}
+  .activity-actions{flex-direction:column;}
+  .act-btn{width:100%;text-align:center;}
+  .nav-lesson-btn span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu de aulas">☰</button>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="mod-badge">📦 MOD 02</div>
+      <h2>Variáveis e Tipos de Dados</h2>
+      <div class="sidebar-progress">
+        <div class="prog-label"><span>Progresso</span><span id="prog-pct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Aulas</div>
+      <button class="lesson-btn active" onclick="goToLesson(0)" id="lb-0">
+        <div class="l-icon">📦</div>
+        <div class="l-info">
+          <div class="l-num">AULA 01</div>
+          <div class="l-title">Variáveis em PHP</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(1)" id="lb-1">
+        <div class="l-icon">🔤</div>
+        <div class="l-info">
+          <div class="l-num">AULA 02</div>
+          <div class="l-title">Strings</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(2)" id="lb-2">
+        <div class="l-icon">🔢</div>
+        <div class="l-info">
+          <div class="l-num">AULA 03</div>
+          <div class="l-title">Int e Float</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(3)" id="lb-3">
+        <div class="l-icon">⚡</div>
+        <div class="l-info">
+          <div class="l-num">AULA 04</div>
+          <div class="l-title">Boolean e Null</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(4)" id="lb-4">
+        <div class="l-icon">📋</div>
+        <div class="l-info">
+          <div class="l-num">AULA 05</div>
+          <div class="l-title">Arrays</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(5)" id="lb-5">
+        <div class="l-icon">🔄</div>
+        <div class="l-info">
+          <div class="l-num">AULA 06</div>
+          <div class="l-title">Tipagem Dinâmica</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ AULA 1 ══════════ -->
+    <div class="lesson-panel active" id="lesson-0">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 01 / 06</span>
+          <span class="lesson-dur">⏱ ~15 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Variáveis</em> em PHP</h1>
+        <p class="lesson-desc">Entenda o que são variáveis, como declará-las em PHP e as regras de nomenclatura que todo desenvolvedor precisa conhecer.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é uma variável?</h2>
+          <div class="prose">
+            <p>Uma variável é um <strong>espaço na memória do computador</strong> onde guardamos um valor para usar depois. Pense como uma caixa com um rótulo: o rótulo é o nome da variável, e o conteúdo da caixa é o valor.</p>
+            <p>Em PHP, toda variável começa obrigatoriamente com o símbolo <em>$</em> seguido do nome. Isso é exclusivo do PHP e diferencia a linguagem de outras como Python ou JavaScript.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · variaveis.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Declarando variáveis — sempre com $</span><br>
+<span class="ln">4</span><span class="c-var">$nome</span>  = <span class="c-str">"Ana"</span>;<br>
+<span class="ln">5</span><span class="c-var">$idade</span> = <span class="c-num">22</span>;<br>
+<span class="ln">6</span><span class="c-var">$altura</span> = <span class="c-num">1.68</span>;<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Exibindo os valores</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-var">$nome</span>;   <span class="c-cmt">// Ana</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-var">$idade</span>;  <span class="c-cmt">// 22</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> <span class="c-var">$altura</span>; <span class="c-cmt">// 1.68</span><br>
+<span class="ln">12</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>PHP é case-sensitive para variáveis</strong>
+              <p><code style="font-family:'Space Mono',monospace;">$nome</code>, <code style="font-family:'Space Mono',monospace;">$Nome</code> e <code style="font-family:'Space Mono',monospace;">$NOME</code> são três variáveis diferentes em PHP. Atenção às letras maiúsculas e minúsculas!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Regras de nomenclatura</h2>
+          <div class="prose">
+            <p>Para nomear variáveis em PHP, siga estas regras obrigatórias:</p>
+            <ul>
+              <li>Deve começar com <strong>$</strong> seguido de letra ou underscore (<code style="font-family:'Space Mono',monospace;">_</code>)</li>
+              <li><strong>Não pode começar com número</strong> — <code style="font-family:'Space Mono',monospace;">$1nome</code> é inválido</li>
+              <li>Pode conter letras, números e underscores</li>
+              <li><strong>Não pode ter espaços</strong> — use <code style="font-family:'Space Mono',monospace;">$minha_variavel</code> ou <code style="font-family:'Space Mono',monospace;">$minhaVariavel</code></li>
+              <li>É case-sensitive — <code style="font-family:'Space Mono',monospace;">$x</code> e <code style="font-family:'Space Mono',monospace;">$X</code> são diferentes</li>
+            </ul>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✅</div>
+            <div class="callout-body">
+              <strong>Convenção PHP: snake_case</strong>
+              <p>O padrão mais comum em PHP para variáveis é o <em>snake_case</em>: palavras separadas por underscore. Ex: <code style="font-family:'Space Mono',monospace;">$nome_completo</code>, <code style="font-family:'Space Mono',monospace;">$data_nascimento</code>, <code style="font-family:'Space Mono',monospace;">$total_pedido</code>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Variáveis são dinâmicas</h2>
+          <div class="prose">
+            <p>Diferente de linguagens como Java ou C, em PHP você <strong>não precisa declarar o tipo</strong> da variável. O PHP descobre automaticamente o tipo pelo valor atribuído. Além disso, uma variável pode mudar de valor (e de tipo) a qualquer momento:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · dinamico.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$x</span> = <span class="c-num">10</span>;          <span class="c-cmt">// $x é int</span><br>
+<span class="ln">4</span><span class="c-fn">echo</span> <span class="c-fn">gettype</span>(<span class="c-var">$x</span>); <span class="c-cmt">// "integer"</span><br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-var">$x</span> = <span class="c-str">"PHP"</span>;       <span class="c-cmt">// agora $x é string</span><br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-fn">gettype</span>(<span class="c-var">$x</span>); <span class="c-cmt">// "string"</span><br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-var">$x</span> = <span class="c-kw">true</span>;        <span class="c-cmt">// agora $x é boolean</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-fn">gettype</span>(<span class="c-var">$x</span>); <span class="c-cmt">// "boolean"</span><br>
+<span class="ln">11</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 1 -->
+        <div class="activity-card" id="act-0-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz rápido · +10 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual das opções abaixo é uma declaração de variável <strong>VÁLIDA</strong> em PHP?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">A</div> <code style="font-family:'Space Mono',monospace">1nome = "Carlos";</code></div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">B</div> <code style="font-family:'Space Mono',monospace">nome = "Carlos";</code></div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','0-0')"><div class="quiz-opt-letter">C</div> <code style="font-family:'Space Mono',monospace">$nome = "Carlos";</code></div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">D</div> <code style="font-family:'Space Mono',monospace">var nome = "Carlos";</code></div>
+            </div>
+            <div class="quiz-feedback" id="qfb-0-0"></div>
+            <div class="xp-reward" id="xp-0-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+10 XP ganhos!</strong> Em PHP, toda variável começa com $.</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 1 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>variaveis.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-1')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-1" spellcheck="false">&lt;?php
+
+// Crie suas próprias variáveis!
+$nome   = "Desenvolvedor";
+$cidade = "São Paulo";
+$idade  = 25;
+
+echo "Nome: " . $nome . "\n";
+echo "Cidade: " . $cidade . "\n";
+echo "Idade: " . $idade . "\n";
+
+// Verificando tipos
+echo "\nTipo de \$nome: "   . gettype($nome) . "\n";
+echo "Tipo de \$idade: "  . gettype($idade) . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-1"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Use gettype() para descobrir o tipo de uma variável</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-1','out-sb-1')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 1 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Questões de fixação do conteúdo desta aula</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique com suas palavras por que em PHP toda variável precisa do símbolo <strong>$</strong> antes do nome. Qual seria a vantagem disso para quem lê o código?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>O <strong>$</strong> serve como um identificador visual imediato. Ao ler um código PHP, qualquer palavra precedida de <em>$</em> é, sem dúvida, uma variável — isso facilita a leitura e distingue variáveis de funções, palavras-chave e constantes, que não usam <em>$</em>.</p>
+                <p>A vantagem é a <strong>clareza</strong>: em um template PHP misturado com HTML, você sabe instantaneamente o que é código dinâmico (variável) e o que é texto estático.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Das variáveis abaixo, identifique quais são <strong>válidas</strong> e quais são <strong>inválidas</strong> em PHP. Para as inválidas, explique o motivo:<br><br>
+            <code style="font-family:'Space Mono',monospace;color:var(--accent)">$_nome</code> · <code style="font-family:'Space Mono',monospace;color:var(--accent)">$2valor</code> · <code style="font-family:'Space Mono',monospace;color:var(--accent)">$meu nome</code> · <code style="font-family:'Space Mono',monospace;color:var(--accent)">$totalPedido</code> · <code style="font-family:'Space Mono',monospace;color:var(--accent)">$class</code></p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>$_nome</strong> — ✅ Válida. Pode começar com underscore.</p>
+                <p><strong>$2valor</strong> — ❌ Inválida. Não pode começar com número após o $.</p>
+                <p><strong>$meu nome</strong> — ❌ Inválida. Espaços não são permitidos em nomes de variáveis.</p>
+                <p><strong>$totalPedido</strong> — ✅ Válida. camelCase é aceito em PHP.</p>
+                <p><strong>$class</strong> — ✅ Válida. Apesar de <code style="font-family:'Space Mono',monospace">class</code> ser palavra reservada, como nome de variável precedida de $ é permitido.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Usando o ambiente de código acima, crie um script PHP que declare 5 variáveis com informações sobre você (nome, idade, cidade, profissão, linguagem favorita) e exiba todas usando <strong>echo</strong>, cada uma em uma linha, com um rótulo descritivo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$nome       = "Carlos Silva";
+$idade      = 23;
+$cidade     = "Campinas";
+$profissao  = "Estudante de TI";
+$linguagem  = "PHP";
+
+echo "Nome: "       . $nome      . "\n";
+echo "Idade: "      . $idade     . " anos\n";
+echo "Cidade: "     . $cidade    . "\n";
+echo "Profissão: "  . $profissao . "\n";
+echo "Linguagem: "  . $linguagem . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn disabled">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(0)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(1)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-0 -->
+
+    <!-- ══════════ AULA 2 ══════════ -->
+    <div class="lesson-panel" id="lesson-1">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 02 / 06</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Strings</em> — texto em PHP</h1>
+        <p class="lesson-desc">Aprenda a trabalhar com texto em PHP: como criar strings, concatenar, e usar as funções nativas mais importantes para manipulação de texto.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é uma String?</h2>
+          <div class="prose">
+            <p>Uma <strong>string</strong> é qualquer sequência de caracteres — letras, números, símbolos, espaços. Em PHP, strings são delimitadas por aspas simples <em>' '</em> ou aspas duplas <em>" "</em>.</p>
+            <p>A diferença fundamental entre elas é como o PHP processa o conteúdo interno:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · strings.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$linguagem</span> = <span class="c-str">"PHP"</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt">// Aspas duplas: interpreta variáveis e escapes</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-str">"Eu aprendo $linguagem!\n"</span>; <span class="c-cmt">// Eu aprendo PHP!</span><br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Aspas simples: tudo é texto literal</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-str">'Eu aprendo $linguagem!\n'</span>; <span class="c-cmt">// Eu aprendo $linguagem!\n</span><br>
+<span class="ln">10</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Concatenação com ponto (.)</h2>
+          <div class="prose">
+            <p>Para unir duas ou mais strings em PHP, usamos o operador <em>.</em> (ponto). É diferente de JavaScript (que usa <code style="font-family:'Space Mono',monospace">+</code>) e Python (que também usa <code style="font-family:'Space Mono',monospace">+</code>):</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · concatenacao.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$primeiro</span> = <span class="c-str">"PHP"</span>;<br>
+<span class="ln">4</span><span class="c-var">$segundo</span>  = <span class="c-str">"Master"</span>;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-cmt">// Concatenando com ponto</span><br>
+<span class="ln">7</span><span class="c-var">$resultado</span> = <span class="c-var">$primeiro</span> . <span class="c-str">" "</span> . <span class="c-var">$segundo</span>;<br>
+<span class="ln">8</span><span class="c-fn">echo</span> <span class="c-var">$resultado</span>; <span class="c-cmt">// PHP Master</span><br>
+<span class="ln">9</span><br>
+<span class="ln">10</span><span class="c-cmt">// Concatenação e atribuição (.=)</span><br>
+<span class="ln">11</span><span class="c-var">$frase</span>  = <span class="c-str">"Aprender "</span>;<br>
+<span class="ln">12</span><span class="c-var">$frase</span> .= <span class="c-str">"PHP"</span>;<span class="c-cmt">// equivale a: $frase = $frase . "PHP"</span><br>
+<span class="ln">13</span><span class="c-fn">echo</span> <span class="c-var">$frase</span>; <span class="c-cmt">// Aprender PHP</span><br>
+<span class="ln">14</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Funções nativas de String</h2>
+          <div class="prose">
+            <p>PHP tem centenas de funções nativas para manipular strings. As mais usadas no dia a dia:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · funcoes_string.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$texto</span> = <span class="c-str">"  Olá, Mundo PHP!  "</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-fn">echo</span> <span class="c-fn">strlen</span>(<span class="c-var">$texto</span>);          <span class="c-cmt">// Tamanho: 20</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-fn">strtoupper</span>(<span class="c-var">$texto</span>);      <span class="c-cmt">// MAIÚSCULAS</span><br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-fn">strtolower</span>(<span class="c-var">$texto</span>);      <span class="c-cmt">// minúsculas</span><br>
+<span class="ln">8</span><span class="c-fn">echo</span> <span class="c-fn">trim</span>(<span class="c-var">$texto</span>);            <span class="c-cmt">// Remove espaços das bordas</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-fn">str_replace</span>(<span class="c-str">"Mundo"</span>, <span class="c-str">"Dev"</span>, <span class="c-var">$texto</span>); <span class="c-cmt">// Substitui</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-fn">strpos</span>(<span class="c-var">$texto</span>, <span class="c-str">"PHP"</span>);    <span class="c-cmt">// Posição de "PHP"</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> <span class="c-fn">substr</span>(<span class="c-var">$texto</span>, <span class="c-num">7</span>, <span class="c-num">5</span>);    <span class="c-cmt">// Extrai 5 chars a partir da pos 7</span><br>
+<span class="ln">12</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Cuidado com caracteres especiais</strong>
+              <p>Funções como <code style="font-family:'Space Mono',monospace">strlen()</code> contam bytes, não caracteres. Para textos com acentos (UTF-8), use <code style="font-family:'Space Mono',monospace">mb_strlen()</code> — o prefixo <strong>mb_</strong> indica "multibyte".</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- FILL IN THE BLANK AULA 2 -->
+        <div class="activity-card" id="act-1-0">
+          <div class="activity-header">
+            <div class="activity-icon">✏️</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Complete o código · +15 XP</div>
+              <h3>Qual função devo usar?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:20px;font-size:.95rem;">Preencha com a função PHP correta para cada situação.</p>
+            <div class="fitb-sentence">
+              Contar caracteres de uma string: <input class="fitb-input" id="fitb-1-0" placeholder="função" data-answer="strlen" style="width:120px;">($texto)<br><br>
+              Converter para maiúsculas: <input class="fitb-input" id="fitb-1-1" placeholder="função" data-answer="strtoupper" style="width:140px;">($texto)<br><br>
+              Substituir texto: <input class="fitb-input" id="fitb-1-2" placeholder="função" data-answer="str_replace" style="width:140px;">("a", "b", $texto)<br><br>
+              Remover espaços das bordas: <input class="fitb-input" id="fitb-1-3" placeholder="função" data-answer="trim" style="width:100px;">($texto)
+            </div>
+            <div class="quiz-feedback" id="qfb-1-0"></div>
+            <div class="xp-reward" id="xp-1-0"><div class="xp-icon">⭐</div><div class="xp-text">Perfeito! <strong>+15 XP!</strong> Você já conhece as funções essenciais de string!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkFitbCustom('1-0',['fitb-1-0','fitb-1-1','fitb-1-2','fitb-1-3'],['strlen','strtoupper','str_replace','trim'],15)">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetFitb(['fitb-1-0','fitb-1-1','fitb-1-2','fitb-1-3'],'qfb-1-0','xp-1-0')">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 2 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>strings.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-2')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-2" spellcheck="false">&lt;?php
+
+$nome = "php master";
+
+// Experimente as funções de string!
+echo strtoupper($nome) . "\n";      // MAIÚSCULAS
+echo ucwords($nome) . "\n";         // Capitaliza cada palavra
+echo strlen($nome) . " chars\n";    // Tamanho
+
+// Concatenação
+$saudacao = "Bem-vindo ao " . strtoupper($nome) . "!";
+echo $saudacao . "\n";
+
+// Substituição
+echo str_replace("master", "curso", $nome) . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-2"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 ucwords() capitaliza a primeira letra de cada palavra</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-2','out-sb-2')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 2 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Questões de fixação do conteúdo desta aula</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual é a diferença entre aspas simples e aspas duplas em PHP? Escreva um exemplo que demonstre o comportamento diferente de cada uma ao usar uma variável dentro da string.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Aspas duplas (" "):</strong> o PHP interpola variáveis e processa escapes como <code style="font-family:'Space Mono',monospace">\n</code> (nova linha) e <code style="font-family:'Space Mono',monospace">\t</code> (tabulação).</p>
+                <p><strong>Aspas simples (' '):</strong> tudo é tratado como texto literal. Variáveis não são substituídas.</p>
+              </div>
+              <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;margin-top:10px;">&lt;?php
+$nome = "Ana";
+echo "Olá, $nome!";   // Saída: Olá, Ana!
+echo 'Olá, $nome!';   // Saída: Olá, $nome!
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Usando o ambiente de código acima, crie um script PHP que receba a string <code style="font-family:'Space Mono',monospace;color:var(--accent)">"  olá, mundo!  "</code> e exiba: o texto sem espaços nas bordas, em maiúsculas, o número de caracteres e o texto com "mundo" substituído por "PHP".</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$texto = "  olá, mundo!  ";
+
+$sem_espacos = trim($texto);
+echo $sem_espacos . "\n";                     // olá, mundo!
+echo strtoupper($sem_espacos) . "\n";         // OLÁ, MUNDO!
+echo strlen($sem_espacos) . " caracteres\n";  // 12 caracteres
+echo str_replace("mundo", "PHP", $sem_espacos) . "\n"; // olá, PHP!
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">O que o operador <strong>.=</strong> faz em PHP? Escreva um exemplo prático mostrando a construção de uma frase palavra por palavra usando esse operador.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>O operador <strong>.=</strong> é a concatenação com atribuição: ele pega o valor atual da variável, concatena com o novo valor e salva o resultado na mesma variável. É um atalho para <code style="font-family:'Space Mono',monospace">$var = $var . "novo"</code>.</p>
+              </div>
+              <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;margin-top:10px;">&lt;?php
+$frase  = "PHP ";
+$frase .= "é ";
+$frase .= "muito ";
+$frase .= "poderoso!";
+echo $frase; // PHP é muito poderoso!
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(0)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(1)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(2)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-1 -->
+
+    <!-- ══════════ AULA 3 ══════════ -->
+    <div class="lesson-panel" id="lesson-2">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 03 / 06</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Int</em> e <em>Float</em> — números em PHP</h1>
+        <p class="lesson-desc">Trabalhe com números inteiros e decimais em PHP, entenda operadores aritméticos, funções matemáticas e as armadilhas comuns com ponto flutuante.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Inteiros (int)</h2>
+          <div class="prose">
+            <p>O tipo <strong>int</strong> (integer) representa números inteiros — positivos, negativos ou zero. Em PHP 64-bit, o valor máximo de um int é <em>9.223.372.036.854.775.807</em> (acessível via <code style="font-family:'Space Mono',monospace">PHP_INT_MAX</code>).</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · inteiros.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$positivo</span>  = <span class="c-num">100</span>;<br>
+<span class="ln">4</span><span class="c-var">$negativo</span>  = <span class="c-num">-50</span>;<br>
+<span class="ln">5</span><span class="c-var">$zero</span>      = <span class="c-num">0</span>;<br>
+<span class="ln">6</span><br>
+<span class="ln">7</span><span class="c-cmt">// Operadores aritméticos</span><br>
+<span class="ln">8</span><span class="c-fn">echo</span> <span class="c-num">10</span> + <span class="c-num">3</span>;  <span class="c-cmt">// 13  (adição)</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-num">10</span> - <span class="c-num">3</span>;  <span class="c-cmt">// 7   (subtração)</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-num">10</span> * <span class="c-num">3</span>;  <span class="c-cmt">// 30  (multiplicação)</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> <span class="c-num">10</span> / <span class="c-num">3</span>;  <span class="c-cmt">// 3.33... (divisão)</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-num">10</span> % <span class="c-num">3</span>;  <span class="c-cmt">// 1   (módulo/resto)</span><br>
+<span class="ln">13</span><span class="c-fn">echo</span> <span class="c-num">10</span> ** <span class="c-num">3</span>; <span class="c-cmt">// 1000 (potência)</span><br>
+<span class="ln">14</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Decimais (float)</h2>
+          <div class="prose">
+            <p>O tipo <strong>float</strong> (também chamado de double) armazena números com casas decimais. O separador decimal em PHP é o ponto <em>.</em>, não a vírgula:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · floats.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$preco</span>   = <span class="c-num">29.90</span>;<br>
+<span class="ln">4</span><span class="c-var">$desconto</span> = <span class="c-num">0.15</span>; <span class="c-cmt">// 15%</span><br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-var">$valor_final</span> = <span class="c-var">$preco</span> - (<span class="c-var">$preco</span> * <span class="c-var">$desconto</span>);<br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-var">$valor_final</span>; <span class="c-cmt">// 25.415</span><br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-cmt">// Formatando para 2 casas decimais</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-fn">number_format</span>(<span class="c-var">$valor_final</span>, <span class="c-num">2</span>, <span class="c-str">','</span>, <span class="c-str">'.'</span>);<br>
+<span class="ln">11</span><span class="c-cmt">// Saída: 25,42 (padrão brasileiro)</span><br>
+<span class="ln">12</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-warn">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-body">
+              <strong>Atenção com comparação de floats</strong>
+              <p>Nunca compare floats com <code style="font-family:'Space Mono',monospace">==</code>. Ex: <code style="font-family:'Space Mono',monospace">0.1 + 0.2 == 0.3</code> pode retornar <code style="font-family:'Space Mono',monospace">false</code> por imprecisão de ponto flutuante. Use <code style="font-family:'Space Mono',monospace">abs($a - $b) &lt; 0.0001</code> para comparações seguras.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Funções matemáticas</h2>
+          <div class="prose">
+            <p>PHP oferece funções matemáticas prontas para uso, sem precisar importar bibliotecas:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · matematica.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-fn">echo</span> <span class="c-fn">abs</span>(<span class="c-num">-42</span>);         <span class="c-cmt">// 42     (valor absoluto)</span><br>
+<span class="ln">4</span><span class="c-fn">echo</span> <span class="c-fn">round</span>(<span class="c-num">3.7</span>);       <span class="c-cmt">// 4      (arredonda)</span><br>
+<span class="ln">5</span><span class="c-fn">echo</span> <span class="c-fn">ceil</span>(<span class="c-num">3.1</span>);        <span class="c-cmt">// 4      (arredonda para cima)</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-fn">floor</span>(<span class="c-num">3.9</span>);       <span class="c-cmt">// 3      (arredonda para baixo)</span><br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-fn">sqrt</span>(<span class="c-num">16</span>);         <span class="c-cmt">// 4      (raiz quadrada)</span><br>
+<span class="ln">8</span><span class="c-fn">echo</span> <span class="c-fn">pow</span>(<span class="c-num">2</span>, <span class="c-num">8</span>);        <span class="c-cmt">// 256    (potência)</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-fn">max</span>(<span class="c-num">3</span>, <span class="c-num">8</span>, <span class="c-num">1</span>);     <span class="c-cmt">// 8      (maior valor)</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-fn">min</span>(<span class="c-num">3</span>, <span class="c-num">8</span>, <span class="c-num">1</span>);     <span class="c-cmt">// 1      (menor valor)</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> <span class="c-fn">rand</span>(<span class="c-num">1</span>, <span class="c-num">100</span>);     <span class="c-cmt">// número aleatório entre 1 e 100</span><br>
+<span class="ln">12</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 3 -->
+        <div class="activity-card" id="act-2-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧮</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Cálculo mental · +15 XP</div>
+              <h3>Qual é o resultado?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Em PHP, qual é o resultado de <code style="font-family:'Space Mono',monospace">10 % 3</code>?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">A</div> 3</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','2-0')"><div class="quiz-opt-letter">B</div> 1</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">C</div> 3.33</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">D</div> 0</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-2-0"></div>
+            <div class="xp-reward" id="xp-2-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> O operador % retorna o resto da divisão: 10 ÷ 3 = 3 com resto 1.</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 3 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>numeros.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-3')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-3" spellcheck="false">&lt;?php
+
+// Simulador de desconto em loja
+$preco_original = 150.00;
+$desconto_pct   = 20; // 20%
+
+$valor_desconto = $preco_original * ($desconto_pct / 100);
+$preco_final    = $preco_original - $valor_desconto;
+
+echo "Preço original: R$ " . number_format($preco_original, 2, ',', '.') . "\n";
+echo "Desconto ($desconto_pct%): R$ " . number_format($valor_desconto, 2, ',', '.') . "\n";
+echo "Preço final: R$ " . number_format($preco_final, 2, ',', '.') . "\n";
+
+// Funções matemáticas
+echo "\nArredondamentos de 3.5:\n";
+echo "ceil: "  . ceil(3.5)  . "\n";
+echo "floor: " . floor(3.5) . "\n";
+echo "round: " . round(3.5) . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-3"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 number_format($valor, decimais, sep_decimal, sep_milhar)</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-3','out-sb-3')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 3 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique operações numéricas no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual é a diferença entre os tipos <strong>int</strong> e <strong>float</strong> em PHP? Em que situação você usaria cada um? Dê dois exemplos práticos de cada.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>int:</strong> números sem casas decimais. Use para contagens, IDs, quantidades. Ex: <code style="font-family:'Space Mono',monospace">$quantidade = 5</code>, <code style="font-family:'Space Mono',monospace">$id_usuario = 42</code>.</p>
+                <p><strong>float:</strong> números com casas decimais. Use para valores monetários, medidas, percentuais. Ex: <code style="font-family:'Space Mono',monospace">$preco = 29.90</code>, <code style="font-family:'Space Mono',monospace">$altura = 1.75</code>.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">No ambiente de código, crie uma calculadora de IMC (Índice de Massa Corporal). A fórmula é: <strong>IMC = peso / (altura * altura)</strong>. Use peso = 70kg e altura = 1.75m. Exiba o IMC com 2 casas decimais.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$peso   = 70;
+$altura = 1.75;
+
+$imc = $peso / ($altura * $altura);
+
+echo "Peso: "   . $peso   . " kg\n";
+echo "Altura: " . $altura . " m\n";
+echo "IMC: "    . number_format($imc, 2, ',', '.') . "\n";
+// IMC: 22,86
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">O operador <strong>%</strong> (módulo) retorna o resto da divisão. Como você pode usar esse operador para descobrir se um número é par ou ímpar? Escreva um exemplo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Se <code style="font-family:'Space Mono',monospace">$n % 2 === 0</code>, o número é par. Se <code style="font-family:'Space Mono',monospace">$n % 2 === 1</code>, é ímpar. O módulo por 2 sempre retorna 0 (par) ou 1 (ímpar).</p>
+              </div>
+              <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;margin-top:10px;">&lt;?php
+$numero = 7;
+if ($numero % 2 === 0) {
+    echo "$numero é par";
+} else {
+    echo "$numero é ímpar";
+}
+// 7 é ímpar
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(1)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(2)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(3)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-2 -->
+
+    <!-- ══════════ AULA 4 ══════════ -->
+    <div class="lesson-panel" id="lesson-3">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 04 / 06</span>
+          <span class="lesson-dur">⏱ ~15 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Boolean</em> e <em>Null</em></h1>
+        <p class="lesson-desc">Entenda os tipos lógicos do PHP: o boolean (verdadeiro/falso) que controla toda a lógica dos seus programas, e o null que representa ausência de valor.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Boolean — verdadeiro ou falso</h2>
+          <div class="prose">
+            <p>O tipo <strong>bool</strong> (boolean) é o mais simples: só tem dois valores possíveis — <em>true</em> (verdadeiro) ou <em>false</em> (falso). É o tipo usado em condicionais, loops e toda lógica de programação.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · boolean.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$logado</span>       = <span class="c-kw">true</span>;<br>
+<span class="ln">4</span><span class="c-var">$tem_permissao</span> = <span class="c-kw">false</span>;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-cmt">// Operadores de comparação retornam bool</span><br>
+<span class="ln">7</span><span class="c-var">$maior</span>   = <span class="c-num">10</span> &gt; <span class="c-num">5</span>;   <span class="c-cmt">// true</span><br>
+<span class="ln">8</span><span class="c-var">$igual</span>   = <span class="c-num">3</span> == <span class="c-num">3</span>;   <span class="c-cmt">// true</span><br>
+<span class="ln">9</span><span class="c-var">$diferente</span> = <span class="c-num">3</span> != <span class="c-num">4</span>; <span class="c-cmt">// true</span><br>
+<span class="ln">10</span><span class="c-var">$identico</span>  = <span class="c-str">"1"</span> === <span class="c-num">1</span>;<span class="c-cmt">// false (tipo diferente!)</span><br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// var_dump mostra o tipo e valor</span><br>
+<span class="ln">13</span><span class="c-fn">var_dump</span>(<span class="c-var">$logado</span>);    <span class="c-cmt">// bool(true)</span><br>
+<span class="ln">14</span><span class="c-fn">var_dump</span>(<span class="c-var">$identico</span>);  <span class="c-cmt">// bool(false)</span><br>
+<span class="ln">15</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>== vs === em PHP</strong>
+              <p><code style="font-family:'Space Mono',monospace">==</code> compara apenas o <em>valor</em> (com conversão de tipo). <code style="font-family:'Space Mono',monospace">===</code> compara valor <em>e tipo</em>. Prefira sempre <strong>===</strong> para evitar comportamentos inesperados: <code style="font-family:'Space Mono',monospace">"0" == false</code> é <em>true</em>, mas <code style="font-family:'Space Mono',monospace">"0" === false</code> é <em>false</em>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Valores "falsy" em PHP</h2>
+          <div class="prose">
+            <p>Em PHP, alguns valores são tratados como <strong>false</strong> em contexto booleano, mesmo sem serem literalmente <em>false</em>. São os "falsy values":</p>
+            <ul>
+              <li><code style="font-family:'Space Mono',monospace">false</code> — o próprio false</li>
+              <li><code style="font-family:'Space Mono',monospace">0</code> e <code style="font-family:'Space Mono',monospace">0.0</code> — zero inteiro e float</li>
+              <li><code style="font-family:'Space Mono',monospace">""</code> e <code style="font-family:'Space Mono',monospace">"0"</code> — string vazia e string "0"</li>
+              <li><code style="font-family:'Space Mono',monospace">[]</code> — array vazio</li>
+              <li><code style="font-family:'Space Mono',monospace">null</code> — ausência de valor</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Null — ausência de valor</h2>
+          <div class="prose">
+            <p>O tipo <strong>null</strong> representa a <em>ausência de valor</em>. Uma variável é null quando não foi atribuído nenhum valor a ela, quando recebeu <em>null</em> explicitamente, ou quando foi destruída com <code style="font-family:'Space Mono',monospace">unset()</code>.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · null.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$resultado</span> = <span class="c-kw">null</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt">// Verificando se é null</span><br>
+<span class="ln">6</span><span class="c-fn">var_dump</span>(<span class="c-fn">is_null</span>(<span class="c-var">$resultado</span>)); <span class="c-cmt">// bool(true)</span><br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// isset() — verifica se variável existe e não é null</span><br>
+<span class="ln">9</span><span class="c-fn">var_dump</span>(<span class="c-fn">isset</span>(<span class="c-var">$resultado</span>));    <span class="c-cmt">// bool(false)</span><br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-cmt">// Operador de coalescência nula (PHP 7+)</span><br>
+<span class="ln">12</span><span class="c-var">$nome</span> = <span class="c-var">$resultado</span> ?? <span class="c-str">"padrão"</span>;<br>
+<span class="ln">13</span><span class="c-fn">echo</span> <span class="c-var">$nome</span>; <span class="c-cmt">// "padrão"</span><br>
+<span class="ln">14</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Operador ?? (Null Coalescing)</strong>
+              <p>O operador <em>??</em> retorna o valor do lado esquerdo se ele não for null; caso contrário, retorna o valor da direita. Muito útil para valores padrão: <code style="font-family:'Space Mono',monospace">$nome = $_GET['nome'] ?? 'Visitante'</code>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 4 -->
+        <div class="activity-card" id="act-3-0">
+          <div class="activity-header">
+            <div class="activity-icon">🎯</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Desafio lógico · +15 XP</div>
+              <h3>== ou ===? Qual usar?</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Em PHP, qual é o resultado de <code style="font-family:'Space Mono',monospace">0 == "php"</code>?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','3-0')"><div class="quiz-opt-letter">A</div> true — PHP converte "php" para 0 ao comparar com ==</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">B</div> false — são tipos diferentes</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">C</div> Gera um erro de tipo</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">D</div> null</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-3-0"></div>
+            <div class="xp-reward" id="xp-3-0"><div class="xp-icon">🏆</div><div class="xp-text">Correto! <strong>+15 XP!</strong> Por isso sempre use === em comparações críticas!</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 4 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>boolean-null.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-4')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-4" spellcheck="false">&lt;?php
+
+// Explorando booleanos
+$ativo  = true;
+$admin  = false;
+
+// var_dump mostra tipo + valor
+var_dump($ativo);
+var_dump($admin);
+
+// Comparações
+var_dump(10 > 5);     // true
+var_dump(10 === 10);  // true
+var_dump("1" === 1);  // false (tipos diferentes!)
+
+// Null e coalescência
+$config = null;
+$valor  = $config ?? "valor_padrao";
+echo "\nValor: " . $valor . "\n";
+
+// isset vs is_null
+var_dump(isset($config));    // false (é null)
+var_dump(is_null($config));  // true
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-4"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 var_dump() mostra o tipo e o valor de qualquer variável</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-4','out-sb-4')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 4 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Fixando Boolean e Null</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique a diferença entre <strong>==</strong> e <strong>===</strong> em PHP. Por que é importante usar o operador de identidade (<strong>===</strong>) em vez do de igualdade (<strong>==</strong>) na maioria dos casos?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><code style="font-family:'Space Mono',monospace">==</code> compara apenas o valor, realizando <em>type juggling</em> (conversão automática de tipo). Isso pode causar resultados inesperados: <code style="font-family:'Space Mono',monospace">0 == false</code> é <em>true</em>, <code style="font-family:'Space Mono',monospace">"" == false</code> é <em>true</em>.</p>
+                <p><code style="font-family:'Space Mono',monospace">===</code> compara valor <em>e tipo</em>, sem conversão. É mais seguro e previsível. Use sempre === a menos que precise de conversão de tipo intencional.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">O que é o operador <strong>??</strong> (null coalescing) e quando usá-lo? Escreva um exemplo prático simulando a leitura de um parâmetro de URL que pode ou não existir.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>O <strong>??</strong> retorna o operando da esquerda se não for null; caso contrário, retorna o da direita. Evita o padrão verbose de <code style="font-family:'Space Mono',monospace">isset($x) ? $x : 'default'</code>.</p>
+              </div>
+              <pre style="background:var(--bg);border-radius:8px;padding:14px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;margin-top:10px;">&lt;?php
+// Simulando $_GET['pagina'] inexistente
+$_GET = []; // array vazio para simular
+
+$pagina = $_GET['pagina'] ?? 1; // Usa 1 como padrão
+$ordem  = $_GET['ordem']  ?? 'asc';
+
+echo "Página: $pagina\n"; // Página: 1
+echo "Ordem: $ordem\n";   // Ordem: asc
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Liste os 5 valores "falsy" do PHP (que são tratados como false em contexto booleano) e explique por que é importante conhecê-los ao escrever condicionais.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Os valores falsy em PHP são: <strong>false</strong>, <strong>0</strong> (int zero), <strong>0.0</strong> (float zero), <strong>""</strong> (string vazia), <strong>"0"</strong> (string zero), <strong>[]</strong> (array vazio) e <strong>null</strong>.</p>
+                <p>É essencial conhecê-los para evitar bugs em condicionais. Exemplo: <code style="font-family:'Space Mono',monospace">if ($quantidade)</code> falha quando $quantidade é 0, mesmo sendo um valor válido. O correto seria <code style="font-family:'Space Mono',monospace">if ($quantidade !== null)</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(2)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(3)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(4)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-3 -->
+
+    <!-- ══════════ AULA 5 ══════════ -->
+    <div class="lesson-panel" id="lesson-4">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 05 / 06</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Arrays</em> — coleções de dados</h1>
+        <p class="lesson-desc">Domine os arrays em PHP: armazene múltiplos valores em uma única variável, trabalhe com arrays indexados, associativos e multidimensionais.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Array Indexado</h2>
+          <div class="prose">
+            <p>Um <strong>array indexado</strong> armazena uma lista de valores acessados por um índice numérico que começa em <em>0</em> (não em 1!). É como uma lista numerada.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · array_indexado.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Criando um array indexado</span><br>
+<span class="ln">4</span><span class="c-var">$linguagens</span> = [<span class="c-str">"PHP"</span>, <span class="c-str">"Python"</span>, <span class="c-str">"JavaScript"</span>];<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-cmt">// Acessando por índice (começa em 0)</span><br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-var">$linguagens</span>[<span class="c-num">0</span>]; <span class="c-cmt">// PHP</span><br>
+<span class="ln">8</span><span class="c-fn">echo</span> <span class="c-var">$linguagens</span>[<span class="c-num">1</span>]; <span class="c-cmt">// Python</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-var">$linguagens</span>[<span class="c-num">2</span>]; <span class="c-cmt">// JavaScript</span><br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-cmt">// Adicionando um novo elemento</span><br>
+<span class="ln">12</span><span class="c-var">$linguagens</span>[] = <span class="c-str">"Ruby"</span>; <span class="c-cmt">// índice 3</span><br>
+<span class="ln">13</span><br>
+<span class="ln">14</span><span class="c-cmt">// Contando elementos</span><br>
+<span class="ln">15</span><span class="c-fn">echo</span> <span class="c-fn">count</span>(<span class="c-var">$linguagens</span>); <span class="c-cmt">// 4</span><br>
+<span class="ln">16</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Array Associativo</h2>
+          <div class="prose">
+            <p>Um <strong>array associativo</strong> usa chaves de string (em vez de números) para identificar cada valor. É como um dicionário: cada palavra (chave) tem uma definição (valor).</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · array_associativo.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$aluno</span> = [<br>
+<span class="ln">4</span>  <span class="c-str">"nome"</span>    =&gt; <span class="c-str">"Ana Silva"</span>,<br>
+<span class="ln">5</span>  <span class="c-str">"idade"</span>   =&gt; <span class="c-num">22</span>,<br>
+<span class="ln">6</span>  <span class="c-str">"curso"</span>   =&gt; <span class="c-str">"Engenharia de Software"</span>,<br>
+<span class="ln">7</span>  <span class="c-str">"ativo"</span>   =&gt; <span class="c-kw">true</span>,<br>
+<span class="ln">8</span>];<br>
+<span class="ln">9</span><br>
+<span class="ln">10</span><span class="c-cmt">// Acessando por chave</span><br>
+<span class="ln">11</span><span class="c-fn">echo</span> <span class="c-var">$aluno</span>[<span class="c-str">"nome"</span>];  <span class="c-cmt">// Ana Silva</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-var">$aluno</span>[<span class="c-str">"idade"</span>]; <span class="c-cmt">// 22</span><br>
+<span class="ln">13</span><br>
+<span class="ln">14</span><span class="c-cmt">// Adicionando nova chave</span><br>
+<span class="ln">15</span><span class="c-var">$aluno</span>[<span class="c-str">"nota"</span>] = <span class="c-num">9.5</span>;<br>
+<span class="ln">16</span><br>
+<span class="ln">17</span><span class="c-cmt">// Percorrendo com foreach</span><br>
+<span class="ln">18</span><span class="c-kw">foreach</span> (<span class="c-var">$aluno</span> <span class="c-kw">as</span> <span class="c-var">$chave</span> =&gt; <span class="c-var">$valor</span>) {<br>
+<span class="ln">19</span>  <span class="c-fn">echo</span> <span class="c-str">"$chave: $valor\n"</span>;<br>
+<span class="ln">20</span>}<br>
+<span class="ln">21</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Funções de array essenciais</h2>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · funcoes_array.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$nums</span> = [<span class="c-num">3</span>, <span class="c-num">1</span>, <span class="c-num">4</span>, <span class="c-num">1</span>, <span class="c-num">5</span>, <span class="c-num">9</span>, <span class="c-num">2</span>, <span class="c-num">6</span>];<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-fn">sort</span>(<span class="c-var">$nums</span>);                          <span class="c-cmt">// Ordena (modifica o original)</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-fn">implode</span>(<span class="c-str">", "</span>, <span class="c-var">$nums</span>);           <span class="c-cmt">// 1, 1, 2, 3, 4, 5, 6, 9</span><br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-var">$frutas</span> = [<span class="c-str">"maçã"</span>, <span class="c-str">"banana"</span>, <span class="c-str">"uva"</span>];<br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-fn">in_array</span>(<span class="c-str">"banana"</span>, <span class="c-var">$frutas</span>);    <span class="c-cmt">// true (existe no array)</span><br>
+<span class="ln">10</span><span class="c-fn">array_push</span>(<span class="c-var">$frutas</span>, <span class="c-str">"manga"</span>);        <span class="c-cmt">// Adiciona ao final</span><br>
+<span class="ln">11</span><span class="c-fn">array_pop</span>(<span class="c-var">$frutas</span>);                  <span class="c-cmt">// Remove do final</span><br>
+<span class="ln">12</span><span class="c-var">$unicos</span> = <span class="c-fn">array_unique</span>(<span class="c-var">$nums</span>);      <span class="c-cmt">// Remove duplicatas</span><br>
+<span class="ln">13</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- DRAG & DROP AULA 5 -->
+        <div class="activity-card" id="act-4-0">
+          <div class="activity-header">
+            <div class="activity-icon">🎯</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Arrastar e Soltar · +20 XP</div>
+              <h3>Associe a função ao que ela faz!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Arraste cada função para a descrição correta.</p>
+            <div class="drag-area" id="drag-chips-4">
+              <div class="drag-chip" draggable="true" data-val="count()">count()</div>
+              <div class="drag-chip" draggable="true" data-val="implode()">implode()</div>
+              <div class="drag-chip" draggable="true" data-val="in_array()">in_array()</div>
+              <div class="drag-chip" draggable="true" data-val="sort()">sort()</div>
+            </div>
+            <div class="drop-zones" id="drop-zones-4">
+              <div class="drop-zone" data-answer="count()"><span class="zone-label">Conta elementos →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="sort()"><span class="zone-label">Ordena o array →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="implode()"><span class="zone-label">Une em string →</span><span class="zone-slot"></span></div>
+              <div class="drop-zone" data-answer="in_array()"><span class="zone-label">Busca um valor →</span><span class="zone-slot"></span></div>
+            </div>
+            <div class="xp-reward" id="xp-4-0"><div class="xp-icon">🏆</div><div class="xp-text">Perfeito! <strong>+20 XP!</strong> Você domina as funções de array!</div></div>
+            <div class="activity-actions">
+              <button class="act-btn act-btn-primary" onclick="checkDragCustom('drop-zones-4','xp-4-0')">Verificar</button>
+              <button class="act-btn act-btn-secondary" onclick="resetDragCustom('drop-zones-4','drag-chips-4','xp-4-0')">Resetar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 5 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>arrays.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-5')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-5" spellcheck="false">&lt;?php
+
+// Array indexado
+$notas = [8.5, 9.0, 7.5, 10.0, 6.5];
+
+echo "Total de notas: " . count($notas) . "\n";
+echo "Maior nota: "     . max($notas)   . "\n";
+echo "Menor nota: "     . min($notas)   . "\n";
+
+$media = array_sum($notas) / count($notas);
+echo "Média: " . number_format($media, 2, ',', '.') . "\n";
+
+// Array associativo
+$aluno = [
+    "nome"  => "Carlos",
+    "turma" => "TI-2A",
+    "media" => $media,
+];
+
+echo "\n--- Boletim ---\n";
+foreach ($aluno as $campo => $valor) {
+    echo ucfirst($campo) . ": " . $valor . "\n";
+}
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-5"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 array_sum() soma todos os valores, max() e min() retornam o maior/menor</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-5','out-sb-5')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 5 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique Arrays no ambiente acima</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual é a diferença entre um <strong>array indexado</strong> e um <strong>array associativo</strong> em PHP? Quando você escolheria usar cada um deles? Dê um exemplo de caso de uso real para cada tipo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Array indexado:</strong> usa índices numéricos (0, 1, 2...). Ideal para listas simples onde a ordem importa. Ex: lista de resultados de busca, fila de tarefas, itens de um carrinho.</p>
+                <p><strong>Array associativo:</strong> usa chaves de string. Ideal para representar um objeto/entidade com propriedades nomeadas. Ex: dados de um usuário (nome, email, idade), configurações do sistema, linha de banco de dados.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">No ambiente de código acima, crie um array associativo representando um produto de e-commerce com pelo menos 5 campos (nome, preço, estoque, categoria, disponível). Percorra com <strong>foreach</strong> e exiba cada campo formatado.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$produto = [
+    "nome"        => "Teclado Mecânico",
+    "preco"       => 349.90,
+    "estoque"     => 15,
+    "categoria"   => "Periféricos",
+    "disponivel"  => true,
+];
+
+echo "=== Dados do Produto ===\n";
+foreach ($produto as $campo => $valor) {
+    if (is_bool($valor)) {
+        $valor = $valor ? "Sim" : "Não";
+    }
+    echo ucfirst($campo) . ": " . $valor . "\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Crie um script PHP que tenha um array com os nomes de 5 colegas. Use <strong>sort()</strong> para ordenar alfabeticamente, <strong>implode()</strong> para juntar com vírgula e verifique com <strong>in_array()</strong> se um nome específico está na lista.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$colegas = ["Marcos", "Ana", "Beatriz", "Carlos", "Daniel"];
+
+sort($colegas);
+echo "Ordenados: " . implode(", ", $colegas) . "\n";
+// Ana, Beatriz, Carlos, Daniel, Marcos
+
+$busca = "Ana";
+if (in_array($busca, $colegas)) {
+    echo "$busca está na lista!\n";
+} else {
+    echo "$busca não está na lista.\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(3)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(4)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(5)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-4 -->
+
+    <!-- ══════════ AULA 6 ══════════ -->
+    <div class="lesson-panel" id="lesson-5">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 06 / 06</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Tipagem Dinâmica</em> e Conversão</h1>
+        <p class="lesson-desc">Entenda como o PHP gerencia tipos automaticamente, como converter entre tipos manualmente e como usar a verificação de tipos do PHP 8 para escrever código mais seguro.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">PHP é fracamente tipado</h2>
+          <div class="prose">
+            <p>PHP é uma linguagem de <strong>tipagem dinâmica e fraca</strong>: você não declara o tipo de uma variável, e o PHP converte tipos automaticamente quando necessário. Isso é chamado de <em>type juggling</em> (malabarismo de tipos).</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · type_juggling.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// PHP converte automaticamente quando necessário</span><br>
+<span class="ln">4</span><span class="c-var">$numero</span> = <span class="c-str">"5"</span>;         <span class="c-cmt">// string "5"</span><br>
+<span class="ln">5</span><span class="c-var">$resultado</span> = <span class="c-var">$numero</span> + <span class="c-num">3</span>; <span class="c-cmt">// PHP converte "5" para int</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> <span class="c-var">$resultado</span>;           <span class="c-cmt">// 8 (int)</span><br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Concatenação vs adição</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> <span class="c-str">"10"</span> + <span class="c-str">"20"</span>;  <span class="c-cmt">// 30 (adição numérica)</span><br>
+<span class="ln">10</span><span class="c-fn">echo</span> <span class="c-str">"10"</span> . <span class="c-str">"20"</span>;  <span class="c-cmt">// 1020 (concatenação)</span><br>
+<span class="ln">11</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Conversão explícita (casting)</h2>
+          <div class="prose">
+            <p>Você pode <strong>forçar a conversão de tipo</strong> usando o operador de cast — coloque o tipo entre parênteses antes da variável:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · casting.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$valor</span> = <span class="c-str">"42.7abc"</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-fn">echo</span> (<span class="c-kw">int</span>)   <span class="c-var">$valor</span>; <span class="c-cmt">// 42      (para inteiro)</span><br>
+<span class="ln">6</span><span class="c-fn">echo</span> (<span class="c-kw">float</span>) <span class="c-var">$valor</span>; <span class="c-cmt">// 42.7    (para float)</span><br>
+<span class="ln">7</span><span class="c-fn">echo</span> (<span class="c-kw">string</span>)<span class="c-num">3.14</span>;   <span class="c-cmt">// "3.14"  (para string)</span><br>
+<span class="ln">8</span><span class="c-fn">echo</span> (<span class="c-kw">bool</span>)  <span class="c-num">0</span>;       <span class="c-cmt">// false   (para bool)</span><br>
+<span class="ln">9</span><span class="c-fn">echo</span> (<span class="c-kw">array</span>) <span class="c-str">"PHP"</span>;   <span class="c-cmt">// ["PHP"] (para array)</span><br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-cmt">// Funções de conversão</span><br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-fn">intval</span>(<span class="c-str">"42abc"</span>); <span class="c-cmt">// 42</span><br>
+<span class="ln">13</span><span class="c-fn">echo</span> <span class="c-fn">strval</span>(<span class="c-num">100</span>);     <span class="c-cmt">// "100"</span><br>
+<span class="ln">14</span><span class="c-fn">echo</span> <span class="c-fn">floatval</span>(<span class="c-str">"3.5"</span>); <span class="c-cmt">// 3.5</span><br>
+<span class="ln">15</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Verificação de tipos</h2>
+          <div class="prose">
+            <p>PHP tem funções para <strong>verificar o tipo</strong> de uma variável antes de usá-la:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · verificacao_tipos.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-var">$x</span> = <span class="c-num">42</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-fn">is_int</span>(<span class="c-var">$x</span>);     <span class="c-cmt">// true</span><br>
+<span class="ln">6</span><span class="c-fn">is_float</span>(<span class="c-var">$x</span>);   <span class="c-cmt">// false</span><br>
+<span class="ln">7</span><span class="c-fn">is_string</span>(<span class="c-var">$x</span>);  <span class="c-cmt">// false</span><br>
+<span class="ln">8</span><span class="c-fn">is_bool</span>(<span class="c-var">$x</span>);    <span class="c-cmt">// false</span><br>
+<span class="ln">9</span><span class="c-fn">is_array</span>(<span class="c-var">$x</span>);   <span class="c-cmt">// false</span><br>
+<span class="ln">10</span><span class="c-fn">is_null</span>(<span class="c-var">$x</span>);    <span class="c-cmt">// false</span><br>
+<span class="ln">11</span><span class="c-fn">is_numeric</span>(<span class="c-var">$x</span>); <span class="c-cmt">// true (int ou string numérica)</span><br>
+<span class="ln">12</span><span class="c-fn">gettype</span>(<span class="c-var">$x</span>);    <span class="c-cmt">// "integer"</span><br>
+<span class="ln">13</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>PHP 8: declare(strict_types=1)</strong>
+              <p>No PHP 8, você pode ativar tipagem estrita no topo do arquivo com <code style="font-family:'Space Mono',monospace">declare(strict_types=1);</code>. Com isso, funções só aceitam exatamente o tipo declarado na assinatura, evitando conversões silenciosas.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ FINAL AULA 6 -->
+        <div class="activity-card" id="act-5-0">
+          <div class="activity-header">
+            <div class="activity-icon">🏆</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz Final do Módulo · +25 XP</div>
+              <h3>Desafio Final — Módulo 2</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual é o resultado de <code style="font-family:'Space Mono',monospace">(int) "10 maçãs"</code> em PHP?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">A</div> Erro de tipo</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">B</div> 0</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','5-0')"><div class="quiz-opt-letter">C</div> 10</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">D</div> "10 maçãs"</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-5-0"></div>
+            <div class="xp-reward" id="xp-5-0"><div class="xp-icon">🎓</div><div class="xp-text"><strong>+25 XP!</strong> Módulo 2 concluído! O cast (int) extrai a parte numérica inicial da string!</div></div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 6 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>tipagem.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-6')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-6" spellcheck="false">&lt;?php
+
+// Experimente conversões de tipos!
+$valores = ["42", "3.14", "true", "0", "100abc", ""];
+
+echo "=== Tabela de tipos ===\n";
+foreach ($valores as $v) {
+    $tipo    = gettype($v);
+    $int     = (int)$v;
+    $float   = (float)$v;
+    $bool    = (bool)$v ? 'true' : 'false';
+    $numeric = is_numeric($v) ? 'sim' : 'não';
+
+    echo "\"$v\" → int:$int | float:$float | bool:$bool | numérico:$numeric\n";
+}
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-6"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 is_numeric() aceita tanto int quanto strings numéricas como "42"</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-6','out-sb-6')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS FINAIS -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">🏁</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Finais — Módulo 2</h3>
+              <p>Consolide todo o aprendizado do Módulo 2</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">O que é <strong>type juggling</strong> em PHP? Dê um exemplo de situação onde o type juggling pode causar um bug inesperado e como evitá-lo.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Type juggling</strong> é a conversão automática de tipos que o PHP faz quando você usa valores de tipos diferentes juntos numa operação. O PHP "adivinham" o tipo que faz mais sentido no contexto.</p>
+                <p><strong>Bug clássico:</strong> ao comparar o retorno de <code style="font-family:'Space Mono',monospace">strpos()</code> (que pode retornar 0 quando encontra na posição 0) com <code style="font-family:'Space Mono',monospace">==</code>: <code style="font-family:'Space Mono',monospace">strpos("PHP", "P") == false</code> retorna <em>true</em> pois 0 == false.</p>
+                <p><strong>Solução:</strong> usar sempre <code style="font-family:'Space Mono',monospace">===</code>: <code style="font-family:'Space Mono',monospace">strpos("PHP", "P") === false</code> retorna corretamente <em>false</em>.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">No ambiente de código, crie um script que declare uma variável de cada tipo primitivo (string, int, float, bool, null, array) e use <strong>gettype()</strong> para exibir o tipo de cada uma em uma tabela formatada.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$vars = [
+    'string' => "PHP Master",
+    'int'    => 42,
+    'float'  => 3.14,
+    'bool'   => true,
+    'null'   => null,
+    'array'  => [1, 2, 3],
+];
+
+echo "Variável          | Tipo\n";
+echo str_repeat("-", 30) . "\n";
+foreach ($vars as $nome => $val) {
+    $tipo = gettype($val);
+    echo str_pad($nome, 18) . "| " . $tipo . "\n";
+}
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+            <p class="ex-question">Crie um script PHP completo que simule um <strong>formulário de cadastro</strong>: defina variáveis para nome (string), idade (int), altura (float), ativo (bool) e interesses (array). Valide cada tipo com as funções is_*() e exiba um relatório de cadastro formatado.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+$nome       = "Beatriz Costa";
+$idade      = 21;
+$altura     = 1.62;
+$ativo      = true;
+$interesses = ["PHP", "MySQL", "APIs REST"];
+
+// Validação de tipos
+$valido = is_string($nome)
+       && is_int($idade)
+       && is_float($altura)
+       && is_bool($ativo)
+       && is_array($interesses);
+
+echo "╔═══════════════════════════════╗\n";
+echo "║        CADASTRO DE ALUNO      ║\n";
+echo "╠═══════════════════════════════╣\n";
+echo "║ Nome:       " . $nome        . "\n";
+echo "║ Idade:      " . $idade       . " anos\n";
+echo "║ Altura:     " . $altura      . " m\n";
+echo "║ Ativo:      " . ($ativo ? "Sim" : "Não") . "\n";
+echo "║ Interesses: " . implode(", ", $interesses) . "\n";
+echo "╠═══════════════════════════════╣\n";
+echo "║ Cadastro válido: " . ($valido ? "✓ Sim" : "✗ Não") . "\n";
+echo "╚═══════════════════════════════╝\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(4)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(5)">🏆 Concluir Módulo!</button>
+        <a class="nav-lesson-btn primary" href="modulos.html">Ver todos os módulos →</a>
+      </div>
+    </div><!-- /lesson-5 -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- XP BAR -->
+<div class="xp-bar-total">
+  <span class="xp-label">XP Total</span>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill-global"></div></div>
+  <span class="xp-count" id="xp-count">0 / 100 XP</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentLesson = 0;
+const totalLessons = 6;
+let completedLessons = new Set();
+let totalXP = 0;
+const maxXP = 100;
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+function goToLesson(idx) {
+  document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lesson-' + idx).classList.add('active');
+  document.getElementById('lb-' + idx).classList.add('active');
+  currentLesson = idx;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function completeLesson(idx) {
+  if (completedLessons.has(idx)) return;
+  completedLessons.add(idx);
+  document.getElementById('lb-' + idx).classList.add('completed');
+  updateProgress();
+  showToast('✅ Aula ' + (idx + 1) + ' concluída!');
+  if (idx < totalLessons - 1) {
+    setTimeout(() => goToLesson(idx + 1), 1200);
+  } else {
+    setTimeout(() => showToast('🏆 Módulo 2 completo! Parabéns!'), 400);
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((completedLessons.size / totalLessons) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+/* ══════════════════════════════════════
+   XP SYSTEM
+══════════════════════════════════════ */
+function addXP(amount) {
+  totalXP = Math.min(totalXP + amount, maxXP);
+  const pct = (totalXP / maxXP) * 100;
+  document.getElementById('xp-fill-global').style.width = pct + '%';
+  document.getElementById('xp-count').textContent = totalXP + ' / ' + maxXP + ' XP';
+}
+
+/* ══════════════════════════════════════
+   QUIZ
+══════════════════════════════════════ */
+function answerQuiz(el, result, actId) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o === el) o.classList.add(result === 'correct' ? 'correct' : 'wrong');
+    else if (result === 'wrong' && o.getAttribute('onclick') && o.getAttribute('onclick').includes('correct'))
+      o.classList.add('correct');
+  });
+  const fb  = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  const xpMap = { '0-0': 10, '2-0': 15, '3-0': 15, '5-0': 25 };
+  if (result === 'correct') {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correto!</strong> Muito bem! Continue assim.';
+    xpEl.classList.add('show');
+    addXP(xpMap[actId] || 10);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Não foi dessa vez.</strong> Releia o conteúdo e tente novamente.';
+  }
+}
+
+/* ══════════════════════════════════════
+   FILL IN THE BLANK — CUSTOM
+══════════════════════════════════════ */
+function checkFitbCustom(actId, ids, answers, xpAmount) {
+  let allCorrect = true;
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('correct', 'wrong');
+    const val = el.value.trim().toLowerCase().replace(/\(\)/g, '');
+    const ans = answers[i].toLowerCase().replace(/\(\)/g, '');
+    if (val === ans) el.classList.add('correct');
+    else { el.classList.add('wrong'); allCorrect = false; }
+  });
+  const fb  = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  if (allCorrect) {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Perfeito!</strong> Todas as respostas corretas!';
+    xpEl.classList.add('show');
+    addXP(xpAmount);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ Algumas respostas estão erradas. Revise as funções de string!';
+  }
+}
+
+function resetFitb(ids, fbId, xpId) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('correct', 'wrong'); }
+  });
+  const fb = document.getElementById(fbId);
+  if (fb) { fb.className = 'quiz-feedback'; fb.innerHTML = ''; }
+  const xp = document.getElementById(xpId);
+  if (xp) xp.classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   DRAG & DROP — GENERIC
+══════════════════════════════════════ */
+let draggedEl = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initDrag('drag-chips-4', 'drop-zones-4');
+});
+
+function initDrag(chipsId, zonesId) {
+  const chipsContainer = document.getElementById(chipsId);
+  const zonesContainer = document.getElementById(zonesId);
+  if (!chipsContainer || !zonesContainer) return;
+
+  chipsContainer.querySelectorAll('.drag-chip').forEach(chip => addDragEvents(chip));
+
+  zonesContainer.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (!draggedEl) return;
+      const slot = zone.querySelector('.zone-slot');
+      if (slot.firstChild) {
+        const prev = slot.firstChild;
+        chipsContainer.appendChild(prev);
+        prev.style.display = '';
+        addDragEvents(prev);
+      }
+      const placed = document.createElement('span');
+      placed.className = 'placed-chip';
+      placed.textContent = draggedEl.dataset.val;
+      placed.dataset.val = draggedEl.dataset.val;
+      placed.onclick = () => {
+        chipsContainer.appendChild(draggedEl);
+        draggedEl.style.display = '';
+        placed.remove();
+      };
+      slot.appendChild(placed);
+      draggedEl.style.display = 'none';
+    });
+  });
+}
+
+function addDragEvents(el) {
+  el.addEventListener('dragstart', () => { draggedEl = el; el.classList.add('dragging'); });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+}
+
+function checkDragCustom(zonesId, xpId) {
+  let allCorrect = true;
+  document.querySelectorAll('#' + zonesId + ' .drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone', 'wrong-zone');
+    const slot = zone.querySelector('.zone-slot');
+    const placed = slot.querySelector('.placed-chip');
+    if (!placed) { allCorrect = false; return; }
+    if (placed.dataset.val === zone.dataset.answer) zone.classList.add('correct-zone');
+    else { zone.classList.add('wrong-zone'); allCorrect = false; }
+  });
+  if (allCorrect) {
+    document.getElementById(xpId).classList.add('show');
+    addXP(20);
+    showToast('🎯 Perfeito! +20 XP');
+  } else {
+    showToast('❌ Algumas posições estão erradas. Tente novamente!');
+  }
+}
+
+function resetDragCustom(zonesId, chipsId, xpId) {
+  document.querySelectorAll('#' + zonesId + ' .drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone', 'wrong-zone');
+    zone.querySelector('.zone-slot').innerHTML = '';
+  });
+  document.querySelectorAll('#' + chipsId + ' .drag-chip').forEach(c => c.style.display = '');
+  document.getElementById(xpId).classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX (Emulado)
+══════════════════════════════════════ */
+function runCode(editorId) {
+  const code = document.getElementById(editorId).value;
+  const outId = 'out-' + editorId;
+  const outEl = document.getElementById(outId);
+  outEl.classList.remove('error');
+
+  try {
+    const result = emulatePHP(code);
+    outEl.innerHTML = result.error
+      ? `<span style="color:var(--red)">⚠ ${result.error}</span>`
+      : (result.output || '<span style="color:var(--muted);font-style:italic">(sem saída)</span>');
+    if (result.error) outEl.classList.add('error');
+  } catch(e) {
+    outEl.classList.add('error');
+    outEl.innerHTML = `<span style="color:var(--red)">⚠ Erro: ${e.message}</span>`;
+  }
+}
+
+function emulatePHP(code) {
+  let clean = code
+    .replace(/<\?php/gi, '')
+    .replace(/<\?=/gi, 'echo ')
+    .replace(/\?>/gi, '')
+    .trim();
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // PHP constants
+  const constants = {
+    PHP_VERSION: '8.2.0', PHP_OS: 'Linux',
+    PHP_INT_MAX: '9223372036854775807', PHP_INT_MIN: '-9223372036854775808',
+    PHP_EOL: '\\n', DIRECTORY_SEPARATOR: '/',
+    __DIR__: '/var/www/phpmaster', __FILE__: '/var/www/phpmaster/script.php',
+  };
+  Object.entries(constants).forEach(([k, v]) => {
+    clean = clean.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(String(v)));
+  });
+
+  // date()
+  clean = clean.replace(/date\s*\(\s*['"]d\/m\/Y['"]\s*\)/g, `"${dateStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]H:i:s['"]\s*\)/g, `"${timeStr}"`);
+  clean = clean.replace(/date\s*\(\s*['"]d\/m\/Y H:i:s['"]\s*\)/g, `"${dateStr} ${timeStr}"`);
+
+  // Remove comments
+  clean = clean.replace(/\/\/[^\n]*/g, '').replace(/#[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // define() and const
+  clean = clean.replace(/define\s*\(\s*'([^']+)'\s*,\s*([^)]+)\)\s*;/g, (_, n, v) => `let ${n} = ${v.trim()};`);
+  clean = clean.replace(/define\s*\(\s*"([^"]+)"\s*,\s*([^)]+)\)\s*;/g, (_, n, v) => `let ${n} = ${v.trim()};`);
+  clean = clean.replace(/\bconst\s+([A-Z_]+)\s*=/g, 'let $1 =');
+
+  // is_* functions
+  clean = clean.replace(/\bis_int\s*\(/g, '(v => Number.isInteger(v) && typeof v === "number")(');
+  clean = clean.replace(/\bis_float\s*\(/g, '(v => typeof v === "number" && !Number.isInteger(v))(');
+  clean = clean.replace(/\bis_string\s*\(/g, '(v => typeof v === "string")(');
+  clean = clean.replace(/\bis_bool\s*\(/g, '(v => typeof v === "boolean")(');
+  clean = clean.replace(/\bis_array\s*\(/g, '(v => Array.isArray(v) || (typeof v === "object" && v !== null))(');
+  clean = clean.replace(/\bis_null\s*\(/g, '(v => v === null)(');
+  clean = clean.replace(/\bis_numeric\s*\(/g, '(v => !isNaN(parseFloat(v)) && isFinite(v))(');
+  clean = clean.replace(/\bisset\s*\(/g, '(v => v !== null && v !== undefined)(');
+
+  // gettype()
+  clean = clean.replace(/gettype\s*\(([^)]+)\)/g,
+    '(v => v === null ? "NULL" : Array.isArray(v) ? "array" : typeof v === "boolean" ? "boolean" : Number.isInteger(v) ? "integer" : typeof v === "number" ? "double" : typeof v)($1)');
+
+  // number_format
+  clean = clean.replace(/number_format\s*\(([^,]+),\s*(\d+),\s*'([^']+)'\s*,\s*'([^']*)'\s*\)/g,
+    '(v => v.toFixed($2).replace(".", "$3").replace(/\\B(?=(\\d{3})+(?!\\d))/g, "$4"))($1)');
+  clean = clean.replace(/number_format\s*\(([^,]+),\s*(\d+)\)/g, '(v => v.toFixed($2))($1)');
+
+  // var_dump
+  clean = clean.replace(/var_dump\s*\(([^)]+)\)\s*;/g,
+    '__out((v => { const t = v === null ? "NULL" : Array.isArray(v) ? "array" : typeof v; const val = typeof v === "boolean" ? (v ? "true" : "false") : v === null ? "" : v; return t + "(" + val + ")\\n"; })($1));');
+
+  // Math functions
+  clean = clean.replace(/\babs\s*\(/g, 'Math.abs(');
+  clean = clean.replace(/\bround\s*\(/g, 'Math.round(');
+  clean = clean.replace(/\bceil\s*\(/g, 'Math.ceil(');
+  clean = clean.replace(/\bfloor\s*\(/g, 'Math.floor(');
+  clean = clean.replace(/\bsqrt\s*\(/g, 'Math.sqrt(');
+  clean = clean.replace(/\bpow\s*\(/g, 'Math.pow(');
+  clean = clean.replace(/\bmax\s*\(/g, 'Math.max(');
+  clean = clean.replace(/\bmin\s*\(/g, 'Math.min(');
+  clean = clean.replace(/\brand\s*\(([^,]+),\s*([^)]+)\)/g, '(Math.floor(Math.random() * ($2 - $1 + 1)) + $1)');
+
+  // String functions
+  clean = clean.replace(/\bstrlen\s*\(/g, '(s => s.length)(');
+  clean = clean.replace(/\bstrtoupper\s*\(/g, '(s => s.toUpperCase())(');
+  clean = clean.replace(/\bstrtolower\s*\(/g, '(s => s.toLowerCase())(');
+  clean = clean.replace(/\btrim\s*\(/g, '(s => s.trim())(');
+  clean = clean.replace(/\bltrim\s*\(/g, '(s => s.trimStart())(');
+  clean = clean.replace(/\brtrim\s*\(/g, '(s => s.trimEnd())(');
+  clean = clean.replace(/\bucwords\s*\(/g, '(s => s.replace(/\\b\\w/g, c => c.toUpperCase()))(');
+  clean = clean.replace(/\bstrpos\s*\(([^,]+),\s*([^)]+)\)/g, '($1.indexOf($2))');
+  clean = clean.replace(/\bsubstr\s*\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g, '($1.substr($2, $3))');
+  clean = clean.replace(/\bstr_replace\s*\(([^,]+),\s*([^,]+),\s*([^)]+)\)/g,
+    '($3.split($1).join($2))');
+  clean = clean.replace(/\bstr_pad\s*\(([^,]+),\s*([^)]+)\)/g,
+    '($1.toString().padEnd($2))');
+  clean = clean.replace(/\bstr_repeat\s*\(([^,]+),\s*([^)]+)\)/g, '($1.repeat($2))');
+  clean = clean.replace(/\bucfirst\s*\(/g, '(s => s.charAt(0).toUpperCase() + s.slice(1))(');
+  clean = clean.replace(/\bstrtolower\s*\(/g, '(s => s.toLowerCase())(');
+
+  // intval / floatval / strval
+  clean = clean.replace(/\bintval\s*\(/g, '(v => parseInt(v, 10) || 0)(');
+  clean = clean.replace(/\bfloatval\s*\(/g, '(v => parseFloat(v) || 0)(');
+  clean = clean.replace(/\bstrval\s*\(/g, '(v => String(v))(');
+
+  // Array functions
+  clean = clean.replace(/\bcount\s*\(/g, '(a => Array.isArray(a) ? a.length : Object.keys(a).length)(');
+  clean = clean.replace(/\barray_sum\s*\(/g, '(a => a.reduce((s,v) => s+v, 0))(');
+  clean = clean.replace(/\bimplode\s*\(([^,]+),\s*([^)]+)\)/g, '($2.join($1))');
+  clean = clean.replace(/\bexplode\s*\(([^,]+),\s*([^)]+)\)/g, '($2.split($1))');
+  clean = clean.replace(/\barray_push\s*\(([^,]+),\s*([^)]+)\)\s*;/g, '$1.push($2);');
+  clean = clean.replace(/\barray_pop\s*\(([^)]+)\)\s*;/g, '$1.pop();');
+  clean = clean.replace(/\bsort\s*\(([^)]+)\)\s*;/g, '$1.sort((a,b)=>a>b?1:a<b?-1:0);');
+  clean = clean.replace(/\brsort\s*\(([^)]+)\)\s*;/g, '$1.sort((a,b)=>a<b?1:a>b?-1:0);');
+  clean = clean.replace(/\bin_array\s*\(([^,]+),\s*([^)]+)\)/g, '($2.includes($1))');
+  clean = clean.replace(/\barray_unique\s*\(/g, '(a => [...new Set(a)])(');
+  clean = clean.replace(/\barray_keys\s*\(/g, '(o => Object.keys(o))(');
+  clean = clean.replace(/\barray_values\s*\(/g, '(o => Object.values(o))(');
+
+  // var_export
+  clean = clean.replace(/var_export\s*\(([^,]+),\s*true\s*\)/g, 'JSON.stringify($1)');
+
+  // $var → _var
+  clean = clean.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, '_$1');
+
+  // echo / print
+  clean = clean.replace(/\bprint\b/g, 'echo');
+  clean = clean.replace(/\becho\s+/g, '__out(');
+  clean = clean.replace(/(__out\([^;{}\n]+);/g, (m, inner) => inner + ');');
+
+  // Concat . to +
+  clean = clean.replace(/([^.])\.([^.])/g, '$1+$2');
+
+  // foreach
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\s*=>\s*(_\w+)\)/g,
+    'for (let [$2, $3] of (Array.isArray($1) ? $1.entries() : Object.entries($1)))');
+  clean = clean.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\)/g,
+    'for (let $2 of (Array.isArray($1) ? $1 : Object.values($1)))');
+
+  // bool literals
+  clean = clean.replace(/\btrue\b/g, 'true').replace(/\bfalse\b/g, 'false').replace(/\bnull\b/gi, 'null');
+
+  const js = `
+    let __output = '';
+    function __out(v) {
+      if (v === null || v === undefined) return;
+      let s = v === true ? '1' : v === false ? '' : Array.isArray(v) ? 'Array' : String(v);
+      __output += s.replace(/\\\\n/g, '\\n').replace(/\\\\t/g, '\\t');
+    }
+    ${clean}
+    __output;
+  `;
+
+  try {
+    const result = new Function(js)();
+    return { output: result != null ? String(result) : '' };
+  } catch(e) {
+    return { error: 'Parse Error: ' + e.message };
+  }
+}
+
+function clearSandbox(editorId, outId) {
+  document.getElementById(editorId).value = '';
+  const outEl = document.getElementById(outId);
+  outEl.innerHTML = '<span class="out-placeholder">Clique em "Executar" para ver a saída...</span>';
+  outEl.classList.remove('error');
+}
+
+/* ══════════════════════════════════════
+   GABARITO TOGGLE
+══════════════════════════════════════ */
+function toggleGab(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════
+   COPY CODE
+══════════════════════════════════════ */
+function copyCode(btn) {
+  const body = btn.closest('.code-block').querySelector('.cb-body');
+  navigator.clipboard.writeText(body.innerText.replace(/^\d+\t/gm, '').trim()).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR MOBILE DRAWER
+══════════════════════════════════════ */
+(function(){
+  const toggle  = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); toggle.textContent = '✕'; }
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); toggle.textContent = '☰'; }
+
+  toggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+  overlay.addEventListener('click', closeSidebar);
+  document.querySelectorAll('.lesson-btn').forEach(btn => {
+    btn.addEventListener('click', () => { if (window.innerWidth <= 900) closeSidebar(); });
+  });
+})();
+</script>
+</body>
+</html>
