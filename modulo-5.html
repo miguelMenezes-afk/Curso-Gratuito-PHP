@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Módulo 5: PHP com MySQL</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#0f1525;--bg3:#141c30;--card:#161e35;--border:#1f2d50;--php:#7c4dff;--accent:#00e5ff;--text:#e8eaf6;--muted:#8892b0;--white:#ffffff;--green:#69ffb4;--yellow:#ffd166;--red:#ff6b6b;--radius:16px;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1;}
+.glow-1{width:500px;height:500px;background:var(--php);top:-100px;right:-100px;}
+.glow-2{width:400px;height:400px;background:var(--accent);bottom:0;left:-100px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(10,14,26,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);text-decoration:none;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg)!important;padding:9px 20px;border-radius:50px;font-weight:700!important;}
+.layout{display:block;min-height:100vh;padding-top:60px;}
+.sidebar{position:fixed;top:60px;left:0;bottom:0;width:280px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding:28px 0 60px;}
+.sidebar::-webkit-scrollbar{width:4px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.sidebar-header{padding:0 22px 20px;border-bottom:1px solid var(--border);}
+.mod-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);border-radius:50px;padding:4px 12px;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--php);margin-bottom:10px;}
+.sidebar-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3;color:var(--white);}
+.sidebar-progress{margin-top:14px;}
+.prog-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;}
+.sidebar-nav{padding:16px 0;}
+.sidebar-section{padding:8px 22px 4px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.lesson-btn{display:flex;align-items:center;gap:12px;width:100%;padding:12px 22px;background:none;border:none;cursor:pointer;text-align:left;transition:all .2s;border-left:3px solid transparent;}
+.lesson-btn:hover{background:rgba(255,255,255,.04);}
+.lesson-btn.active{background:rgba(124,77,255,.1);border-left-color:var(--php);}
+.lesson-btn.completed{border-left-color:var(--green);}
+.l-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);}
+.lesson-btn.active .l-icon{background:rgba(124,77,255,.2);border-color:rgba(124,77,255,.5);}
+.lesson-btn.completed .l-icon{background:rgba(105,255,180,.1);border-color:rgba(105,255,180,.3);}
+.l-info{flex:1;}.l-num{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.l-title{font-size:.88rem;font-weight:500;color:var(--text);margin-top:1px;}
+.lesson-btn.active .l-title{color:var(--white);font-weight:600;}
+.l-check{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .2s;}
+.lesson-btn.completed .l-check{opacity:1;}
+.main{margin-left:280px;min-height:100vh;max-width:100%;overflow-x:hidden;}
+.lesson-panel{display:none;animation:fadeUp .4s ease;}.lesson-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.lesson-hero{padding:48px 6% 36px;background:linear-gradient(135deg,rgba(124,77,255,.06),rgba(0,229,255,.04));border-bottom:1px solid var(--border);}
+.lesson-body{padding:48px 6%;}
+.lesson-hero>*,.lesson-body>*{max-width:900px;}
+.lesson-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lesson-num-tag{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);padding:4px 10px;border-radius:50px;}
+.lesson-dur{font-size:.8rem;color:var(--muted);}
+.lesson-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-1px;margin-bottom:12px;}
+.lesson-title em{font-style:normal;color:var(--accent);}
+.lesson-desc{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px;}
+.content-block{margin-bottom:40px;}
+.block-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.block-title::before{content:'';width:4px;height:22px;border-radius:2px;background:linear-gradient(180deg,var(--php),var(--accent));display:block;flex-shrink:0;}
+.prose{color:var(--muted);line-height:1.85;font-size:1rem;}
+.prose strong{color:var(--text);font-weight:600;}.prose em{color:var(--accent);font-style:normal;}
+.prose p{margin-bottom:14px;}.prose ul{padding-left:20px;margin-bottom:14px;}.prose ul li{margin-bottom:8px;}
+.prose ol{padding-left:20px;margin-bottom:14px;}.prose ol li{margin-bottom:8px;}
+.prose a{color:var(--accent);text-decoration:none;}
+.callout{border-radius:14px;padding:20px 22px;margin:24px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-info{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.callout-tip{background:rgba(105,255,180,.06);border:1px solid rgba(105,255,180,.2);}
+.callout-warn{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-body strong{display:block;font-size:.9rem;margin-bottom:4px;color:var(--white);}
+.callout-info .callout-body strong{color:var(--accent);}
+.callout-tip .callout-body strong{color:var(--green);}
+.callout-warn .callout-body strong{color:var(--yellow);}
+.callout-body p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+.code-block{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:20px 0;}
+.cb-header{background:var(--bg3);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.cb-dots{display:flex;gap:6px;}.cb-dot{width:10px;height:10px;border-radius:50%;}
+.cb-dot:nth-child(1){background:#ff5f57;}.cb-dot:nth-child(2){background:#febc2e;}.cb-dot:nth-child(3){background:#28c840;}
+.cb-lang{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.cb-copy{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;transition:all .2s;}
+.cb-copy:hover{color:var(--accent);border-color:var(--accent);}
+.cb-body{padding:22px;font-family:'Space Mono',monospace;font-size:.83rem;line-height:1.85;overflow-x:auto;}
+.c-tag{color:#ff6b9d;}.c-var{color:#82aaff;}.c-str{color:#c3e88d;}.c-kw{color:#c792ea;}.c-fn{color:#89ddff;}.c-num{color:#f78c6c;}.c-cmt{color:#546e7a;font-style:italic;}.c-sql{color:#ffd166;}
+.ln{color:#2d3d6b;user-select:none;margin-right:16px;}
+.section-divider{display:flex;align-items:center;gap:14px;margin:48px 0 36px;}
+.section-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.section-divider span{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:2px;white-space:nowrap;}
+.activity-card{background:var(--card);border:1px solid rgba(0,229,255,.25);border-radius:20px;overflow:hidden;margin:36px 0;box-shadow:0 0 40px rgba(0,229,255,.05);}
+.activity-header{background:linear-gradient(135deg,rgba(124,77,255,.15),rgba(0,229,255,.1));padding:20px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(0,229,255,.15);}
+.activity-icon{font-size:1.6rem;}.activity-header-info{flex:1;}
+.activity-tag{font-family:'Space Mono',monospace;font-size:.67rem;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.activity-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+.activity-body{padding:28px;}
+.quiz-question{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-opt{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;cursor:pointer;transition:all .2s;font-size:.95rem;}
+.quiz-opt:hover{border-color:var(--php);background:rgba(124,77,255,.06);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(105,255,180,.08);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+.quiz-opt-letter{width:28px;height:28px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;transition:all .2s;}
+.quiz-opt.correct .quiz-opt-letter{background:var(--green);color:var(--bg);border-color:var(--green);}
+.quiz-opt.wrong .quiz-opt-letter{background:var(--red);color:var(--white);border-color:var(--red);}
+.quiz-feedback{padding:14px 18px;border-radius:12px;font-size:.9rem;display:none;margin-bottom:16px;line-height:1.5;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct-fb{background:rgba(105,255,180,.08);border:1px solid rgba(105,255,180,.3);color:var(--green);}
+.quiz-feedback.wrong-fb{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+.drag-area{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.drag-chip{background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:.8rem;cursor:grab;user-select:none;transition:all .2s;color:var(--accent);}
+.drag-chip:hover{border-color:var(--accent);background:rgba(0,229,255,.06);}.drag-chip.dragging{opacity:.4;}
+.drop-zones{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.drop-zone{min-height:50px;border:2px dashed var(--border);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:12px;transition:all .2s;font-size:.9rem;color:var(--muted);}
+.drop-zone.drag-over{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.drop-zone .zone-label{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);min-width:170px;}
+.drop-zone .placed-chip{background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);border-radius:6px;padding:5px 12px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--php);cursor:pointer;}
+.drop-zone.correct-zone{border-color:var(--green);background:rgba(105,255,180,.06);}
+.drop-zone.wrong-zone{border-color:var(--red);background:rgba(255,107,107,.06);}
+.fitb-sentence{font-size:1rem;line-height:2.8;color:var(--text);margin-bottom:20px;}
+.fitb-input{display:inline-block;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:4px 12px;font-family:'Space Mono',monospace;font-size:.83rem;color:var(--accent);outline:none;width:130px;text-align:center;transition:all .2s;vertical-align:middle;}
+.fitb-input:focus{border-color:var(--accent);}.fitb-input.correct{border-color:var(--green);color:var(--green);}.fitb-input.wrong{border-color:var(--red);color:var(--red);}
+.xp-reward{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(105,255,180,.08),rgba(0,229,255,.05));border:1px solid rgba(105,255,180,.25);border-radius:12px;padding:14px 20px;margin-top:16px;display:none;}
+.xp-reward.show{display:flex;}.xp-icon{font-size:1.5rem;}.xp-text{font-size:.9rem;}.xp-text strong{color:var(--green);}
+.activity-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.act-btn{padding:10px 22px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s;border:none;}
+.act-btn-primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);}
+.act-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3);}
+.act-btn-secondary{background:var(--bg2);color:var(--muted);border:1px solid var(--border);}
+.act-btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+/* SQL SIMULATOR */
+.sql-sim{background:var(--bg2);border:1px solid rgba(255,209,102,.3);border-radius:20px;overflow:hidden;margin:36px 0;box-shadow:0 0 30px rgba(255,209,102,.05);}
+.sql-sim-hdr{background:var(--bg3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.sql-sim-title{display:flex;align-items:center;gap:10px;}
+.sql-sim-title .sd{display:flex;gap:5px;}
+.sql-sim-title .sd span{width:10px;height:10px;border-radius:50%;display:block;}
+.sd .r{background:#ff5f57;}.sd .y{background:#febc2e;}.sd .g{background:#28c840;}
+.sql-sim-title em{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;font-style:normal;}
+.sql-tag{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--yellow);background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);border-radius:50px;padding:4px 10px;}
+.sql-run{background:linear-gradient(135deg,#ffd166,#ff9f43);color:var(--bg);border:none;padding:9px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:6px;}
+.sql-run:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,209,102,.4);}
+.sql-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sql-editor-pane{border-right:1px solid var(--border);}
+.sql-pane-lbl{padding:10px 18px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.sql-pane-lbl .yd{width:6px;height:6px;border-radius:50%;background:var(--yellow);}
+.sql-pane-lbl .gd{width:6px;height:6px;border-radius:50%;background:var(--green);}
+.sql-editor{width:100%;min-height:190px;padding:20px;resize:none;background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:.83rem;line-height:1.8;color:var(--text);tab-size:2;}
+.sql-out{padding:20px;font-family:'Space Mono',monospace;font-size:.83rem;line-height:1.8;min-height:190px;white-space:pre-wrap;word-break:break-word;}
+.sql-out .ph{color:var(--muted);font-style:italic;}
+.sql-table{width:100%;border-collapse:collapse;font-size:.79rem;}
+.sql-table th{background:rgba(255,209,102,.08);color:var(--yellow);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:1px;}
+.sql-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);}
+.sql-table tr:last-child td{border-bottom:none;}.sql-table tr:hover td{background:rgba(255,255,255,.03);}
+.sql-sim-ftr{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--muted);}
+.sql-note{font-family:'Space Mono',monospace;}
+.sql-clr{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:.75rem;cursor:pointer;transition:all .2s;}
+.sql-clr:hover{border-color:var(--red);color:var(--red);}
+/* SANDBOX */
+.sandbox-wrap{background:var(--bg2);border:1px solid rgba(124,77,255,.3);border-radius:20px;overflow:hidden;margin:36px 0;box-shadow:0 0 40px rgba(124,77,255,.07);}
+.sandbox-header{background:var(--bg3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.sandbox-title{display:flex;align-items:center;gap:10px;}
+.sandbox-title .s-dots{display:flex;gap:5px;}
+.sandbox-title .s-dot{width:10px;height:10px;border-radius:50%;}
+.s-dot:nth-child(1){background:#ff5f57;}.s-dot:nth-child(2){background:#febc2e;}.s-dot:nth-child(3){background:#28c840;}
+.sandbox-title span{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;}
+.sandbox-actions{display:flex;gap:10px;align-items:center;}
+.sandbox-tag{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);border-radius:50px;padding:4px 10px;}
+.run-btn{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);border:none;padding:9px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;}
+.run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.35);}
+.run-btn:active{transform:scale(.97);}
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sandbox-editor-wrap{border-right:1px solid var(--border);}
+.sandbox-pane-label{padding:10px 18px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.sandbox-pane-label .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.sandbox-editor{width:100%;min-height:200px;padding:20px;resize:none;background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:.83rem;line-height:1.8;color:var(--text);tab-size:2;}
+.sandbox-output{padding:20px;font-family:'Space Mono',monospace;font-size:.83rem;line-height:1.8;min-height:200px;color:var(--green);white-space:pre-wrap;word-break:break-word;}
+.sandbox-output.error{color:var(--red);}
+.sandbox-output .out-placeholder{color:var(--muted);font-style:italic;}
+.sandbox-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--muted);}
+.sandbox-note{font-family:'Space Mono',monospace;}
+.sandbox-clear{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:.75rem;cursor:pointer;transition:all .2s;}
+.sandbox-clear:hover{border-color:var(--red);color:var(--red);}
+/* EXERCISES */
+.exercises-section{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px;margin-top:48px;}
+.ex-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.ex-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.ex-header-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;}
+.ex-header-info p{color:var(--muted);font-size:.88rem;margin-top:3px;}
+.exercise{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.exercise:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ex-num{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);margin-bottom:8px;letter-spacing:1px;}
+.ex-question{font-size:.98rem;line-height:1.65;color:var(--text);margin-bottom:16px;}
+.ex-question strong{color:var(--accent);}
+.gabarito-toggle{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:9px 16px;color:var(--muted);font-size:.83rem;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;margin-top:12px;}
+.gabarito-toggle:hover{border-color:var(--yellow);color:var(--yellow);}
+.gabarito-toggle .arrow{transition:transform .25s;}
+.gabarito-toggle.open .arrow{transform:rotate(180deg);}
+.gabarito-body{margin-top:14px;padding:20px;background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.2);border-radius:12px;display:none;animation:fadeUp .3s ease;}
+.gabarito-body.open{display:block;}
+.gabarito-body .gab-label{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);letter-spacing:2px;margin-bottom:12px;}
+.gabarito-body .prose{font-size:.9rem;}
+.lesson-nav{display:flex;align-items:center;justify-content:space-between;padding:28px 6%;border-top:1px solid var(--border);background:var(--bg2);}
+.nav-lesson-btn{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 20px;cursor:pointer;transition:all .25s;text-decoration:none;font-size:.9rem;color:var(--muted);}
+.nav-lesson-btn:hover{border-color:var(--accent);color:var(--text);}
+.nav-lesson-btn.primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);border:none;font-weight:700;}
+.nav-lesson-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.3);color:var(--bg);}
+.nav-lesson-btn.disabled{opacity:.3;pointer-events:none;}
+.complete-btn{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--green),#00b88a);color:var(--bg);border:none;border-radius:12px;padding:12px 24px;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .25s;}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(105,255,180,.3);}
+.xp-bar-total{position:fixed;bottom:0;left:280px;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:12px 5%;display:flex;align-items:center;gap:16px;z-index:50;}
+.xp-label{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;width:0%;}
+.xp-count{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);white-space:nowrap;}
+.toast{position:fixed;bottom:60px;right:28px;background:var(--card);border:1px solid var(--green);color:var(--green);border-radius:14px;padding:14px 20px;font-size:.88rem;font-weight:500;z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:slideIn .3s ease;}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.menu-toggle{display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:1.1rem;line-height:1;transition:all .2s;}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;}
+.sidebar-overlay.open{display:block;}
+@media(max-width:900px){
+  .menu-toggle{display:block;}.nav-links li:not(:last-child){display:none;}
+  .layout{grid-template-columns:1fr;}.main{margin-left:0;}
+  .sidebar{transform:translateX(-100%);transition:transform .3s ease;width:min(280px,85vw);z-index:150;}
+  .sidebar.open{transform:translateX(0);}
+  .lesson-hero,.lesson-body{padding-left:5%;padding-right:5%;}
+  .sandbox-grid,.sql-grid{grid-template-columns:1fr;}
+  .sandbox-editor-wrap,.sql-editor-pane{border-right:none;border-bottom:1px solid var(--border);}
+  .xp-bar-total{left:0;}
+  .lesson-nav{flex-wrap:wrap;gap:10px;padding:20px 5%;}
+  .nav-lesson-btn{flex:1;min-width:120px;justify-content:center;}
+  .drop-zone .zone-label{min-width:80px;font-size:.68rem;}
+  .fitb-input{width:100px;font-size:.78rem;}
+  .exercises-section{padding:24px 18px;}
+  .callout{flex-direction:column;gap:8px;}
+}
+@media(max-width:480px){
+  .lesson-title{font-size:1.5rem;}
+  .sandbox-header,.sql-sim-hdr{flex-wrap:wrap;gap:8px;}
+  .sandbox-actions{flex-wrap:wrap;}
+  .activity-header{flex-wrap:wrap;}.activity-body{padding:18px;}
+  .activity-actions{flex-direction:column;}.act-btn{width:100%;text-align:center;}
+  .nav-lesson-btn span{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<div class="toast" id="toast"></div>
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="mod-badge">📦 MOD 05</div>
+    <h2>PHP com MySQL</h2>
+    <div class="sidebar-progress">
+      <div class="prog-label"><span>Progresso</span><span id="prog-pct">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Aulas</div>
+    <button class="lesson-btn active" onclick="goToLesson(0)" id="lb-0">
+      <div class="l-icon">🗄️</div>
+      <div class="l-info"><div class="l-num">AULA 01</div><div class="l-title">Bancos e SQL básico</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(1)" id="lb-1">
+      <div class="l-icon">🔌</div>
+      <div class="l-info"><div class="l-num">AULA 02</div><div class="l-title">Conectando com PDO</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(2)" id="lb-2">
+      <div class="l-icon">➕</div>
+      <div class="l-info"><div class="l-num">AULA 03</div><div class="l-title">INSERT — Criando dados</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(3)" id="lb-3">
+      <div class="l-icon">🔍</div>
+      <div class="l-info"><div class="l-num">AULA 04</div><div class="l-title">SELECT — Lendo dados</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(4)" id="lb-4">
+      <div class="l-icon">✏️</div>
+      <div class="l-info"><div class="l-num">AULA 05</div><div class="l-title">UPDATE — Atualizando</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(5)" id="lb-5">
+      <div class="l-icon">🗑️</div>
+      <div class="l-info"><div class="l-num">AULA 06</div><div class="l-title">DELETE — Removendo</div></div>
+      <span class="l-check">✓</span>
+    </button>
+    <button class="lesson-btn" onclick="goToLesson(6)" id="lb-6">
+      <div class="l-icon">🏆</div>
+      <div class="l-info"><div class="l-num">AULA 07</div><div class="l-title">Consultas avançadas</div></div>
+      <span class="l-check">✓</span>
+    </button>
+  </div>
+</aside>
+<main class="main">
+<!-- ===== AULA 1: Bancos e SQL básico ===== -->
+<div class="lesson-panel active" id="lesson-0">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 01 / 07</span><span class="lesson-dur">⏱ ~20 min</span></div>
+    <h1 class="lesson-title">Bancos de dados e <em>SQL básico</em></h1>
+    <p class="lesson-desc">Entenda o que é um banco de dados relacional, como o MySQL se encaixa no ecossistema PHP e aprenda os 4 comandos SQL fundamentais que formam o CRUD.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">O que é um banco de dados relacional?</h2>
+      <div class="prose">
+        <p>Um <strong>banco de dados relacional</strong> organiza informações em <em>tabelas</em> — semelhante a planilhas — com linhas (registros) e colunas (campos). O <strong>MySQL</strong> é o banco relacional open-source mais popular e combina perfeitamente com PHP.</p>
+        <p>Cada tabela representa uma entidade do sistema: <strong>usuários</strong>, <strong>produtos</strong>, <strong>pedidos</strong>. As tabelas se relacionam através de chaves estrangeiras.</p>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <strong>MySQL no XAMPP</strong>
+          <p>Se você instalou o XAMPP (Módulo 1), o MySQL já está incluído! Inicie o serviço <strong>MySQL</strong> no painel XAMPP e acesse o gerenciador em <code style="font-family:'Space Mono',monospace">http://localhost/phpmyadmin</code>.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Criando banco e tabela</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · criar-banco.sql</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-cmt">-- Criar banco de dados</span><br>
+<span class="ln">2</span><span class="c-sql">CREATE DATABASE</span> phpmaster_db <span class="c-sql">CHARACTER SET</span> utf8mb4;<br>
+<span class="ln">3</span><span class="c-sql">USE</span> phpmaster_db;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt">-- Criar tabela de usuários</span><br>
+<span class="ln">6</span><span class="c-sql">CREATE TABLE</span> usuarios (<br>
+<span class="ln">7</span>&nbsp;&nbsp;id        <span class="c-kw">INT</span> <span class="c-sql">AUTO_INCREMENT PRIMARY KEY</span>,<br>
+<span class="ln">8</span>&nbsp;&nbsp;nome      <span class="c-kw">VARCHAR</span>(<span class="c-num">100</span>) <span class="c-sql">NOT NULL</span>,<br>
+<span class="ln">9</span>&nbsp;&nbsp;email     <span class="c-kw">VARCHAR</span>(<span class="c-num">150</span>) <span class="c-sql">UNIQUE NOT NULL</span>,<br>
+<span class="ln">10</span>&nbsp;&nbsp;ativo     <span class="c-kw">BOOLEAN</span> <span class="c-sql">DEFAULT</span> <span class="c-num">1</span>,<br>
+<span class="ln">11</span>&nbsp;&nbsp;criado_em <span class="c-kw">TIMESTAMP</span> <span class="c-sql">DEFAULT CURRENT_TIMESTAMP</span><br>
+<span class="ln">12</span>);
+        </div>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <strong>AUTO_INCREMENT + PRIMARY KEY</strong>
+          <p>O campo <code style="font-family:'Space Mono',monospace">id INT AUTO_INCREMENT PRIMARY KEY</code> é o padrão de ouro: o MySQL gera automaticamente um número único e crescente para cada registro inserido.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Os 4 comandos do CRUD</h2>
+      <div class="prose">
+        <p>Todo trabalho com banco de dados se resume a 4 operações — o acrônimo <em>CRUD</em>:</p>
+        <ul>
+          <li><strong>C</strong>reate → <code style="font-family:'Space Mono',monospace;color:var(--accent)">INSERT INTO</code> — inserir novos registros</li>
+          <li><strong>R</strong>ead &nbsp;&nbsp; → <code style="font-family:'Space Mono',monospace;color:var(--accent)">SELECT</code> — consultar registros</li>
+          <li><strong>U</strong>pdate → <code style="font-family:'Space Mono',monospace;color:var(--accent)">UPDATE</code> — modificar registros existentes</li>
+          <li><strong>D</strong>elete → <code style="font-family:'Space Mono',monospace;color:var(--accent)">DELETE FROM</code> — remover registros</li>
+        </ul>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL INTERATIVO</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>simulador.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql1')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql1" spellcheck="false">-- Tabela disponível: produtos (id, nome, preco, estoque, categoria)
+-- Explore os comandos!
+
+SELECT * FROM produtos;
+
+-- Tente também:
+-- SELECT nome, preco FROM produtos WHERE preco > 50 ORDER BY preco DESC;
+-- SELECT COUNT(*) AS total FROM produtos;
+-- SELECT categoria, AVG(preco) AS media FROM produtos GROUP BY categoria;</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql1"><span class="ph">Clique em "Executar" para ver o resultado...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Tabela: produtos (id, nome, preco, estoque, categoria)</span><button class="sql-clr" onclick="clearSQL('sql1','out-sql1')">Limpar</button></div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🧠</div><div class="activity-header-info"><div class="activity-tag">Quiz rápido · +10 XP</div><h3>Qual operação SQL corresponde ao "Read" do CRUD?</h3></div></div>
+      <div class="activity-body">
+        <p class="quiz-question">No acrônimo CRUD, a operação de <strong>consulta/leitura</strong> de dados é feita com qual comando SQL?</p>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">A</div> INSERT INTO</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'correct','0-0')"><div class="quiz-opt-letter">B</div> SELECT</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">C</div> UPDATE</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">D</div> DELETE FROM</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-0-0"></div>
+        <div class="xp-reward" id="xp-0-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+10 XP!</strong> SELECT é o comando de leitura — o mais utilizado em qualquer sistema.</div></div>
+      </div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Pratique SQL no simulador acima</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">No simulador, escreva uma query SQL que selecione apenas o <strong>nome</strong> e o <strong>preço</strong> dos produtos com preço maior que R$ 50, ordenados do mais barato ao mais caro.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--yellow);line-height:1.8;">SELECT nome, preco
+FROM produtos
+WHERE preco > 50
+ORDER BY preco ASC;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Escreva o comando SQL completo para criar uma tabela chamada <strong>produtos</strong> com os campos: id (PK auto increment), nome (varchar 100, obrigatório), preco (decimal 10,2), estoque (int, padrão 0) e categoria (varchar 50).</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--yellow);line-height:1.8;">CREATE TABLE produtos (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    nome      VARCHAR(100) NOT NULL,
+    preco     DECIMAL(10,2),
+    estoque   INT DEFAULT 0,
+    categoria VARCHAR(50),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">No simulador, escreva uma query que calcule o <strong>valor total em estoque</strong> por categoria (preco × estoque), agrupada por categoria. Use as funções <code style="font-family:'Space Mono',monospace;color:var(--accent)">SUM()</code> e <code style="font-family:'Space Mono',monospace;color:var(--accent)">GROUP BY</code>.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--yellow);line-height:1.8;">SELECT
+    categoria,
+    COUNT(*) AS qtd_produtos,
+    SUM(preco * estoque) AS valor_total_estoque
+FROM produtos
+GROUP BY categoria
+ORDER BY valor_total_estoque DESC;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn disabled">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(0)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(1)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 2: Conectando com PDO ===== -->
+<div class="lesson-panel" id="lesson-1">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 02 / 07</span><span class="lesson-dur">⏱ ~25 min</span></div>
+    <h1 class="lesson-title">Conectando PHP ao MySQL com <em>PDO</em></h1>
+    <p class="lesson-desc">PDO (PHP Data Objects) é a forma moderna e segura de conectar PHP a qualquer banco de dados. Aprenda a criar conexões robustas com boas práticas profissionais.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">PDO vs MySQLi — qual escolher?</h2>
+      <div class="prose">
+        <p>Existem duas extensões para conectar PHP ao MySQL: <strong>PDO</strong> e <strong>MySQLi</strong>. Este curso adota o PDO pelos seguintes motivos:</p>
+        <ul>
+          <li><strong>Multi-banco:</strong> PDO funciona com MySQL, PostgreSQL, SQLite e outros — MySQLi só com MySQL</li>
+          <li><strong>API orientada a objetos</strong> mais limpa e moderna</li>
+          <li><strong>Prepared Statements nativos</strong>, prevenindo SQL Injection desde o design</li>
+          <li>Adotado por frameworks como Laravel e Symfony</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Criando a conexão PDO</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · conexao.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$host</span>    = <span class="c-str">'localhost'</span>;<br>
+<span class="ln">3</span><span class="c-var">$banco</span>   = <span class="c-str">'phpmaster_db'</span>;<br>
+<span class="ln">4</span><span class="c-var">$usuario</span> = <span class="c-str">'root'</span>;<br>
+<span class="ln">5</span><span class="c-var">$senha</span>   = <span class="c-str">''</span>; <span class="c-cmt">// Vazio no XAMPP local</span><br>
+<span class="ln">6</span><br>
+<span class="ln">7</span><span class="c-kw">try</span> {<br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-var">$dsn</span> = <span class="c-str">"mysql:host={$host};dbname={$banco};charset=utf8mb4"</span>;<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-var">$pdo</span> = <span class="c-kw">new</span> <span class="c-fn">PDO</span>(<span class="c-var">$dsn</span>, <span class="c-var">$usuario</span>, <span class="c-var">$senha</span>, [<br>
+<span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">PDO</span>::<span class="c-fn">ATTR_ERRMODE</span>          =&gt; <span class="c-fn">PDO</span>::<span class="c-fn">ERRMODE_EXCEPTION</span>,<br>
+<span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">PDO</span>::<span class="c-fn">ATTR_DEFAULT_FETCH_MODE</span> =&gt; <span class="c-fn">PDO</span>::<span class="c-fn">FETCH_ASSOC</span>,<br>
+<span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">PDO</span>::<span class="c-fn">ATTR_EMULATE_PREPARES</span>  =&gt; <span class="c-kw">false</span>,<br>
+<span class="ln">13</span>&nbsp;&nbsp;]);<br>
+<span class="ln">14</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Conexão bem-sucedida!\n"</span>;<br>
+<span class="ln">15</span>} <span class="c-kw">catch</span> (<span class="c-fn">PDOException</span> <span class="c-var">$e</span>) {<br>
+<span class="ln">16</span>&nbsp;&nbsp;<span class="c-fn">die</span>(<span class="c-str">"Erro: "</span> . <span class="c-var">$e</span>-&gt;<span class="c-fn">getMessage</span>());<br>
+<span class="ln">17</span>}
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <strong>Nunca exponha credenciais!</strong>
+          <p>Em produção, armazene host, banco, usuário e senha em um arquivo <code style="font-family:'Space Mono',monospace">.env</code> ou <code style="font-family:'Space Mono',monospace">config.php</code> <strong>fora da pasta pública</strong>. Nunca versione esse arquivo no Git.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Arquivo de conexão reutilizável (padrão profissional)</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · config/database.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-kw">function</span> <span class="c-fn">getConnection</span>(): <span class="c-fn">PDO</span> {<br>
+<span class="ln">3</span>&nbsp;&nbsp;<span class="c-kw">static</span> <span class="c-var">$pdo</span> = <span class="c-kw">null</span>; <span class="c-cmt">// Singleton — cria só uma vez</span><br>
+<span class="ln">4</span>&nbsp;&nbsp;<span class="c-kw">if</span> (<span class="c-var">$pdo</span> === <span class="c-kw">null</span>) {<br>
+<span class="ln">5</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">try</span> {<br>
+<span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-var">$pdo</span> = <span class="c-kw">new</span> <span class="c-fn">PDO</span>(<br>
+<span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">"mysql:host=localhost;dbname=phpmaster_db;charset=utf8mb4"</span>,<br>
+<span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-str">'root'</span>, <span class="c-str">''</span>,<br>
+<span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="c-fn">PDO</span>::<span class="c-fn">ATTR_ERRMODE</span> =&gt; <span class="c-fn">PDO</span>::<span class="c-fn">ERRMODE_EXCEPTION</span>,<br>
+<span class="ln">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">PDO</span>::<span class="c-fn">ATTR_DEFAULT_FETCH_MODE</span> =&gt; <span class="c-fn">PDO</span>::<span class="c-fn">FETCH_ASSOC</span>]<br>
+<span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br>
+<span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;} <span class="c-kw">catch</span> (<span class="c-fn">PDOException</span> <span class="c-var">$e</span>) {<br>
+<span class="ln">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">error_log</span>(<span class="c-var">$e</span>-&gt;<span class="c-fn">getMessage</span>());<br>
+<span class="ln">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">die</span>(<span class="c-str">"Serviço indisponível."</span>);<br>
+<span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<span class="ln">16</span>&nbsp;&nbsp;}<br>
+<span class="ln">17</span>&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-var">$pdo</span>;<br>
+<span class="ln">18</span>}<br>
+<span class="ln">19</span><br>
+<span class="ln">20</span><span class="c-cmt">// Em qualquer outro arquivo:</span><br>
+<span class="ln">21</span><span class="c-fn">require_once</span> <span class="c-str">'config/database.php'</span>;<br>
+<span class="ln">22</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🎯</div><div class="activity-header-info"><div class="activity-tag">Arrastar e Soltar · +15 XP</div><h3>Associe cada opção PDO à sua função!</h3></div></div>
+      <div class="activity-body">
+        <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Arraste cada constante PDO para a descrição correta.</p>
+        <div class="drag-area" id="drag-chips">
+          <div class="drag-chip" draggable="true" data-val="ERRMODE_EXCEPTION">ERRMODE_EXCEPTION</div>
+          <div class="drag-chip" draggable="true" data-val="FETCH_ASSOC">FETCH_ASSOC</div>
+          <div class="drag-chip" draggable="true" data-val="EMULATE_PREPARES=false">EMULATE_PREPARES=false</div>
+        </div>
+        <div class="drop-zones" id="drop-zones">
+          <div class="drop-zone" data-answer="ERRMODE_EXCEPTION"><span class="zone-label">Lança exceção em erros →</span><span class="zone-slot"></span></div>
+          <div class="drop-zone" data-answer="FETCH_ASSOC"><span class="zone-label">Retorna arrays com chaves nomeadas →</span><span class="zone-slot"></span></div>
+          <div class="drop-zone" data-answer="EMULATE_PREPARES=false"><span class="zone-label">Usa prepared statements reais →</span><span class="zone-slot"></span></div>
+        </div>
+        <div class="xp-reward" id="xp-1-0"><div class="xp-icon">🏆</div><div class="xp-text">Perfeito! <strong>+15 XP!</strong> Você conhece as opções essenciais do PDO!</div></div>
+        <div class="activity-actions">
+          <button class="act-btn act-btn-primary" onclick="checkDrag()">Verificar</button>
+          <button class="act-btn act-btn-secondary" onclick="resetDrag()">Resetar</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+    <div class="sandbox-wrap">
+      <div class="sandbox-header">
+        <div class="sandbox-title"><div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div><span>conexao-pdo.php</span></div>
+        <div class="sandbox-actions"><span class="sandbox-tag">PHP Sandbox</span><button class="run-btn" onclick="runCode('sb2')">▶ Executar</button></div>
+      </div>
+      <div class="sandbox-grid">
+        <div class="sandbox-editor-wrap">
+          <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+          <textarea class="sandbox-editor" id="sb2" spellcheck="false">&lt;?php
+// Simulação de conexão PDO
+$host    = 'localhost';
+$banco   = 'phpmaster_db';
+$usuario = 'root';
+$senha   = '';
+$dsn     = "mysql:host={$host};dbname={$banco};charset=utf8mb4";
+
+echo "=== Configuração PDO ===\n\n";
+echo "DSN: $dsn\n";
+echo "Usuário: $usuario\n\n";
+echo "Opções definidas:\n";
+echo "  ERRMODE_EXCEPTION: lança exceção em erros SQL\n";
+echo "  FETCH_ASSOC: arrays com chaves nomeadas\n";
+echo "  EMULATE_PREPARES false: prepared real\n\n";
+echo "✅ Conexão simulada com sucesso!\n";
+echo "Pronto para executar queries.\n";
+?&gt;</textarea>
+        </div>
+        <div>
+          <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+          <div class="sandbox-output" id="out-sb2"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+        </div>
+      </div>
+      <div class="sandbox-footer"><span class="sandbox-note">💡 No XAMPP real, new PDO() abre a conexão física com o MySQL</span><button class="sandbox-clear" onclick="clearSandbox('sb2','out-sb2')">Limpar</button></div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Fixando os conceitos de conexão PDO</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">Explique o que é o <strong>DSN</strong> (Data Source Name) no PDO. Quais informações ele contém? Por que é importante especificar <code style="font-family:'Space Mono',monospace;color:var(--accent)">charset=utf8mb4</code> e não apenas <code style="font-family:'Space Mono',monospace;color:var(--accent)">utf8</code>?</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <div class="prose"><p>O <strong>DSN</strong> é uma string de conexão que identifica o banco de dados. No MySQL tem o formato: <code style="font-family:'Space Mono',monospace">mysql:host=HOST;dbname=BANCO;charset=CHARSET</code>. Ele contém o <strong>driver</strong> (mysql), o <strong>host</strong> do servidor, o nome do <strong>banco</strong> e a <strong>codificação</strong>.</p><p><strong>utf8mb4</strong> suporta o conjunto Unicode completo — incluindo emojis e caracteres de 4 bytes. O antigo <code style="font-family:'Space Mono',monospace">utf8</code> do MySQL só aceita até 3 bytes e falha com emojis e certos caracteres asiáticos, gerando erros silenciosos de dados corrompidos.</p></div></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Por que é recomendado envolver a criação do PDO dentro de um <strong>try/catch</strong>? O que acontece se a conexão falhar sem esse tratamento?</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <div class="prose"><p>Quando a conexão PDO falha, ela lança uma <strong>PDOException</strong>. Sem try/catch, essa exceção provoca um <em>Fatal Error</em> que exibe detalhes sensíveis — usuário, senha e nome do banco — diretamente na tela do usuário, criando uma falha grave de segurança.</p><p>Com try/catch você controla a mensagem exibida ao usuário (amigável e sem detalhes técnicos) e pode registrar o erro real em um arquivo de log seguro com <code style="font-family:'Space Mono',monospace">error_log()</code>.</p></div></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">Escreva um arquivo <strong>database.php</strong> completo com uma função <code style="font-family:'Space Mono',monospace;color:var(--accent)">getConnection(): PDO</code> que use o padrão Singleton, constantes de configuração, tratamento de erros adequado e retorne sempre a mesma instância PDO.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+// config/database.php
+define('DB_HOST',    'localhost');
+define('DB_NAME',    'phpmaster_db');
+define('DB_USER',    'root');
+define('DB_PASS',    '');
+define('DB_CHARSET', 'utf8mb4');
+
+function getConnection(): PDO {
+    static $pdo = null;
+    if ($pdo === null) {
+        $dsn = "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=".DB_CHARSET;
+        try {
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE          => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            die("Serviço temporariamente indisponível.");
+        }
+    }
+    return $pdo;
+}
+?&gt;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(0)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(1)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(2)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 3: INSERT ===== -->
+<div class="lesson-panel" id="lesson-2">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 03 / 07</span><span class="lesson-dur">⏱ ~25 min</span></div>
+    <h1 class="lesson-title"><em>INSERT</em> — Criando dados</h1>
+    <p class="lesson-desc">Aprenda a inserir registros no banco usando PDO com Prepared Statements — a única forma segura de enviar dados ao MySQL, prevenindo SQL Injection.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">INSERT INTO com Prepared Statements</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · inserir.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-fn">require_once</span> <span class="c-str">'config/database.php'</span>;<br>
+<span class="ln">3</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-var">$nome</span>  = <span class="c-str">"Ana Beatriz"</span>;<br>
+<span class="ln">6</span><span class="c-var">$email</span> = <span class="c-str">"ana@email.com"</span>;<br>
+<span class="ln">7</span><span class="c-var">$senha</span> = <span class="c-fn">password_hash</span>(<span class="c-str">"minhasenha123"</span>, <span class="c-fn">PASSWORD_BCRYPT</span>);<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-cmt">// 1. Preparar — placeholders :nome, :email, :senha</span><br>
+<span class="ln">10</span><span class="c-var">$sql</span> = <span class="c-str">"INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)"</span>;<br>
+<span class="ln">11</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-var">$sql</span>);<br>
+<span class="ln">12</span><br>
+<span class="ln">13</span><span class="c-cmt">// 2. Executar com os valores reais</span><br>
+<span class="ln">14</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<br>
+<span class="ln">15</span>&nbsp;&nbsp;<span class="c-str">':nome'</span>  =&gt; <span class="c-var">$nome</span>,<br>
+<span class="ln">16</span>&nbsp;&nbsp;<span class="c-str">':email'</span> =&gt; <span class="c-var">$email</span>,<br>
+<span class="ln">17</span>&nbsp;&nbsp;<span class="c-str">':senha'</span> =&gt; <span class="c-var">$senha</span>,<br>
+<span class="ln">18</span>]);<br>
+<span class="ln">19</span><br>
+<span class="ln">20</span><span class="c-cmt">// 3. Obter o ID gerado automaticamente</span><br>
+<span class="ln">21</span><span class="c-var">$id</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">lastInsertId</span>();<br>
+<span class="ln">22</span><span class="c-fn">echo</span> <span class="c-str">"Usuário criado com ID: "</span> . <span class="c-var">$id</span>;
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="callout-icon">🔐</div>
+        <div class="callout-body">
+          <strong>Nunca armazene senhas em texto puro!</strong>
+          <p>Use sempre <code style="font-family:'Space Mono',monospace">password_hash($senha, PASSWORD_BCRYPT)</code> para guardar e <code style="font-family:'Space Mono',monospace">password_verify($input, $hash)</code> para verificar. Assim, mesmo que o banco vaze, as senhas ficam protegidas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Por que Prepared Statements previnem SQL Injection?</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · sql-injection.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-cmt">// ❌ VULNERÁVEL — NUNCA FAÇA ISSO!</span><br>
+<span class="ln">2</span><span class="c-var">$nome</span> = <span class="c-var">$_POST</span>[<span class="c-str">'nome'</span>]; <span class="c-cmt">// Ex: "'; DROP TABLE usuarios; --"</span><br>
+<span class="ln">3</span><span class="c-var">$sql</span> = <span class="c-str">"INSERT INTO usuarios (nome) VALUES ('$nome')"</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-cmt">// ✅ SEGURO — COM PREPARED STATEMENTS</span><br>
+<span class="ln">6</span><span class="c-var">$sql</span>  = <span class="c-str">"INSERT INTO usuarios (nome) VALUES (:nome)"</span>;<br>
+<span class="ln">7</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-var">$sql</span>);<br>
+<span class="ln">8</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':nome'</span> =&gt; <span class="c-var">$nome</span>]);<br>
+<span class="ln">9</span><span class="c-cmt">// O valor é tratado como dado — nunca como código SQL</span>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">✏️</div><div class="activity-header-info"><div class="activity-tag">Complete o código · +15 XP</div><h3>Preencha o INSERT com Prepared Statement!</h3></div></div>
+      <div class="activity-body">
+        <p style="color:var(--muted);margin-bottom:16px;font-size:.95rem;">Complete as lacunas para inserir um produto com segurança:</p>
+        <div class="fitb-sentence">
+          <span style="color:#82aaff;">$sql</span> = <span style="color:#c3e88d">"INSERT INTO produtos (nome, preco) VALUES (<input class="fitb-input" id="fitb-0" placeholder=":campo" data-answer=":nome" style="width:75px">, <input class="fitb-input" id="fitb-1" placeholder=":campo" data-answer=":preco" style="width:75px">)"</span>;<br>
+          <span style="color:#82aaff;">$stmt</span> = <span style="color:#82aaff;">$pdo</span>-&gt;<input class="fitb-input" id="fitb-2" placeholder="método" data-answer="prepare" style="width:100px">(<span style="color:#82aaff;">$sql</span>);<br>
+          <span style="color:#82aaff;">$stmt</span>-&gt;<input class="fitb-input" id="fitb-3" placeholder="método" data-answer="execute" style="width:100px">([<span style="color:#c3e88d">':nome'</span> =&gt; <span style="color:#82aaff;">$nome</span>, <span style="color:#c3e88d">':preco'</span> =&gt; <span style="color:#82aaff;">$preco</span>]);
+        </div>
+        <div class="quiz-feedback" id="qfb-2-0"></div>
+        <div class="xp-reward" id="xp-2-0"><div class="xp-icon">⭐</div><div class="xp-text">Excelente! <strong>+15 XP!</strong> Você sabe inserir dados com segurança!</div></div>
+        <div class="activity-actions">
+          <button class="act-btn act-btn-primary" onclick="checkFitb('2-0',[':nome',':preco','prepare','execute'])">Verificar</button>
+          <button class="act-btn act-btn-secondary" onclick="resetFitb(['fitb-0','fitb-1','fitb-2','fitb-3'],'qfb-2-0','xp-2-0')">Limpar</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>insert.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql3')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql3" spellcheck="false">-- Insira um produto e confirme com SELECT
+INSERT INTO produtos (nome, preco, estoque, categoria)
+VALUES ('Smartphone Pro', 1499.90, 10, 'Eletrônicos');
+
+-- Confirme a inserção:
+SELECT * FROM produtos ORDER BY id DESC;</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql3"><span class="ph">Clique em "Executar"...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Após INSERT, use SELECT para confirmar a inserção</span><button class="sql-clr" onclick="clearSQL('sql3','out-sql3')">Limpar</button></div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Pratique INSERT e Prepared Statements</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">Escreva um script PHP completo que insira um novo produto na tabela <strong>produtos</strong> com os campos: nome, preço, estoque e categoria. Use Prepared Statements com PDO e exiba o ID gerado com <code style="font-family:'Space Mono',monospace;color:var(--accent)">lastInsertId()</code>.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+
+$nome      = "Fone Bluetooth";
+$preco     = 149.90;
+$estoque   = 30;
+$categoria = "Eletrônicos";
+
+$sql = "INSERT INTO produtos (nome, preco, estoque, categoria)
+        VALUES (:nome, :preco, :estoque, :categoria)";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
+    ':nome'      => $nome,
+    ':preco'     => $preco,
+    ':estoque'   => $estoque,
+    ':categoria' => $categoria,
+]);
+
+echo "Produto inserido! ID: " . $pdo->lastInsertId() . "\n";
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Crie um script que insira <strong>múltiplos registros</strong> usando um array e foreach. Insira 3 usuários na tabela <strong>usuarios</strong>. Prepare o statement uma vez e execute várias. Exiba quantos foram inseridos.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+
+$usuarios = [
+    ['nome' => 'Carlos Silva',   'email' => 'carlos@email.com'],
+    ['nome' => 'Maria Oliveira', 'email' => 'maria@email.com'],
+    ['nome' => 'João Santos',    'email' => 'joao@email.com'],
+];
+
+$sql  = "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
+$stmt = $pdo->prepare($sql); // Prepara UMA vez
+
+$inseridos = 0;
+foreach ($usuarios as $u) {
+    $stmt->execute([
+        ':nome'  => $u['nome'],
+        ':email' => $u['email'],
+        ':senha' => password_hash('senha123', PASSWORD_BCRYPT),
+    ]);
+    $inseridos++;
+}
+echo "$inseridos usuários inseridos!\n";
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">Crie um script que simule um <strong>formulário de cadastro</strong> com variáveis $nome, $email e $mensagem. Valide que nenhum campo está vazio e que o e-mail é válido com <code style="font-family:'Space Mono',monospace;color:var(--accent)">filter_var()</code>. Se a validação falhar, exiba erros. Caso contrário, insira na tabela <strong>contatos</strong>.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+
+$nome     = "Ana Lima";
+$email    = "ana@email.com";
+$mensagem = "Tenho dúvidas sobre o curso!";
+$erros    = [];
+
+if (empty(trim($nome)))     $erros[] = "Nome é obrigatório.";
+if (empty(trim($email)))    $erros[] = "E-mail é obrigatório.";
+elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $erros[] = "E-mail inválido.";
+if (empty(trim($mensagem))) $erros[] = "Mensagem é obrigatória.";
+
+if (!empty($erros)) {
+    foreach ($erros as $e) echo "❌ $e\n";
+} else {
+    $pdo  = getConnection();
+    $stmt = $pdo->prepare(
+        "INSERT INTO contatos (nome, email, mensagem) VALUES (:n, :e, :m)"
+    );
+    $stmt->execute([':n'=>$nome, ':e'=>$email, ':m'=>$mensagem]);
+    echo "✅ Mensagem enviada! ID: " . $pdo->lastInsertId() . "\n";
+}
+?&gt;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(1)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(2)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(3)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 4: SELECT ===== -->
+<div class="lesson-panel" id="lesson-3">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 04 / 07</span><span class="lesson-dur">⏱ ~25 min</span></div>
+    <h1 class="lesson-title"><em>SELECT</em> — Lendo dados</h1>
+    <p class="lesson-desc">Aprenda a buscar registros com SELECT, filtrar com WHERE, ordenar com ORDER BY e paginar resultados com LIMIT — tudo de forma segura com PDO.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">fetch() e fetchAll() — buscando registros</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · listar.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-cmt">// Buscar TODOS — sem parâmetros, use query()</span><br>
+<span class="ln">5</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">query</span>(<span class="c-str">"SELECT * FROM produtos ORDER BY nome ASC"</span>);<br>
+<span class="ln">6</span><span class="c-var">$produtos</span> = <span class="c-var">$stmt</span>-&gt;<span class="c-fn">fetchAll</span>(); <span class="c-cmt">// Array de arrays associativos</span><br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-kw">foreach</span> (<span class="c-var">$produtos</span> <span class="c-kw">as</span> <span class="c-var">$p</span>) {<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-var">$p</span>[<span class="c-str">'nome'</span>] . <span class="c-str">" — R$ "</span> . <span class="c-var">$p</span>[<span class="c-str">'preco'</span>] . <span class="c-str">"\n"</span>;<br>
+<span class="ln">10</span>}<br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// Buscar UM por ID — use prepare()</span><br>
+<span class="ln">13</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-str">"SELECT * FROM produtos WHERE id = :id"</span>);<br>
+<span class="ln">14</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':id'</span> =&gt; <span class="c-num">3</span>]);<br>
+<span class="ln">15</span><span class="c-var">$produto</span> = <span class="c-var">$stmt</span>-&gt;<span class="c-fn">fetch</span>(); <span class="c-cmt">// Retorna uma linha ou false</span><br>
+<span class="ln">16</span><br>
+<span class="ln">17</span><span class="c-kw">if</span> (<span class="c-var">$produto</span>) {<br>
+<span class="ln">18</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Encontrado: "</span> . <span class="c-var">$produto</span>[<span class="c-str">'nome'</span>];<br>
+<span class="ln">19</span>} <span class="c-kw">else</span> {<br>
+<span class="ln">20</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Produto não encontrado."</span>;<br>
+<span class="ln">21</span>}
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <strong>fetch() vs fetchAll()</strong>
+          <p><code style="font-family:'Space Mono',monospace">fetch()</code> retorna <strong>uma linha</strong> (ideal para busca por ID). <code style="font-family:'Space Mono',monospace">fetchAll()</code> retorna <strong>todas as linhas</strong> de uma vez (ideal para listagens). Para tabelas muito grandes, prefira fetch() em laço para economizar memória.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Filtros, paginação e busca por texto (LIKE)</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · filtros.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// Busca por texto com LIKE (% é adicionado em PHP, não no SQL)</span><br>
+<span class="ln">3</span><span class="c-var">$busca</span> = <span class="c-str">"mouse"</span>;<br>
+<span class="ln">4</span><span class="c-var">$termo</span> = <span class="c-str">"%"</span> . <span class="c-var">$busca</span> . <span class="c-str">"%"</span>;<br>
+<span class="ln">5</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-str">"SELECT * FROM produtos WHERE nome LIKE :t ORDER BY nome"</span>);<br>
+<span class="ln">6</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':t'</span> =&gt; <span class="c-var">$termo</span>]);<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Paginação com LIMIT e OFFSET</span><br>
+<span class="ln">9</span><span class="c-var">$pagina</span>     = <span class="c-num">1</span>;<br>
+<span class="ln">10</span><span class="c-var">$por_pagina</span> = <span class="c-num">10</span>;<br>
+<span class="ln">11</span><span class="c-var">$offset</span>     = (<span class="c-var">$pagina</span> - <span class="c-num">1</span>) * <span class="c-var">$por_pagina</span>;<br>
+<span class="ln">12</span><span class="c-var">$sql</span> = <span class="c-str">"SELECT * FROM produtos ORDER BY preco ASC LIMIT :lim OFFSET :off"</span>;<br>
+<span class="ln">13</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-var">$sql</span>);<br>
+<span class="ln">14</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">bindValue</span>(<span class="c-str">':lim'</span>, <span class="c-var">$por_pagina</span>, <span class="c-fn">PDO</span>::<span class="c-fn">PARAM_INT</span>);<br>
+<span class="ln">15</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">bindValue</span>(<span class="c-str">':off'</span>, <span class="c-var">$offset</span>,     <span class="c-fn">PDO</span>::<span class="c-fn">PARAM_INT</span>);<br>
+<span class="ln">16</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>();
+        </div>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <strong>bindValue() para LIMIT e OFFSET</strong>
+          <p>LIMIT e OFFSET precisam ser inteiros. Use <code style="font-family:'Space Mono',monospace">bindValue()</code> com <code style="font-family:'Space Mono',monospace">PDO::PARAM_INT</code> para garantir o tipo correto e evitar erros de sintaxe SQL.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🧠</div><div class="activity-header-info"><div class="activity-tag">Quiz de código · +20 XP</div><h3>Qual método retorna UMA linha do resultado?</h3></div></div>
+      <div class="activity-body">
+        <p class="quiz-question">Ao buscar um único registro por ID com PDO, qual método correto devemos usar após o execute()?</p>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">A</div> $stmt->fetchAll()</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'correct','3-0')"><div class="quiz-opt-letter">B</div> $stmt->fetch()</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">C</div> $stmt->query()</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">D</div> $stmt->prepare()</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-3-0"></div>
+        <div class="xp-reward" id="xp-3-0"><div class="xp-icon">🎉</div><div class="xp-text">Correto! <strong>+20 XP!</strong> fetch() retorna uma linha; fetchAll() retorna todas.</div></div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>select.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql4')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql4" spellcheck="false">-- Teste diferentes tipos de SELECT
+
+SELECT * FROM produtos ORDER BY preco DESC;
+
+-- Descomente para testar outros:
+-- SELECT * FROM produtos WHERE preco < 100;
+-- SELECT * FROM produtos WHERE nome LIKE '%Mouse%';
+-- SELECT * FROM produtos ORDER BY preco ASC LIMIT 3;
+-- SELECT COUNT(*) AS total, AVG(preco) AS media FROM produtos;</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql4"><span class="ph">Clique em "Executar"...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Comente/descomente as queries para testar cada uma</span><button class="sql-clr" onclick="clearSQL('sql4','out-sql4')">Limpar</button></div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Pratique SELECT com PDO</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">Escreva um script PHP que busque todos os produtos com preço entre <strong>R$ 50 e R$ 500</strong>, ordenados pelo preço crescente. Use Prepared Statements e exiba nome e preço formatado de cada resultado com <code style="font-family:'Space Mono',monospace;color:var(--accent)">number_format()</code>.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+
+$sql = "SELECT nome, preco FROM produtos
+        WHERE preco BETWEEN :min AND :max
+        ORDER BY preco ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':min' => 50, ':max' => 500]);
+$produtos = $stmt->fetchAll();
+
+echo "Produtos entre R$50 e R$500:\n";
+foreach ($produtos as $p) {
+    $preco = number_format($p['preco'], 2, ',', '.');
+    echo "- {$p['nome']}: R$ $preco\n";
+}
+echo "\nTotal: " . count($produtos) . " produto(s)\n";
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Crie uma função PHP <code style="font-family:'Space Mono',monospace;color:var(--accent)">buscarPorId(PDO $pdo, int $id): array|false</code> que receba a conexão e um ID e retorne o array do registro ou false. Demonstre o uso com um exemplo de produto encontrado e um não encontrado.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+function buscarPorId(PDO $pdo, int $id): array|false {
+    $stmt = $pdo->prepare("SELECT * FROM produtos WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    return $stmt->fetch();
+}
+
+$pdo = getConnection();
+
+$produto = buscarPorId($pdo, 2);
+if ($produto) {
+    echo "Encontrado: {$produto['nome']} — R$ {$produto['preco']}\n";
+} else {
+    echo "Produto não encontrado.\n";
+}
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">Implemente um sistema de <strong>busca por texto</strong>. Crie uma variável $busca com um termo. Use LIKE no SQL para encontrar produtos cujo nome contenha esse termo. Adicione o <code style="font-family:'Space Mono',monospace;color:var(--accent)">%</code> em PHP (nunca no SQL). Exiba os resultados ou "nenhum resultado encontrado".</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo   = getConnection();
+$busca = "mouse";
+$termo = "%" . $busca . "%"; // % em PHP, não no SQL
+
+$sql  = "SELECT * FROM produtos WHERE nome LIKE :termo ORDER BY nome";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':termo' => $termo]);
+$resultados = $stmt->fetchAll();
+
+if (empty($resultados)) {
+    echo "Nenhum produto encontrado para \"$busca\".\n";
+} else {
+    echo count($resultados) . " resultado(s) para \"$busca\":\n";
+    foreach ($resultados as $p) {
+        $preco = number_format($p['preco'], 2, ',', '.');
+        echo "- {$p['nome']} (R$ $preco)\n";
+    }
+}
+?&gt;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(2)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(3)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(4)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 5: UPDATE ===== -->
+<div class="lesson-panel" id="lesson-4">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 05 / 07</span><span class="lesson-dur">⏱ ~20 min</span></div>
+    <h1 class="lesson-title"><em>UPDATE</em> — Atualizando dados</h1>
+    <p class="lesson-desc">Aprenda a modificar registros existentes com segurança. O UPDATE é poderoso — e perigoso sem WHERE. Veja como usá-lo corretamente e verificar quantas linhas foram afetadas.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">UPDATE com PDO e rowCount()</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · atualizar.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-var">$id</span>      = <span class="c-num">3</span>;<br>
+<span class="ln">5</span><span class="c-var">$preco</span>   = <span class="c-num">89.90</span>;<br>
+<span class="ln">6</span><span class="c-var">$estoque</span> = <span class="c-num">50</span>;<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-var">$sql</span> = <span class="c-str">"UPDATE produtos SET preco = :preco, estoque = :estoque WHERE id = :id"</span>;<br>
+<span class="ln">9</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-var">$sql</span>);<br>
+<span class="ln">10</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':preco'</span>=&gt;<span class="c-var">$preco</span>, <span class="c-str">':estoque'</span>=&gt;<span class="c-var">$estoque</span>, <span class="c-str">':id'</span>=&gt;<span class="c-var">$id</span>]);<br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// rowCount() — quantas linhas foram realmente afetadas</span><br>
+<span class="ln">13</span><span class="c-kw">if</span> (<span class="c-var">$stmt</span>-&gt;<span class="c-fn">rowCount</span>() &gt; <span class="c-num">0</span>) {<br>
+<span class="ln">14</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Produto atualizado com sucesso!\n"</span>;<br>
+<span class="ln">15</span>} <span class="c-kw">else</span> {<br>
+<span class="ln">16</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Nenhum produto com ID $id encontrado.\n"</span>;<br>
+<span class="ln">17</span>}
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <strong>SEMPRE use WHERE no UPDATE!</strong>
+          <p>Um <code style="font-family:'Space Mono',monospace">UPDATE produtos SET preco = 0</code> sem WHERE <strong>zera o preço de TODOS os produtos</strong>. Sempre filtre pelo ID ou outro campo único.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Soft Delete: desativar em vez de remover</h2>
+      <div class="prose"><p>Em vez de deletar registros permanentemente, o padrão profissional é usar um campo <code style="font-family:'Space Mono',monospace;color:var(--accent)">ativo</code> ou <code style="font-family:'Space Mono',monospace;color:var(--accent)">deletado_em</code> para "esconder" o registro sem apagá-lo:</p></div>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · soft-delete.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-cmt">// Desativar usuário (soft delete)</span><br>
+<span class="ln">3</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<br>
+<span class="ln">4</span>&nbsp;&nbsp;<span class="c-str">"UPDATE usuarios SET ativo = 0 WHERE id = :id"</span><br>
+<span class="ln">5</span>);<br>
+<span class="ln">6</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':id'</span> =&gt; <span class="c-num">4</span>]);<br>
+<span class="ln">7</span><span class="c-fn">echo</span> <span class="c-str">"Usuário desativado.\n"</span>;<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-cmt">// Na listagem, filtrar apenas os ativos:</span><br>
+<span class="ln">10</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">query</span>(<span class="c-str">"SELECT * FROM usuarios WHERE ativo = 1"</span>);
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🧠</div><div class="activity-header-info"><div class="activity-tag">Quiz crítico · +20 XP</div><h3>O que rowCount() retorna após um UPDATE?</h3></div></div>
+      <div class="activity-body">
+        <p class="quiz-question">Após executar um UPDATE com PDO, o método <code style="font-family:'Space Mono',monospace">$stmt->rowCount()</code> retorna:</p>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">A</div> O ID do registro atualizado</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">B</div> O novo valor do campo atualizado</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'correct','4-0')"><div class="quiz-opt-letter">C</div> O número de linhas afetadas pela operação</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">D</div> Sempre retorna true se não houve erro</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-4-0"></div>
+        <div class="xp-reward" id="xp-4-0"><div class="xp-icon">🎉</div><div class="xp-text">Correto! <strong>+20 XP!</strong> rowCount() confirma se o UPDATE realmente modificou algo!</div></div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>update.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql5')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql5" spellcheck="false">-- Veja antes de atualizar
+SELECT id, nome, preco, estoque FROM produtos WHERE id = 1;
+
+-- Atualize e confirme
+UPDATE produtos SET preco = 59.99, estoque = 100 WHERE id = 1;
+
+-- Confirme a atualização
+SELECT id, nome, preco, estoque FROM produtos WHERE id = 1;</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql5"><span class="ph">Clique em "Executar"...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Boas práticas: SELECT antes e depois do UPDATE</span><button class="sql-clr" onclick="clearSQL('sql5','out-sql5')">Limpar</button></div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Pratique UPDATE com PDO</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">Escreva um script PHP que atualize o <strong>estoque</strong> após uma venda. Receba $produto_id e $quantidade_vendida. Busque o estoque atual, valide se há quantidade suficiente e, caso haja, subtraia e atualize com UPDATE. Exiba mensagem de sucesso ou "estoque insuficiente".</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+
+$produto_id       = 2;
+$quantidade_vendida = 5;
+
+$stmt = $pdo->prepare("SELECT estoque FROM produtos WHERE id = :id");
+$stmt->execute([':id' => $produto_id]);
+$produto = $stmt->fetch();
+
+if (!$produto) {
+    echo "Produto não encontrado.\n";
+} elseif ($produto['estoque'] < $quantidade_vendida) {
+    echo "Estoque insuficiente! Disponível: {$produto['estoque']}\n";
+} else {
+    $novo = $produto['estoque'] - $quantidade_vendida;
+    $upd  = $pdo->prepare("UPDATE produtos SET estoque = :est WHERE id = :id");
+    $upd->execute([':est' => $novo, ':id' => $produto_id]);
+    echo "Venda registrada! Novo estoque: $novo unidades.\n";
+}
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Crie um script PHP que implemente <strong>soft delete</strong> de usuário: marque a coluna <code style="font-family:'Space Mono',monospace;color:var(--accent)">ativo = 0</code> em vez de deletar. Verifique se o usuário existe e não está já desativado antes de executar. Exiba mensagem adequada para cada situação.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+$usuario_id = 3;
+
+$check = $pdo->prepare("SELECT id, nome, ativo FROM usuarios WHERE id = :id");
+$check->execute([':id' => $usuario_id]);
+$usuario = $check->fetch();
+
+if (!$usuario) {
+    echo "Usuário não encontrado.\n";
+} elseif ($usuario['ativo'] == 0) {
+    echo "Usuário já está desativado.\n";
+} else {
+    $upd = $pdo->prepare("UPDATE usuarios SET ativo = 0 WHERE id = :id");
+    $upd->execute([':id' => $usuario_id]);
+    echo "Usuário \"{$usuario['nome']}\" desativado.\n";
+}
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">Implemente uma função <strong>atualizarCampos(PDO $pdo, string $tabela, int $id, array $campos): bool</strong> que construa dinamicamente o SQL do UPDATE a partir de um array de campos. Exemplo: <code style="font-family:'Space Mono',monospace;color:var(--accent)">atualizarCampos($pdo, 'produtos', 5, ['nome'=>'Novo', 'preco'=>99.9])</code></p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+function atualizarCampos(PDO $pdo, string $tabela, int $id, array $campos): bool {
+    if (empty($campos)) return false;
+
+    $sets = [];
+    $params = [':__id' => $id];
+    foreach ($campos as $campo => $valor) {
+        $sets[] = "$campo = :$campo";
+        $params[":$campo"] = $valor;
+    }
+
+    $sql  = "UPDATE $tabela SET " . implode(', ', $sets) . " WHERE id = :__id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->rowCount() > 0;
+}
+
+$pdo = getConnection();
+$ok = atualizarCampos($pdo, 'produtos', 2, ['nome'=>'Mouse Gamer Pro','preco'=>129.90]);
+echo $ok ? "Atualizado!\n" : "Sem alterações.\n";
+?&gt;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(3)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(4)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(5)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 6: DELETE ===== -->
+<div class="lesson-panel" id="lesson-5">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 06 / 07</span><span class="lesson-dur">⏱ ~20 min</span></div>
+    <h1 class="lesson-title"><em>DELETE</em> — Removendo dados</h1>
+    <p class="lesson-desc">Aprenda a remover registros com segurança, entenda a diferença entre hard delete e soft delete, e por que transações são essenciais em operações críticas.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">DELETE FROM com PDO</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · deletar.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();<br>
+<span class="ln">3</span><span class="c-var">$id</span>  = <span class="c-num">7</span>;<br>
+<span class="ln">4</span><br>
+<span class="ln">5</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-str">"DELETE FROM produtos WHERE id = :id"</span>);<br>
+<span class="ln">6</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':id'</span> =&gt; <span class="c-var">$id</span>]);<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-kw">if</span> (<span class="c-var">$stmt</span>-&gt;<span class="c-fn">rowCount</span>() &gt; <span class="c-num">0</span>) {<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Produto deletado com sucesso!\n"</span>;<br>
+<span class="ln">10</span>} <span class="c-kw">else</span> {<br>
+<span class="ln">11</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Nenhum produto com ID $id.\n"</span>;<br>
+<span class="ln">12</span>}
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <strong>DELETE sem WHERE = CATÁSTROFE!</strong>
+          <p><code style="font-family:'Space Mono',monospace">DELETE FROM produtos</code> sem WHERE apaga <strong>TODOS os registros</strong> da tabela. Sempre verifique duas vezes se há um WHERE correto antes de executar.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Transações: garantindo consistência dos dados</h2>
+      <div class="prose"><p>Uma <strong>transação</strong> agrupa múltiplas operações em uma unidade atômica: ou tudo executa com sucesso, ou nada é aplicado. Essencial para operações críticas como cancelamento de pedidos:</p></div>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">PHP · transacao.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><span class="c-var">$pdo</span> = <span class="c-fn">getConnection</span>();<br>
+<span class="ln">3</span><br>
+<span class="ln">4</span><span class="c-kw">try</span> {<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-var">$pdo</span>-&gt;<span class="c-fn">beginTransaction</span>(); <span class="c-cmt">// Inicia a transação</span><br>
+<span class="ln">6</span><br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-cmt">// Op 1: Remove os itens do pedido</span><br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-var">$s1</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-str">"DELETE FROM itens_pedido WHERE pedido_id = :id"</span>);<br>
+<span class="ln">9</span>&nbsp;&nbsp;<span class="c-var">$s1</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':id'</span> =&gt; <span class="c-num">10</span>]);<br>
+<span class="ln">10</span><br>
+<span class="ln">11</span>&nbsp;&nbsp;<span class="c-cmt">// Op 2: Remove o pedido principal</span><br>
+<span class="ln">12</span>&nbsp;&nbsp;<span class="c-var">$s2</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-str">"DELETE FROM pedidos WHERE id = :id"</span>);<br>
+<span class="ln">13</span>&nbsp;&nbsp;<span class="c-var">$s2</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':id'</span> =&gt; <span class="c-num">10</span>]);<br>
+<span class="ln">14</span><br>
+<span class="ln">15</span>&nbsp;&nbsp;<span class="c-var">$pdo</span>-&gt;<span class="c-fn">commit</span>(); <span class="c-cmt">// Confirma TUDO</span><br>
+<span class="ln">16</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Pedido removido com sucesso!\n"</span>;<br>
+<span class="ln">17</span>} <span class="c-kw">catch</span> (<span class="c-fn">Exception</span> <span class="c-var">$e</span>) {<br>
+<span class="ln">18</span>&nbsp;&nbsp;<span class="c-var">$pdo</span>-&gt;<span class="c-fn">rollBack</span>(); <span class="c-cmt">// Desfaz TUDO se algo falhar</span><br>
+<span class="ln">19</span>&nbsp;&nbsp;<span class="c-fn">echo</span> <span class="c-str">"Erro! Operação revertida.\n"</span>;<br>
+<span class="ln">20</span>}
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🎯</div><div class="activity-header-info"><div class="activity-tag">Arrastar e Soltar · +15 XP</div><h3>Ordene as etapas de uma transação PDO!</h3></div></div>
+      <div class="activity-body">
+        <p style="color:var(--muted);margin-bottom:18px;font-size:.95rem;">Arraste cada método para a etapa correta de uma transação PDO.</p>
+        <div class="drag-area" id="drag-chips">
+          <div class="drag-chip" draggable="true" data-val="beginTransaction()">beginTransaction()</div>
+          <div class="drag-chip" draggable="true" data-val="commit()">commit()</div>
+          <div class="drag-chip" draggable="true" data-val="rollBack()">rollBack()</div>
+        </div>
+        <div class="drop-zones" id="drop-zones">
+          <div class="drop-zone" data-answer="beginTransaction()"><span class="zone-label">1. Iniciar a transação →</span><span class="zone-slot"></span></div>
+          <div class="drop-zone" data-answer="commit()"><span class="zone-label">2. Confirmar todas as ops →</span><span class="zone-slot"></span></div>
+          <div class="drop-zone" data-answer="rollBack()"><span class="zone-label">3. Reverter em caso de erro →</span><span class="zone-slot"></span></div>
+        </div>
+        <div class="xp-reward" id="xp-5-0"><div class="xp-icon">🏆</div><div class="xp-text">Perfeito! <strong>+15 XP!</strong> Você domina o fluxo de transações PDO!</div></div>
+        <div class="activity-actions">
+          <button class="act-btn act-btn-primary" onclick="checkDragL5()">Verificar</button>
+          <button class="act-btn act-btn-secondary" onclick="resetDragL5()">Resetar</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>delete.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql6')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql6" spellcheck="false">-- Veja antes de deletar
+SELECT * FROM produtos WHERE id = 4;
+
+-- Delete o registro
+DELETE FROM produtos WHERE id = 4;
+
+-- Confirme que foi removido
+SELECT * FROM produtos WHERE id = 4;
+
+-- Veja os restantes
+SELECT * FROM produtos ORDER BY id;</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql6"><span class="ph">Clique em "Executar"...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Sempre confirme o que vai deletar com SELECT antes!</span><button class="sql-clr" onclick="clearSQL('sql6','out-sql6')">Limpar</button></div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">📝</div><div class="ex-header-info"><h3>Exercícios Propostos</h3><p>Pratique DELETE e transações</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">Crie um script com <strong>transação PDO</strong> que simule o cancelamento de um pedido: delete os registros de <strong>itens_pedido</strong> e depois o <strong>pedido</strong> principal. Se qualquer operação falhar, execute rollback e exiba o erro.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+$pedido_id = 5;
+
+try {
+    $pdo->beginTransaction();
+
+    $s1 = $pdo->prepare("DELETE FROM itens_pedido WHERE pedido_id = :id");
+    $s1->execute([':id' => $pedido_id]);
+
+    $s2 = $pdo->prepare("DELETE FROM pedidos WHERE id = :id");
+    $s2->execute([':id' => $pedido_id]);
+
+    $pdo->commit();
+    echo "Pedido $pedido_id cancelado com sucesso!\n";
+} catch (Exception $e) {
+    $pdo->rollBack();
+    echo "Erro ao cancelar: " . $e->getMessage() . "\n";
+}
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Escreva um script PHP que implemente um <strong>soft delete</strong> com timestamp. Adicione a coluna <code style="font-family:'Space Mono',monospace;color:var(--accent)">deletado_em TIMESTAMP NULL</code> na tabela usuarios e atualize-a com <code style="font-family:'Space Mono',monospace;color:var(--accent)">NOW()</code> em vez de deletar fisicamente.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">-- SQL para adicionar a coluna:
+ALTER TABLE usuarios ADD COLUMN deletado_em TIMESTAMP NULL DEFAULT NULL;
+
+&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+$id  = 4;
+
+$stmt = $pdo->prepare(
+    "UPDATE usuarios SET deletado_em = NOW() WHERE id = :id AND deletado_em IS NULL"
+);
+$stmt->execute([':id' => $id]);
+
+echo $stmt->rowCount() > 0
+    ? "Usuário $id marcado como deletado em " . date('d/m/Y H:i:s') . "\n"
+    : "Usuário não encontrado ou já deletado.\n";
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO</div>
+        <p class="ex-question">Explique com suas palavras a diferença entre <strong>hard delete</strong> e <strong>soft delete</strong>. Em quais cenários cada abordagem é mais adequada? Cite dois sistemas reais onde o soft delete é essencial e justifique.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <div class="prose"><p><strong>Hard delete:</strong> Remove o registro fisicamente com <code style="font-family:'Space Mono',monospace">DELETE FROM</code>. O dado some para sempre. Adequado para dados temporários sem valor histórico: sessões expiradas, logs de debug, dados de teste.</p><p><strong>Soft delete:</strong> Mantém o registro, mas o marca como "excluído" via flag (<code style="font-family:'Space Mono',monospace">ativo=0</code>) ou timestamp (<code style="font-family:'Space Mono',monospace">deletado_em</code>). O dado continua no banco, mas é filtrado nas queries normais.</p><p><strong>Exemplos onde é essencial:</strong></p><p>1. <strong>E-commerce:</strong> Um produto deletado que faz parte de pedidos históricos não pode ser removido — o histórico ficaria inconsistente sem a referência ao produto e seu preço na época da compra.</p><p>2. <strong>Sistemas bancários/financeiros:</strong> Regulamentações (como a LGPD e normas do BACEN) exigem que transações e registros de clientes sejam mantidos por anos. O soft delete permite cumprir essa obrigação legal sem apagar os dados.</p></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(4)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(5)">✓ Concluir Aula</button>
+    <button class="nav-lesson-btn primary" onclick="goToLesson(6)">Próxima Aula →</button>
+  </div>
+</div>
+
+<!-- ===== AULA 7: CONSULTAS AVANÇADAS ===== -->
+<div class="lesson-panel" id="lesson-6">
+  <div class="lesson-hero">
+    <div class="lesson-meta"><span class="lesson-num-tag">AULA 07 / 07</span><span class="lesson-dur">⏱ ~30 min</span></div>
+    <h1 class="lesson-title">Consultas <em>Avançadas</em></h1>
+    <p class="lesson-desc">Eleve seu nível com JOIN entre tabelas, funções de agregação (COUNT, SUM, AVG), GROUP BY e subconsultas. Esses recursos separam o desenvolvedor intermediário do avançado.</p>
+  </div>
+  <div class="lesson-body">
+    <div class="content-block">
+      <h2 class="block-title">JOIN: relacionando tabelas</h2>
+      <div class="prose"><p>O <strong>JOIN</strong> combina linhas de duas ou mais tabelas com base em uma coluna relacionada. O mais comum é o <em>INNER JOIN</em>, que retorna apenas registros com correspondência em ambas as tabelas:</p></div>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL + PHP · join.php</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-cmt">-- Buscar pedidos com o nome do cliente</span><br>
+<span class="ln">2</span><span class="c-sql">SELECT</span> p.id, u.nome <span class="c-sql">AS</span> cliente, p.total, p.status<br>
+<span class="ln">3</span><span class="c-sql">FROM</span> pedidos p<br>
+<span class="ln">4</span><span class="c-sql">INNER JOIN</span> usuarios u <span class="c-sql">ON</span> p.usuario_id = u.id<br>
+<span class="ln">5</span><span class="c-sql">WHERE</span> p.status = <span class="c-str">'aprovado'</span><br>
+<span class="ln">6</span><span class="c-sql">ORDER BY</span> p.criado_em <span class="c-sql">DESC</span>;<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Em PHP com PDO:</span><br>
+<span class="ln">9</span><span class="c-var">$sql</span>  = <span class="c-str">"SELECT p.id, u.nome AS cliente, p.total FROM pedidos p INNER JOIN usuarios u ON p.usuario_id = u.id WHERE p.status = :s"</span>;<br>
+<span class="ln">10</span><span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;<span class="c-fn">prepare</span>(<span class="c-var">$sql</span>);<br>
+<span class="ln">11</span><span class="c-var">$stmt</span>-&gt;<span class="c-fn">execute</span>([<span class="c-str">':s'</span> =&gt; <span class="c-str">'aprovado'</span>]);<br>
+<span class="ln">12</span><span class="c-var">$pedidos</span> = <span class="c-var">$stmt</span>-&gt;<span class="c-fn">fetchAll</span>();
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <strong>Tipos de JOIN</strong>
+          <p><strong>INNER JOIN:</strong> só registros com correspondência em ambas · <strong>LEFT JOIN:</strong> todos da tabela esquerda + correspondências da direita (NULL quando não existe) · <strong>RIGHT JOIN:</strong> o inverso do LEFT JOIN.</p>
+        </div>
+      </div>
+    </div>
+    <div class="content-block">
+      <h2 class="block-title">Funções de agregação e GROUP BY</h2>
+      <div class="code-block">
+        <div class="cb-header"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · agregacao.sql</span><button class="cb-copy" onclick="copyCode(this)">Copiar</button></div>
+        <div class="cb-body">
+<span class="ln">1</span><span class="c-cmt">-- Estatísticas por categoria</span><br>
+<span class="ln">2</span><span class="c-sql">SELECT</span><br>
+<span class="ln">3</span>&nbsp;&nbsp;categoria,<br>
+<span class="ln">4</span>&nbsp;&nbsp;<span class="c-fn">COUNT</span>(*) <span class="c-sql">AS</span> total_produtos,<br>
+<span class="ln">5</span>&nbsp;&nbsp;<span class="c-fn">AVG</span>(preco) <span class="c-sql">AS</span> preco_medio,<br>
+<span class="ln">6</span>&nbsp;&nbsp;<span class="c-fn">SUM</span>(estoque * preco) <span class="c-sql">AS</span> valor_estoque,<br>
+<span class="ln">7</span>&nbsp;&nbsp;<span class="c-fn">MIN</span>(preco) <span class="c-sql">AS</span> menor_preco,<br>
+<span class="ln">8</span>&nbsp;&nbsp;<span class="c-fn">MAX</span>(preco) <span class="c-sql">AS</span> maior_preco<br>
+<span class="ln">9</span><span class="c-sql">FROM</span> produtos<br>
+<span class="ln">10</span><span class="c-sql">GROUP BY</span> categoria<br>
+<span class="ln">11</span><span class="c-sql">HAVING</span> <span class="c-fn">COUNT</span>(*) &gt; <span class="c-num">1</span><br>
+<span class="ln">12</span><span class="c-sql">ORDER BY</span> valor_estoque <span class="c-sql">DESC</span>;
+        </div>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <strong>HAVING vs WHERE</strong>
+          <p><code style="font-family:'Space Mono',monospace">WHERE</code> filtra linhas <em>antes</em> do agrupamento. <code style="font-family:'Space Mono',monospace">HAVING</code> filtra <em>após</em> o agrupamento — por isso é usado com funções de agregação como COUNT e SUM.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><hr><span>// SIMULADOR SQL AVANÇADO</span><hr></div>
+    <div class="sql-sim">
+      <div class="sql-sim-hdr">
+        <div class="sql-sim-title"><div class="sd"><span class="r"></span><span class="y"></span><span class="g"></span></div><em>avancado.sql</em></div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="sql-tag">SQL Simulator</span><button class="sql-run" onclick="runSQL('sql7')">▶ Executar</button></div>
+      </div>
+      <div class="sql-grid">
+        <div class="sql-editor-pane">
+          <div class="sql-pane-lbl"><div class="yd"></div> Editor SQL</div>
+          <textarea class="sql-editor" id="sql7" spellcheck="false">-- Consultas avançadas
+SELECT
+    categoria,
+    COUNT(*) AS qtd_produtos,
+    ROUND(AVG(preco), 2) AS preco_medio,
+    SUM(estoque * preco) AS valor_estoque
+FROM produtos
+GROUP BY categoria
+ORDER BY valor_estoque DESC;
+
+-- Teste também (descomente):
+-- SELECT * FROM produtos WHERE preco > (SELECT AVG(preco) FROM produtos);</textarea>
+        </div>
+        <div>
+          <div class="sql-pane-lbl"><div class="gd"></div> Resultado</div>
+          <div class="sql-out" id="out-sql7"><span class="ph">Clique em "Executar"...</span></div>
+        </div>
+      </div>
+      <div class="sql-sim-ftr"><span class="sql-note">💡 Tabela: produtos (id, nome, preco, estoque, categoria)</span><button class="sql-clr" onclick="clearSQL('sql7','out-sql7')">Limpar</button></div>
+    </div>
+    <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+    <div class="activity-card">
+      <div class="activity-header"><div class="activity-icon">🏆</div><div class="activity-header-info"><div class="activity-tag">Quiz Final do Módulo · +25 XP</div><h3>Desafio Final — Módulo 5</h3></div></div>
+      <div class="activity-body">
+        <p class="quiz-question">Qual é a diferença fundamental entre <strong>WHERE</strong> e <strong>HAVING</strong> em SQL?</p>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">A</div> São sinônimos — podem ser usados indistintamente.</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">B</div> WHERE funciona com JOINs e HAVING apenas com tabelas simples.</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'correct','6-0')"><div class="quiz-opt-letter">C</div> WHERE filtra linhas antes do GROUP BY; HAVING filtra grupos após a agregação.</div>
+          <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">D</div> HAVING é mais rápido que WHERE em qualquer situação.</div>
+        </div>
+        <div class="quiz-feedback" id="qfb-6-0"></div>
+        <div class="xp-reward" id="xp-6-0"><div class="xp-icon">🎓</div><div class="xp-text"><strong>+25 XP!</strong> Módulo 5 completo! Você agora domina PHP com MySQL!</div></div>
+      </div>
+    </div>
+    <div class="exercises-section">
+      <div class="ex-header"><div class="ex-icon">🏁</div><div class="ex-header-info"><h3>Exercícios Finais — Módulo 5</h3><p>Consolide o aprendizado completo de PHP com MySQL</p></div></div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 01</div>
+        <p class="ex-question">No simulador SQL, escreva uma query que busque todos os produtos com preço <strong>acima da média geral</strong> usando uma <strong>subconsulta</strong>. Ordene do mais caro ao mais barato e exiba nome, preço e categoria.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--yellow);line-height:1.8;">SELECT nome, preco, categoria
+FROM produtos
+WHERE preco > (SELECT AVG(preco) FROM produtos)
+ORDER BY preco DESC;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 02</div>
+        <p class="ex-question">Crie um script PHP completo que gere um <strong>relatório de inventário por categoria</strong> usando GROUP BY. Calcule: quantidade de produtos, preço médio e valor total em estoque (estoque × preço). Formate os valores monetários e exiba de forma organizada.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+$pdo = getConnection();
+
+$sql = "SELECT
+            categoria,
+            COUNT(*) AS qtd,
+            AVG(preco) AS preco_medio,
+            SUM(estoque * preco) AS valor_total
+        FROM produtos
+        GROUP BY categoria
+        ORDER BY valor_total DESC";
+
+$stmt = $pdo->query($sql);
+$relatorio = $stmt->fetchAll();
+
+echo "╔══════════════════════════════════╗\n";
+echo "║   RELATÓRIO POR CATEGORIA       ║\n";
+echo "╠══════════════════════════════════╣\n";
+foreach ($relatorio as $r) {
+    $media = number_format($r['preco_medio'], 2, ',', '.');
+    $total = number_format($r['valor_total'], 2, ',', '.');
+    echo "Categoria: {$r['categoria']}\n";
+    echo "  Produtos:    {$r['qtd']}\n";
+    echo "  Preço médio: R$ $media\n";
+    echo "  Valor total: R$ $total\n";
+    echo "──────────────────────────────────\n";
+}
+?&gt;</pre></div>
+      </div>
+      <div class="exercise">
+        <div class="ex-num">EXERCÍCIO 03 — DESAFIO FINAL</div>
+        <p class="ex-question">Crie um <strong>CRUD completo</strong> em PHP para a tabela <strong>produtos</strong>. Implemente 4 funções: <code style="font-family:'Space Mono',monospace;color:var(--accent)">criarProduto()</code>, <code style="font-family:'Space Mono',monospace;color:var(--accent)">listarProdutos()</code>, <code style="font-family:'Space Mono',monospace;color:var(--accent)">atualizarProduto()</code> e <code style="font-family:'Space Mono',monospace;color:var(--accent)">deletarProduto()</code>. Use Prepared Statements em todas. Demonstre o uso de cada função em sequência.</p>
+        <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+        <div class="gabarito-body"><div class="gab-label">// GABARITO</div>
+        <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--green);line-height:1.8;">&lt;?php
+require_once 'config/database.php';
+
+function criarProduto(PDO $pdo, string $nome, float $preco, int $estoque): int {
+    $stmt = $pdo->prepare(
+        "INSERT INTO produtos (nome, preco, estoque) VALUES (:n,:p,:e)"
+    );
+    $stmt->execute([':n'=>$nome,':p'=>$preco,':e'=>$estoque]);
+    return (int)$pdo->lastInsertId();
+}
+
+function listarProdutos(PDO $pdo): array {
+    return $pdo->query("SELECT * FROM produtos ORDER BY nome")->fetchAll();
+}
+
+function atualizarProduto(PDO $pdo, int $id, string $nome, float $preco): bool {
+    $stmt = $pdo->prepare("UPDATE produtos SET nome=:n, preco=:p WHERE id=:id");
+    $stmt->execute([':n'=>$nome,':p'=>$preco,':id'=>$id]);
+    return $stmt->rowCount() > 0;
+}
+
+function deletarProduto(PDO $pdo, int $id): bool {
+    $stmt = $pdo->prepare("DELETE FROM produtos WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    return $stmt->rowCount() > 0;
+}
+
+// === Demonstração ===
+$pdo = getConnection();
+
+$id = criarProduto($pdo, "Smartwatch", 399.90, 20);
+echo "Criado com ID: $id\n";
+
+$lista = listarProdutos($pdo);
+echo "Total no banco: " . count($lista) . " produto(s)\n";
+
+$ok = atualizarProduto($pdo, $id, 'Smartwatch Pro', 499.90);
+echo "Atualizado: " . ($ok ? "Sim" : "Não") . "\n";
+
+$del = deletarProduto($pdo, $id);
+echo "Deletado: " . ($del ? "Sim" : "Não") . "\n";
+?&gt;</pre></div>
+      </div>
+    </div>
+  </div>
+  <div class="lesson-nav">
+    <button class="nav-lesson-btn" onclick="goToLesson(5)">← Anterior</button>
+    <button class="complete-btn" onclick="completeLesson(6)">🏆 Concluir Módulo!</button>
+    <a class="nav-lesson-btn primary" href="modulos.html">Ver todos os módulos →</a>
+  </div>
+</div>
+</main>
+</div><!-- /layout -->
+
+<div class="xp-bar-total">
+  <span class="xp-label">XP Total</span>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill-global"></div></div>
+  <span class="xp-count" id="xp-count">0 / 120 XP</span>
+</div>
+
+<script>
+/* ── STATE ── */
+let currentLesson = 0;
+const totalLessons = 7;
+let completedLessons = new Set();
+let totalXP = 0;
+const maxXP = 120;
+
+/* ── NAVIGATION ── */
+function goToLesson(idx) {
+  document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lesson-' + idx).classList.add('active');
+  document.getElementById('lb-' + idx).classList.add('active');
+  currentLesson = idx;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function completeLesson(idx) {
+  if (completedLessons.has(idx)) return;
+  completedLessons.add(idx);
+  document.getElementById('lb-' + idx).classList.add('completed');
+  updateProgress();
+  showToast('✅ Aula ' + (idx+1) + ' concluída!');
+  if (idx < totalLessons - 1) setTimeout(() => goToLesson(idx+1), 1200);
+  else setTimeout(() => showToast('🏆 Módulo 5 completo! Parabéns!'), 400);
+}
+function updateProgress() {
+  const pct = Math.round((completedLessons.size / totalLessons) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+/* ── XP ── */
+function addXP(amount) {
+  totalXP = Math.min(totalXP + amount, maxXP);
+  document.getElementById('xp-fill-global').style.width = (totalXP/maxXP*100) + '%';
+  document.getElementById('xp-count').textContent = totalXP + ' / ' + maxXP + ' XP';
+}
+
+/* ── QUIZ ── */
+function answerQuiz(el, result, actId) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o === el) o.classList.add(result === 'correct' ? 'correct' : 'wrong');
+    else if (result === 'wrong' && o.getAttribute('onclick') && o.getAttribute('onclick').includes('correct'))
+      o.classList.add('correct');
+  });
+  const fb   = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-'  + actId);
+  if (result === 'correct') {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correto!</strong> Muito bem!';
+    xpEl.classList.add('show');
+    const xpMap = {'0-0':10,'3-0':20,'4-0':20,'6-0':25};
+    addXP(xpMap[actId] || 10);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Não foi dessa vez.</strong> Releia o conteúdo e tente novamente.';
+  }
+}
+
+/* ── DRAG & DROP (Aula 2) ── */
+let draggedEl = null;
+
+function initDrag(poolId, zonesSelector) {
+  document.querySelectorAll(poolId + ' .drag-chip').forEach(chip => {
+    chip.addEventListener('dragstart', () => { draggedEl = chip; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend',   () => chip.classList.remove('dragging'));
+  });
+  document.querySelectorAll(zonesSelector).forEach(zone => {
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag-over');
+      if (!draggedEl) return;
+      const slot = zone.querySelector('.zone-slot');
+      if (slot.firstChild) {
+        const prev = slot.firstChild;
+        document.querySelector(poolId).appendChild(prev);
+        prev.setAttribute('draggable','true');
+        addDragEvt(prev, poolId);
+      }
+      const placed = document.createElement('span');
+      placed.className = 'placed-chip';
+      placed.textContent = draggedEl.dataset.val;
+      placed.setAttribute('data-val', draggedEl.dataset.val);
+      placed.onclick = () => { draggedEl.style.display=''; placed.remove(); };
+      slot.appendChild(placed);
+      draggedEl.style.display = 'none';
+    });
+  });
+}
+
+function addDragEvt(el, poolId) {
+  el.addEventListener('dragstart', () => { draggedEl = el; el.classList.add('dragging'); });
+  el.addEventListener('dragend',   () => el.classList.remove('dragging'));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initDrag('#lesson-1 #drag-chips', '#lesson-1 .drop-zone');
+  initDrag('#lesson-5 #drag-chips', '#lesson-5 .drop-zone');
+});
+
+function checkDropZones(lessonId, xpId, xpAmount) {
+  let all = true;
+  document.querySelectorAll('#lesson-' + lessonId + ' .drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    const placed = zone.querySelector('.zone-slot .placed-chip');
+    if (!placed) { all = false; return; }
+    if (placed.dataset.val === zone.dataset.answer) zone.classList.add('correct-zone');
+    else { zone.classList.add('wrong-zone'); all = false; }
+  });
+  if (all) {
+    document.getElementById(xpId).classList.add('show');
+    addXP(xpAmount);
+    showToast('🎯 Perfeito! +' + xpAmount + ' XP');
+  } else {
+    showToast('❌ Algumas posições estão erradas!');
+  }
+}
+
+function checkDrag()    { checkDropZones(1, 'xp-1-0', 15); }
+function checkDragL5()  { checkDropZones(5, 'xp-5-0', 15); }
+
+function resetDropZones(lessonId, xpId) {
+  document.querySelectorAll('#lesson-' + lessonId + ' .drop-zone').forEach(zone => {
+    zone.classList.remove('correct-zone','wrong-zone');
+    zone.querySelector('.zone-slot').innerHTML = '';
+  });
+  document.querySelectorAll('#lesson-' + lessonId + ' .drag-chip').forEach(c => c.style.display='');
+  document.getElementById(xpId).classList.remove('show');
+}
+
+function resetDrag()   { resetDropZones(1, 'xp-1-0'); }
+function resetDragL5() { resetDropZones(5, 'xp-5-0'); }
+
+/* ── FILL IN THE BLANK ── */
+function checkFitb(actId, answers) {
+  const ids = ['fitb-0','fitb-1','fitb-2','fitb-3'];
+  let allCorrect = true;
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.classList.remove('correct','wrong');
+    if (el.value.trim().toLowerCase() === (answers[i]||'').toLowerCase()) el.classList.add('correct');
+    else { el.classList.add('wrong'); allCorrect = false; }
+  });
+  const fb   = document.getElementById('qfb-'+actId);
+  const xpEl = document.getElementById('xp-'+actId);
+  if (allCorrect) {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Perfeito!</strong> Você preencheu todas as lacunas corretamente!';
+    xpEl.classList.add('show'); addXP(15);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ Verifique os placeholders (:campo) e os métodos PDO!';
+  }
+}
+function resetFitb(ids, fbId, xpId) {
+  ids.forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.classList.remove('correct','wrong');} });
+  const fb=document.getElementById(fbId); if(fb){fb.className='quiz-feedback';fb.innerHTML='';}
+  const xp=document.getElementById(xpId); if(xp) xp.classList.remove('show');
+}
+
+/* ── SQL SIMULATOR ── */
+const DB = {
+  produtos: [
+    {id:1, nome:'Mouse Gamer',      preco:79.90,  estoque:45,  categoria:'Periféricos'},
+    {id:2, nome:'Teclado Mecânico', preco:249.00, estoque:20,  categoria:'Periféricos'},
+    {id:3, nome:'Monitor 24"',      preco:899.00, estoque:8,   categoria:'Eletrônicos'},
+    {id:4, nome:'Headset USB',      preco:149.90, estoque:30,  categoria:'Periféricos'},
+    {id:5, nome:'Webcam HD',        preco:189.00, estoque:15,  categoria:'Eletrônicos'},
+    {id:6, nome:'Mousepad XL',      preco:39.90,  estoque:100, categoria:'Acessórios'},
+    {id:7, nome:'Hub USB-C',        preco:119.00, estoque:25,  categoria:'Acessórios'},
+    {id:8, nome:'Cabo HDMI 2m',     preco:29.90,  estoque:80,  categoria:'Acessórios'},
+    {id:9, nome:'SSD 480GB',        preco:299.00, estoque:12,  categoria:'Armazenamento'},
+    {id:10,nome:'Pendrive 64GB',    preco:49.90,  estoque:60,  categoria:'Armazenamento'},
+  ]
+};
+
+function runSQL(editorId) {
+  const raw = document.getElementById(editorId).value.trim();
+  const outEl = document.getElementById('out-' + editorId);
+  try {
+    const stmts = raw.split(';').map(s => s.trim()).filter(s => s && !s.startsWith('--'));
+    let last = null;
+    for (const s of stmts) last = execStmt(s);
+    if (Array.isArray(last) && last.length === 0) {
+      outEl.innerHTML = '<span style="color:var(--muted);font-style:italic">0 registros encontrados.</span>';
+    } else if (Array.isArray(last)) {
+      outEl.innerHTML = buildTable(last);
+    } else {
+      outEl.innerHTML = last || '<span style="color:var(--muted);font-style:italic">(sem saída)</span>';
+    }
+  } catch(e) {
+    outEl.innerHTML = '<span style="color:var(--red)">⚠ Erro SQL: ' + e.message + '</span>';
+  }
+}
+
+function execStmt(sql) {
+  const up = sql.toUpperCase().trimStart();
+  if (up.startsWith('SELECT'))  return execSelect(sql);
+  if (up.startsWith('INSERT'))  return execInsert(sql);
+  if (up.startsWith('UPDATE'))  return execUpdate(sql);
+  if (up.startsWith('DELETE'))  return execDelete(sql);
+  if (up.startsWith('CREATE') || up.startsWith('ALTER') || up.startsWith('DROP') || up.startsWith('USE'))
+    return '<span style="color:var(--green)">✅ Comando DDL aceito (simulado).</span>';
+  throw new Error('Comando não reconhecido: ' + sql.slice(0,30));
+}
+
+function execSelect(sql) {
+  let data = JSON.parse(JSON.stringify(DB.produtos));
+  const colMatch = sql.match(/SELECT\s+(.*?)\s+FROM/is);
+  let cols = colMatch ? colMatch[1].trim() : '*';
+
+  const whereMatch = sql.match(/WHERE\s+(.*?)(?:\s+GROUP BY|\s+ORDER BY|\s+LIMIT|\s+HAVING|$)/is);
+  if (whereMatch) data = filterWhere(data, whereMatch[1].trim());
+
+  const groupMatch = sql.match(/GROUP BY\s+(.*?)(?:\s+HAVING|\s+ORDER BY|\s+LIMIT|$)/is);
+  if (groupMatch) {
+    data = applyGroup(data, groupMatch[1].trim(), cols);
+    cols = '*';
+  }
+
+  const havMatch = sql.match(/HAVING\s+(.*?)(?:\s+ORDER BY|\s+LIMIT|$)/is);
+  if (havMatch) data = filterHaving(data, havMatch[1].trim());
+
+  const orderMatch = sql.match(/ORDER BY\s+(.*?)(?:\s+LIMIT|$)/is);
+  if (orderMatch) data = applyOrder(data, orderMatch[1].trim());
+
+  const limitMatch = sql.match(/LIMIT\s+(\d+)/i);
+  if (limitMatch) data = data.slice(0, parseInt(limitMatch[1]));
+
+  return data;
+}
+
+function filterWhere(data, cond) {
+  // Subconsulta AVG
+  if (/preco\s*>\s*\(SELECT AVG\(preco\) FROM produtos\)/i.test(cond)) {
+    const avg = data.reduce((s,r)=>s+r.preco,0)/data.length;
+    return data.filter(r=>r.preco>avg);
+  }
+  return data.filter(row => {
+    const bt = cond.match(/(\w+)\s+BETWEEN\s+([\d.]+)\s+AND\s+([\d.]+)/i);
+    if (bt) return row[bt[1].toLowerCase()]>=parseFloat(bt[2]) && row[bt[1].toLowerCase()]<=parseFloat(bt[3]);
+    const lk = cond.match(/(\w+)\s+LIKE\s+'([^']+)'/i);
+    if (lk) { const p=lk[2].replace(/%/g,'.*').replace(/_/g,'.'); return new RegExp('^'+p+'$','i').test(String(row[lk[1].toLowerCase()]||'')); }
+    const eq = cond.match(/(\w+)\s*=\s*'([^']+)'/i);
+    if (eq) return String(row[eq[1].toLowerCase()]||'')=== eq[2];
+    const eqn = cond.match(/(\w+)\s*=\s*([\d.]+)/i);
+    if (eqn) return row[eqn[1].toLowerCase()]==parseFloat(eqn[2]);
+    const gt = cond.match(/(\w+)\s*>\s*([\d.]+)/i);
+    if (gt) return row[gt[1].toLowerCase()]>parseFloat(gt[2]);
+    const lt = cond.match(/(\w+)\s*<\s*([\d.]+)/i);
+    if (lt) return row[lt[1].toLowerCase()]<parseFloat(lt[2]);
+    return true;
+  });
+}
+
+function applyGroup(data, col, cols) {
+  const g={};
+  data.forEach(r=>{const k=String(r[col.toLowerCase()]||'');(g[k]=g[k]||[]).push(r);});
+  return Object.entries(g).map(([k,rows])=>{
+    const r={};
+    r[col.toLowerCase()] = k;
+    const cm = cols.match(/COUNT\s*\(\s*\*\s*\)\s*(?:AS\s+(\w+))?/i);
+    if(cm) r[cm[1]||'count']=rows.length;
+    const am = cols.match(/(?:ROUND\s*\(\s*)?AVG\s*\((\w+)\)\s*(?:,\s*\d+\s*\))?\s*(?:AS\s+(\w+))?/i);
+    if(am) r[am[2]||'avg_'+am[1]]=parseFloat((rows.reduce((s,x)=>s+(x[am[1].toLowerCase()]||0),0)/rows.length).toFixed(2));
+    const sm = cols.match(/SUM\s*\((\w+)\s*\*\s*(\w+)\)\s*(?:AS\s+(\w+))?/i);
+    if(sm) r[sm[3]||'sum']=parseFloat(rows.reduce((s,x)=>s+((x[sm[1].toLowerCase()]||0)*(x[sm[2].toLowerCase()]||0)),0).toFixed(2));
+    const sm2 = !sm && cols.match(/SUM\s*\((\w+)\)\s*(?:AS\s+(\w+))?/i);
+    if(sm2) r[sm2[2]||'sum_'+sm2[1]]=parseFloat(rows.reduce((s,x)=>s+(x[sm2[1].toLowerCase()]||0),0).toFixed(2));
+    const mm = cols.match(/MIN\s*\((\w+)\)\s*(?:AS\s+(\w+))?/i);
+    if(mm) r[mm[2]||'min_'+mm[1]]=Math.min(...rows.map(x=>x[mm[1].toLowerCase()]||0));
+    const mx = cols.match(/MAX\s*\((\w+)\)\s*(?:AS\s+(\w+))?/i);
+    if(mx) r[mx[2]||'max_'+mx[1]]=Math.max(...rows.map(x=>x[mx[1].toLowerCase()]||0));
+    return r;
+  });
+}
+
+function filterHaving(data, cond) {
+  const m = cond.match(/COUNT\s*\(\s*\*\s*\)\s*>\s*(\d+)/i);
+  if(m) {
+    const min=parseInt(m[1]);
+    const k=Object.keys(data[0]||{}).find(x=>x.startsWith('count'))||'count';
+    return data.filter(r=>(r[k]||0)>min);
+  }
+  return data;
+}
+
+function applyOrder(data, s) {
+  const p=s.split(',')[0].trim().split(/\s+/);
+  const col=p[0].replace(/.*\./,'').toLowerCase();
+  const dir=(p[1]||'ASC').toUpperCase()==='DESC'?-1:1;
+  return [...data].sort((a,b)=>{if(a[col]<b[col])return -1*dir;if(a[col]>b[col])return dir;return 0;});
+}
+
+function execInsert(sql) {
+  const m = sql.match(/INSERT INTO (\w+)\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)/i);
+  if (!m) throw new Error('Sintaxe INSERT inválida');
+  if (m[1].toLowerCase() !== 'produtos') throw new Error('Tabela não disponível: '+m[1]);
+  const cols = m[2].split(',').map(c=>c.trim().toLowerCase());
+  const vals = m[3].split(',').map(v=>{v=v.trim().replace(/^'|'$/g,'');return isNaN(v)?v:parseFloat(v);});
+  const row = {id: Math.max(...DB.produtos.map(r=>r.id))+1};
+  cols.forEach((c,i)=>row[c]=vals[i]);
+  DB.produtos.push(row);
+  return `<span style="color:var(--green)">✅ 1 linha inserida. ID gerado: ${row.id}</span>`;
+}
+
+function execUpdate(sql) {
+  const tm=sql.match(/UPDATE\s+(\w+)\s+SET/i);
+  if(!tm||tm[1].toLowerCase()!=='produtos') throw new Error('Tabela não disponível');
+  const sm=sql.match(/SET\s+(.*?)\s+WHERE/i)||sql.match(/SET\s+(.*)/i);
+  if(!sm) throw new Error('Cláusula SET não encontrada');
+  const pairs=sm[1].split(',').map(p=>{const[k,v]=p.split('=').map(x=>x.trim());const val=v.replace(/^'|'$/g,'');return[k.trim().toLowerCase(),isNaN(val)?val:parseFloat(val)];});
+  const wm=sql.match(/WHERE\s+(.*)/i);
+  let affected=0;
+  DB.produtos.forEach(row=>{
+    const match=wm?filterWhere([row],wm[1]).length>0:true;
+    if(match){pairs.forEach(([k,v])=>row[k]=v);affected++;}
+  });
+  return `<span style="color:var(--green)">✅ ${affected} linha(s) atualizada(s).</span>`;
+}
+
+function execDelete(sql) {
+  const wm=sql.match(/WHERE\s+(.*)/i);
+  const before=DB.produtos.length;
+  if(wm){const keep=DB.produtos.filter(r=>filterWhere([r],wm[1]).length===0);DB.produtos.length=0;keep.forEach(r=>DB.produtos.push(r));}
+  const d=before-DB.produtos.length;
+  return `<span style="color:var(--green)">✅ ${d} linha(s) deletada(s).</span>`;
+}
+
+function buildTable(rows) {
+  if(!rows.length) return '<span style="color:var(--muted);font-style:italic">0 registros.</span>';
+  const cols=Object.keys(rows[0]);
+  let h='<table class="sql-table"><thead><tr>';
+  cols.forEach(c=>h+=`<th>${c.toUpperCase()}</th>`);
+  h+='</tr></thead><tbody>';
+  rows.forEach(row=>{
+    h+='<tr>';
+    cols.forEach(c=>{
+      const v=row[c];
+      const d=typeof v==='number'&&!Number.isInteger(v)?v.toFixed(2):(v??'NULL');
+      h+=`<td>${d}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+=`</tbody></table><div style="margin-top:8px;font-size:.72rem;color:var(--muted)">${rows.length} registro(s)</div>`;
+  return h;
+}
+
+function clearSQL(editorId, outId) {
+  document.getElementById(editorId).value='';
+  document.getElementById(outId).innerHTML='<span class="ph">Clique em "Executar"...</span>';
+}
+
+/* ── PHP SANDBOX ── */
+function runCode(editorId) {
+  const code=document.getElementById(editorId).value;
+  const outEl=document.getElementById('out-'+editorId);
+  outEl.classList.remove('error');
+  try {
+    const r=emulatePHP(code);
+    outEl.innerHTML=r.error?`<span style="color:var(--red)">⚠ ${r.error}</span>`:(r.output||'<span style="color:var(--muted);font-style:italic">(sem saída)</span>');
+    if(r.error) outEl.classList.add('error');
+  } catch(e) { outEl.classList.add('error'); outEl.innerHTML=`<span style="color:var(--red)">⚠ ${e.message}</span>`; }
+}
+
+function emulatePHP(code) {
+  let c=code.replace(/<\?php/gi,'').replace(/<\?=/gi,'echo ').replace(/\?>/gi,'').trim();
+  c=c.replace(/\/\/[^\n]*/g,'').replace(/#[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'');
+  c=c.replace(/define\s*\(\s*'([^']+)'\s*,\s*([^)]+)\)\s*;/g,(_,n,v)=>`let ${n}=${v.trim()};`);
+  c=c.replace(/\bconst\s+([A-Z_]+)\s*=/g,'let $1 =');
+  c=c.replace(/number_format\s*\(([^,]+),\s*(\d+)[^)]*\)/g,(_,v,d)=>`parseFloat(${v}).toFixed(${d})`);
+  c=c.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g,'_$1');
+  c=c.replace(/\becho\s+/g,'__out(');
+  c=c.replace(/(__out\([^;{}\n]+);/g,(_,inner)=>inner+');');
+  c=c.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\s*=>\s*(_\w+)\)/g,'for(let[$2,$3] of Object.entries($1))');
+  c=c.replace(/foreach\s*\((_\w+)\s+as\s+(_\w+)\)/g,'for(let $2 of Object.values($1))');
+  c=c.replace(/([^.=!<>])\.([^.=\d])/g,'$1+$2');
+  const js=`let __output='';function __out(v){let s=v===null?'':v===true?'1':v===false?'':String(v);__output+=s.replace(/\\\\n/g,'\\n');}${c}__output;`;
+  try{const r=new Function(js)();return{output:r!=null?String(r):''};}catch(e){return{error:'Parse Error: '+e.message};}
+}
+
+function clearSandbox(editorId, outId) {
+  document.getElementById(editorId).value='';
+  document.getElementById(outId).innerHTML='<span class="out-placeholder">Clique em "Executar" para ver a saída...</span>';
+  document.getElementById(outId).classList.remove('error');
+}
+
+/* ── GABARITO ── */
+function toggleGab(btn) { btn.classList.toggle('open'); btn.nextElementSibling.classList.toggle('open'); }
+
+/* ── COPY CODE ── */
+function copyCode(btn) {
+  const body=btn.closest('.code-block').querySelector('.cb-body');
+  navigator.clipboard.writeText(body.innerText.replace(/^\d+\t/gm,'').trim()).then(()=>{
+    btn.textContent='Copiado!'; setTimeout(()=>btn.textContent='Copiar',2000);
+  });
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>{t.style.display='none';},3000);
+}
+
+/* ── MOBILE SIDEBAR ── */
+(function(){
+  const toggle=document.getElementById('menuToggle');
+  const sidebar=document.querySelector('.sidebar');
+  const overlay=document.getElementById('sidebarOverlay');
+  if(!toggle||!sidebar||!overlay) return;
+  function open(){sidebar.classList.add('open');overlay.classList.add('open');toggle.textContent='✕';}
+  function close(){sidebar.classList.remove('open');overlay.classList.remove('open');toggle.textContent='☰';}
+  toggle.addEventListener('click',()=>sidebar.classList.contains('open')?close():open());
+  overlay.addEventListener('click',close);
+  document.querySelectorAll('.lesson-btn').forEach(btn=>btn.addEventListener('click',()=>{if(window.innerWidth<=900)close();}));
+})();
+</script>
+</body>
+</html>
