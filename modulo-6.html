@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHPMaster — Módulo 6: Orientação a Objetos</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════ */
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #0f1525;
+  --bg3:     #141c30;
+  --card:    #161e35;
+  --border:  #1f2d50;
+  --php:     #7c4dff;
+  --accent:  #00e5ff;
+  --text:    #e8eaf6;
+  --muted:   #8892b0;
+  --white:   #ffffff;
+  --green:   #69ffb4;
+  --yellow:  #ffd166;
+  --red:     #ff6b6b;
+  --radius:  16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1;}
+.glow-1{width:500px;height:500px;background:var(--php);top:-100px;right:-100px;}
+.glow-2{width:400px;height:400px;background:var(--accent);bottom:0;left:-100px;}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);text-decoration:none;}
+.logo span{color:var(--accent);}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg)!important;padding:9px 20px;border-radius:50px;font-weight:700!important;}
+
+/* ══════════════════════════════════════
+   LAYOUT: SIDEBAR + MAIN
+══════════════════════════════════════ */
+.layout{display:block;min-height:100vh;padding-top:60px;}
+
+.sidebar{
+  position:fixed;top:60px;left:0;bottom:0;width:280px;
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;z-index:100;
+  padding:28px 0 60px;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.sidebar-header{padding:0 22px 20px;border-bottom:1px solid var(--border);}
+.mod-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,77,255,.15);border:1px solid rgba(124,77,255,.4);
+  border-radius:50px;padding:4px 12px;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--php);
+  margin-bottom:10px;
+}
+.sidebar-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3;color:var(--white);}
+.sidebar-progress{margin-top:14px;}
+.prog-label{font-size:.75rem;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:var(--border);border-radius:50px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;}
+
+.sidebar-nav{padding:16px 0;}
+.sidebar-section{padding:8px 22px 4px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+.lesson-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:12px 22px;
+  background:none;border:none;cursor:pointer;
+  text-align:left;transition:all .2s;
+  border-left:3px solid transparent;
+}
+.lesson-btn:hover{background:rgba(255,255,255,.04);}
+.lesson-btn.active{background:rgba(124,77,255,.1);border-left-color:var(--php);}
+.lesson-btn.completed{border-left-color:var(--green);}
+
+.l-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+}
+.lesson-btn.active .l-icon{background:rgba(124,77,255,.2);border-color:rgba(124,77,255,.5);}
+.lesson-btn.completed .l-icon{background:rgba(105,255,180,.1);border-color:rgba(105,255,180,.3);}
+
+.l-info{flex:1;}
+.l-num{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.l-title{font-size:.88rem;font-weight:500;color:var(--text);margin-top:1px;}
+.lesson-btn.active .l-title{color:var(--white);font-weight:600;}
+
+.l-check{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .2s;}
+.lesson-btn.completed .l-check{opacity:1;}
+
+.main{margin-left:280px;min-height:100vh;max-width:100%;overflow-x:hidden;}
+
+/* ══════════════════════════════════════
+   LESSON PANEL
+══════════════════════════════════════ */
+.lesson-panel{display:none;animation:fadeUp .4s ease;}
+.lesson-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.lesson-hero{
+  padding:48px 6% 36px;
+  background:linear-gradient(135deg,rgba(124,77,255,.06),rgba(0,229,255,.04));
+  border-bottom:1px solid var(--border);
+}
+.lesson-body{padding:48px 6%;}
+.lesson-hero > *,.lesson-body > *{max-width:900px;}
+.lesson-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.lesson-num-tag{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--php);background:rgba(124,77,255,.12);border:1px solid rgba(124,77,255,.3);padding:4px 10px;border-radius:50px;}
+.lesson-dur{font-size:.8rem;color:var(--muted);}
+.lesson-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-1px;margin-bottom:12px;}
+.lesson-title em{font-style:normal;color:var(--accent);}
+.lesson-desc{color:var(--muted);font-size:1.05rem;line-height:1.7;max-width:680px;}
+
+.content-block{margin-bottom:40px;}
+
+.block-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.block-title::before{
+  content:'';width:4px;height:22px;border-radius:2px;
+  background:linear-gradient(180deg,var(--php),var(--accent));
+  display:block;flex-shrink:0;
+}
+
+.prose{color:var(--muted);line-height:1.85;font-size:1rem;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose em{color:var(--accent);font-style:normal;}
+.prose p{margin-bottom:14px;}
+.prose ul{padding-left:20px;margin-bottom:14px;}
+.prose ul li{margin-bottom:8px;}
+.prose ol{padding-left:20px;margin-bottom:14px;}
+.prose ol li{margin-bottom:8px;}
+.prose a{color:var(--accent);text-decoration:none;}
+
+.callout{
+  border-radius:14px;padding:20px 22px;margin:24px 0;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.callout-info{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.callout-tip{background:rgba(105,255,180,.06);border:1px solid rgba(105,255,180,.2);}
+.callout-warn{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.2);}
+.callout-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;font-size:.9rem;margin-bottom:4px;color:var(--white);}
+.callout-info .callout-body strong{color:var(--accent);}
+.callout-tip .callout-body strong{color:var(--green);}
+.callout-warn .callout-body strong{color:var(--yellow);}
+.callout-body p{font-size:.9rem;color:var(--muted);line-height:1.6;}
+
+.code-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin:20px 0;
+}
+.cb-header{
+  background:var(--bg3);padding:11px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.cb-dots{display:flex;gap:6px;}
+.cb-dot{width:10px;height:10px;border-radius:50%;}
+.cb-dot:nth-child(1){background:#ff5f57;}
+.cb-dot:nth-child(2){background:#febc2e;}
+.cb-dot:nth-child(3){background:#28c840;}
+.cb-lang{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.cb-copy{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  background:none;border:1px solid var(--border);border-radius:6px;
+  padding:3px 10px;cursor:pointer;transition:all .2s;
+}
+.cb-copy:hover{color:var(--accent);border-color:var(--accent);}
+.cb-body{
+  padding:22px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.85;overflow-x:auto;
+}
+.c-tag{color:#ff6b9d;} .c-var{color:#82aaff;} .c-str{color:#c3e88d;}
+.c-kw{color:#c792ea;}  .c-fn{color:#89ddff;}  .c-num{color:#f78c6c;}
+.c-cmt{color:#546e7a;font-style:italic;} .c-out{color:#ffd166;}
+.ln{color:#2d3d6b;user-select:none;margin-right:16px;}
+
+.section-divider{
+  display:flex;align-items:center;gap:14px;margin:48px 0 36px;
+}
+.section-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.section-divider span{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--muted);letter-spacing:2px;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   INTERACTIVE ACTIVITY
+══════════════════════════════════════ */
+.activity-card{
+  background:var(--card);border:1px solid rgba(0,229,255,.25);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(0,229,255,.05);
+}
+.activity-header{
+  background:linear-gradient(135deg,rgba(124,77,255,.15),rgba(0,229,255,.1));
+  padding:20px 28px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid rgba(0,229,255,.15);
+}
+.activity-icon{font-size:1.6rem;}
+.activity-header-info{flex:1;}
+.activity-tag{
+  font-family:'Space Mono',monospace;font-size:.67rem;
+  color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+}
+.activity-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;}
+.activity-body{padding:28px;}
+
+.quiz-question{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:12px;padding:14px 18px;cursor:pointer;
+  transition:all .2s;font-size:.95rem;
+}
+.quiz-opt:hover{border-color:var(--php);background:rgba(124,77,255,.06);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(105,255,180,.08);color:var(--green);}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,107,107,.08);color:var(--red);}
+.quiz-opt-letter{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;
+  transition:all .2s;
+}
+.quiz-opt.correct .quiz-opt-letter{background:var(--green);color:var(--bg);border-color:var(--green);}
+.quiz-opt.wrong .quiz-opt-letter{background:var(--red);color:var(--white);border-color:var(--red);}
+.quiz-feedback{
+  padding:14px 18px;border-radius:12px;font-size:.9rem;
+  display:none;margin-bottom:16px;line-height:1.5;
+}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.correct-fb{background:rgba(105,255,180,.08);border:1px solid rgba(105,255,180,.3);color:var(--green);}
+.quiz-feedback.wrong-fb{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+
+.xp-reward{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(105,255,180,.08),rgba(0,229,255,.05));
+  border:1px solid rgba(105,255,180,.25);border-radius:12px;
+  padding:14px 20px;margin-top:16px;display:none;
+}
+.xp-reward.show{display:flex;}
+.xp-icon{font-size:1.5rem;}
+.xp-text{font-size:.9rem;}
+.xp-text strong{color:var(--green);}
+
+.activity-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.act-btn{
+  padding:10px 22px;border-radius:10px;font-family:'Syne',sans-serif;
+  font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s;border:none;
+}
+.act-btn-primary{background:linear-gradient(135deg,var(--php),var(--accent));color:var(--bg);}
+.act-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.3);}
+.act-btn-secondary{background:var(--bg2);color:var(--muted);border:1px solid var(--border);}
+.act-btn-secondary:hover{border-color:var(--muted);color:var(--text);}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX
+══════════════════════════════════════ */
+.sandbox-wrap{
+  background:var(--bg2);border:1px solid rgba(124,77,255,.3);
+  border-radius:20px;overflow:hidden;margin:36px 0;
+  box-shadow:0 0 40px rgba(124,77,255,.07);
+}
+.sandbox-header{
+  background:var(--bg3);padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.sandbox-title{display:flex;align-items:center;gap:10px;}
+.sandbox-title .s-dots{display:flex;gap:5px;}
+.sandbox-title .s-dot{width:10px;height:10px;border-radius:50%;}
+.s-dot:nth-child(1){background:#ff5f57;}
+.s-dot:nth-child(2){background:#febc2e;}
+.s-dot:nth-child(3){background:#28c840;}
+.sandbox-title span{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-left:6px;}
+.sandbox-actions{display:flex;gap:10px;align-items:center;}
+.sandbox-tag{
+  font-family:'Space Mono',monospace;font-size:.68rem;
+  color:var(--php);background:rgba(124,77,255,.12);
+  border:1px solid rgba(124,77,255,.3);border-radius:50px;padding:4px 10px;
+}
+.run-btn{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;padding:9px 20px;border-radius:8px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;
+  cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;
+}
+.run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,229,255,.35);}
+.run-btn:active{transform:scale(.97);}
+
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr;}
+.sandbox-editor-wrap{border-right:1px solid var(--border);}
+.sandbox-pane-label{
+  padding:10px 18px;background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+.sandbox-pane-label .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.sandbox-editor{
+  width:100%;min-height:200px;padding:20px;resize:none;
+  background:transparent;border:none;outline:none;
+  font-family:'Space Mono',monospace;font-size:.83rem;
+  line-height:1.8;color:var(--text);tab-size:2;
+}
+.sandbox-output{
+  padding:20px;font-family:'Space Mono',monospace;
+  font-size:.83rem;line-height:1.8;min-height:200px;
+  color:var(--green);white-space:pre-wrap;word-break:break-word;
+}
+.sandbox-output.error{color:var(--red);}
+.sandbox-output .out-placeholder{color:var(--muted);font-style:italic;}
+
+.sandbox-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  font-size:.78rem;color:var(--muted);
+}
+.sandbox-note{font-family:'Space Mono',monospace;}
+.sandbox-clear{
+  margin-left:auto;background:none;border:1px solid var(--border);
+  color:var(--muted);border-radius:6px;padding:4px 12px;
+  font-size:.75rem;cursor:pointer;transition:all .2s;
+}
+.sandbox-clear:hover{border-color:var(--red);color:var(--red);}
+
+/* ══════════════════════════════════════
+   EXERCISES
+══════════════════════════════════════ */
+.exercises-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:36px;margin-top:48px;
+}
+.ex-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  padding-bottom:20px;border-bottom:1px solid var(--border);
+}
+.ex-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.ex-header-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;}
+.ex-header-info p{color:var(--muted);font-size:.88rem;margin-top:3px;}
+
+.exercise{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.exercise:last-of-type{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ex-num{
+  font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--yellow);margin-bottom:8px;letter-spacing:1px;
+}
+.ex-question{font-size:.98rem;line-height:1.65;color:var(--text);margin-bottom:16px;}
+.ex-question strong{color:var(--accent);}
+
+.gabarito-toggle{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:9px 16px;color:var(--muted);
+  font-size:.83rem;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;
+  margin-top:12px;
+}
+.gabarito-toggle:hover{border-color:var(--yellow);color:var(--yellow);}
+.gabarito-toggle .arrow{transition:transform .25s;}
+.gabarito-toggle.open .arrow{transform:rotate(180deg);}
+.gabarito-body{
+  margin-top:14px;padding:20px;
+  background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.2);
+  border-radius:12px;display:none;animation:fadeUp .3s ease;
+}
+.gabarito-body.open{display:block;}
+.gabarito-body .gab-label{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--yellow);
+  letter-spacing:2px;margin-bottom:12px;
+}
+.gabarito-body .prose{font-size:.9rem;}
+
+/* ══════════════════════════════════════
+   LESSON NAVIGATION
+══════════════════════════════════════ */
+.lesson-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 6%;border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.nav-lesson-btn{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;cursor:pointer;
+  transition:all .25s;text-decoration:none;
+  font-size:.9rem;color:var(--muted);
+}
+.nav-lesson-btn:hover{border-color:var(--accent);color:var(--text);}
+.nav-lesson-btn.primary{
+  background:linear-gradient(135deg,var(--php),var(--accent));
+  color:var(--bg);border:none;font-weight:700;
+}
+.nav-lesson-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,255,.3);color:var(--bg);}
+.nav-lesson-btn.disabled{opacity:.3;pointer-events:none;}
+
+.complete-btn{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--green),#00b88a);
+  color:var(--bg);border:none;border-radius:12px;padding:12px 24px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .25s;
+}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(105,255,180,.3);}
+
+/* ══════════════════════════════════════
+   XP BAR TOTAL
+══════════════════════════════════════ */
+.xp-bar-total{
+  position:fixed;bottom:0;left:280px;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:12px 5%;display:flex;align-items:center;gap:16px;
+  z-index:50;
+}
+.xp-label{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.xp-track{flex:1;height:8px;background:var(--border);border-radius:50px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--php),var(--accent));border-radius:50px;transition:width .6s ease;width:0%;}
+.xp-count{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);white-space:nowrap;}
+
+.toast{
+  position:fixed;bottom:60px;right:28px;
+  background:var(--card);border:1px solid var(--green);color:var(--green);
+  border-radius:14px;padding:14px 20px;font-size:.88rem;font-weight:500;
+  z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateX(80px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+.menu-toggle{
+  display:none;
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;cursor:pointer;
+  color:var(--muted);font-size:1.1rem;line-height:1;
+  transition:all .2s;
+}
+.menu-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:99;
+}
+.sidebar-overlay.open{display:block;}
+
+@media(max-width:900px){
+  .menu-toggle{display:block;}
+  .nav-links li:not(:last-child){display:none;}
+  .layout{grid-template-columns:1fr;}
+  .main{margin-left:0;}
+  .sidebar{transform:translateX(-100%);transition:transform .3s ease;width:min(280px,85vw);z-index:150;}
+  .sidebar.open{transform:translateX(0);}
+  .lesson-hero,.lesson-body{padding-left:5%;padding-right:5%;}
+  .sandbox-grid{grid-template-columns:1fr;}
+  .sandbox-editor-wrap{border-right:none;border-bottom:1px solid var(--border);}
+  .xp-bar-total{left:0;}
+  .lesson-nav{flex-wrap:wrap;gap:10px;padding:20px 5%;}
+  .nav-lesson-btn{flex:1;min-width:120px;justify-content:center;}
+  .exercises-section{padding:24px 18px;}
+  .callout{flex-direction:column;gap:8px;}
+}
+
+@media(max-width:480px){
+  .lesson-title{font-size:1.5rem;}
+  .sandbox-header{flex-wrap:wrap;gap:8px;}
+  .sandbox-actions{flex-wrap:wrap;}
+  .activity-header{flex-wrap:wrap;}
+  .activity-body{padding:18px;}
+  .activity-actions{flex-direction:column;}
+  .act-btn{width:100%;text-align:center;}
+  .nav-lesson-btn span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-blob glow-1"></div>
+<div class="glow-blob glow-2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html">PHP<span>Master</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="motivacoes.html">Motivações</a></li>
+    <li><a href="modulos.html">Módulos</a></li>
+    <li><a href="contato.html" class="nav-cta">Contato</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu de aulas">☰</button>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="mod-badge">🧩 MOD 06</div>
+      <h2>Orientação a Objetos</h2>
+      <div class="sidebar-progress">
+        <div class="prog-label"><span>Progresso</span><span id="prog-pct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Aulas</div>
+      <button class="lesson-btn active" onclick="goToLesson(0)" id="lb-0">
+        <div class="l-icon">🎯</div>
+        <div class="l-info">
+          <div class="l-num">AULA 01</div>
+          <div class="l-title">Introdução à POO</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(1)" id="lb-1">
+        <div class="l-icon">📦</div>
+        <div class="l-info">
+          <div class="l-num">AULA 02</div>
+          <div class="l-title">Classes e Objetos</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(2)" id="lb-2">
+        <div class="l-icon">⚙️</div>
+        <div class="l-info">
+          <div class="l-num">AULA 03</div>
+          <div class="l-title">Propriedades e Métodos</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(3)" id="lb-3">
+        <div class="l-icon">🏗️</div>
+        <div class="l-info">
+          <div class="l-num">AULA 04</div>
+          <div class="l-title">Construtores</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(4)" id="lb-4">
+        <div class="l-icon">🔗</div>
+        <div class="l-info">
+          <div class="l-num">AULA 05</div>
+          <div class="l-title">Herança</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(5)" id="lb-5">
+        <div class="l-icon">🔒</div>
+        <div class="l-info">
+          <div class="l-num">AULA 06</div>
+          <div class="l-title">Encapsulamento</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(6)" id="lb-6">
+        <div class="l-icon">📋</div>
+        <div class="l-info">
+          <div class="l-num">AULA 07</div>
+          <div class="l-title">Interfaces</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+      <button class="lesson-btn" onclick="goToLesson(7)" id="lb-7">
+        <div class="l-icon">📁</div>
+        <div class="l-info">
+          <div class="l-num">AULA 08</div>
+          <div class="l-title">Namespaces</div>
+        </div>
+        <span class="l-check">✓</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ AULA 1: INTRODUÇÃO À POO ══════════ -->
+    <div class="lesson-panel active" id="lesson-0">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 01 / 08</span>
+          <span class="lesson-dur">⏱ ~15 min</span>
+        </div>
+        <h1 class="lesson-title">Introdução à <em>POO</em></h1>
+        <p class="lesson-desc">Entenda os pilares da Programação Orientada a Objetos e por que ela revolucionou o desenvolvimento de software.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é POO?</h2>
+          <div class="prose">
+            <p>A <strong>Programação Orientada a Objetos (POO)</strong> é um paradigma que organiza o código ao redor de "objetos" — entidades que combinam dados (propriedades) e comportamentos (métodos). Em vez de pensar em procedimentos e funções soltas, você modela o mundo real em código.</p>
+            <p>PHP moderno (>=5.0) suporta POO completa e é fundamental para frameworks como Laravel, Symfony e WordPress moderno.</p>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Diferença entre procedural e POO</strong>
+              <p><strong>Procedural:</strong> código organizado em funções que manipulam dados. <strong>POO:</strong> código organizado em objetos que <em>contêm</em> dados e comportamentos juntos.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Os 4 pilares da POO</h2>
+          <div class="prose">
+            <p>A POO se sustenta em 4 conceitos fundamentais:</p>
+            <ol>
+              <li><strong>Encapsulamento:</strong> ocultar detalhes internos e expor apenas o necessário</li>
+              <li><strong>Abstração:</strong> focar no essencial, ignorando detalhes irrelevantes</li>
+              <li><strong>Herança:</strong> reaproveitar código criando classes derivadas</li>
+              <li><strong>Polimorfismo:</strong> mesma interface, comportamentos diferentes</li>
+            </ol>
+            <p>Vamos estudar cada um em detalhes nas próximas aulas.</p>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Por que usar POO?</h2>
+          <div class="prose">
+            <p>Vantagens da POO em projetos reais:</p>
+            <ul>
+              <li><strong>Organização:</strong> código mais limpo e estruturado</li>
+              <li><strong>Reutilização:</strong> menos código duplicado</li>
+              <li><strong>Manutenibilidade:</strong> mudanças isoladas, menos bugs</li>
+              <li><strong>Escalabilidade:</strong> mais fácil crescer o projeto</li>
+              <li><strong>Colaboração:</strong> equipes trabalham melhor em código POO</li>
+            </ul>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✅</div>
+            <div class="callout-body">
+              <strong>Quando usar POO?</strong>
+              <p>Use POO para projetos com múltiplas entidades relacionadas (usuários, produtos, pedidos...). Para scripts simples de 50 linhas, procedural pode ser suficiente.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 1 -->
+        <div class="activity-card" id="act-0-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual pilar da POO permite que uma classe "herde" propriedades e métodos de outra classe?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">A</div> Encapsulamento</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">B</div> Abstração</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','0-0')"><div class="quiz-opt-letter">C</div> Herança</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','0-0')"><div class="quiz-opt-letter">D</div> Polimorfismo</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-0-0"></div>
+            <div class="xp-reward" id="xp-0-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> Herança é o pilar que permite reaproveitar código entre classes.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 1 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Questões de fixação do conteúdo desta aula</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique com suas palavras a diferença entre <strong>programação procedural</strong> e <strong>programação orientada a objetos</strong>. Dê um exemplo de cada.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Procedural:</strong> organiza código em funções e procedimentos que operam sobre dados separados. Ex: <code style="font-family:'Space Mono',monospace">calcular_salario($nome, $horas, $valor_hora)</code></p>
+                <p><strong>POO:</strong> organiza código em objetos que <em>contêm</em> dados e comportamentos juntos. Ex: <code style="font-family:'Space Mono',monospace">$funcionario->calcularSalario()</code></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Liste os <strong>4 pilares da POO</strong> e explique brevemente cada um deles.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>1. Encapsulamento:</strong> Ocultar detalhes de implementação e expor apenas interfaces públicas.</p>
+                <p><strong>2. Abstração:</strong> Simplificar complexidade focando no essencial e ignorando detalhes.</p>
+                <p><strong>3. Herança:</strong> Criar classes derivadas que herdam características de classes base.</p>
+                <p><strong>4. Polimorfismo:</strong> Mesma interface, comportamentos diferentes conforme o contexto.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Cite <strong>3 vantagens práticas</strong> de usar POO em projetos de médio/grande porte.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>1. Reutilização de código:</strong> Herança e composição reduzem duplicação.</p>
+                <p><strong>2. Manutenibilidade:</strong> Mudanças isoladas em classes específicas sem quebrar o sistema.</p>
+                <p><strong>3. Colaboração em equipe:</strong> Equipes trabalham em classes diferentes sem conflito.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn disabled">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(0)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(1)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-0 -->
+
+    <!-- ══════════ AULA 2: CLASSES E OBJETOS ══════════ -->
+    <div class="lesson-panel" id="lesson-1">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 02 / 08</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Classes</em> e <em>Objetos</em></h1>
+        <p class="lesson-desc">Aprenda a criar suas primeiras classes em PHP e instanciar objetos a partir delas.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é uma Classe?</h2>
+          <div class="prose">
+            <p>Uma <strong>classe</strong> é uma "planta" ou "molde" que define a estrutura e comportamento de objetos. É como um blueprint arquitetônico: define o que será construído, mas não é a construção em si.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · primeira_classe.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Carro {<br>
+<span class="ln">4</span>  <span class="c-cmt">// Aqui vão propriedades e métodos</span><br>
+<span class="ln">5</span>  <span class="c-kw">public</span> <span class="c-var">$marca</span>;<br>
+<span class="ln">6</span>  <span class="c-kw">public</span> <span class="c-var">$modelo</span>;<br>
+<span class="ln">7</span>}<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-cmt">// Convenção: nome de classe em PascalCase</span><br>
+<span class="ln">10</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">O que é um Objeto?</h2>
+          <div class="prose">
+            <p>Um <strong>objeto</strong> é uma <em>instância</em> de uma classe — a "construção" feita a partir do blueprint. Você pode criar múltiplos objetos da mesma classe.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · objetos.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Carro {<br>
+<span class="ln">4</span>  <span class="c-kw">public</span> <span class="c-var">$marca</span>;<br>
+<span class="ln">5</span>  <span class="c-kw">public</span> <span class="c-var">$modelo</span>;<br>
+<span class="ln">6</span>}<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Criando objetos (instâncias)</span><br>
+<span class="ln">9</span><span class="c-var">$carro1</span> = <span class="c-kw">new</span> Carro();<br>
+<span class="ln">10</span><span class="c-var">$carro1</span>-&gt;<span class="c-var">marca</span>  = <span class="c-str">"Toyota"</span>;<br>
+<span class="ln">11</span><span class="c-var">$carro1</span>-&gt;<span class="c-var">modelo</span> = <span class="c-str">"Corolla"</span>;<br>
+<span class="ln">12</span><br>
+<span class="ln">13</span><span class="c-var">$carro2</span> = <span class="c-kw">new</span> Carro();<br>
+<span class="ln">14</span><span class="c-var">$carro2</span>-&gt;<span class="c-var">marca</span>  = <span class="c-str">"Honda"</span>;<br>
+<span class="ln">15</span><span class="c-var">$carro2</span>-&gt;<span class="c-var">modelo</span> = <span class="c-str">"Civic"</span>;<br>
+<span class="ln">16</span><br>
+<span class="ln">17</span><span class="c-fn">echo</span> <span class="c-var">$carro1</span>-&gt;<span class="c-var">marca</span>; <span class="c-cmt">// Toyota</span><br>
+<span class="ln">18</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">💡</div>
+            <div class="callout-body">
+              <strong>Operador -> (seta)</strong>
+              <p>Usa-se <code style="font-family:'Space Mono',monospace">-></code> para acessar propriedades e métodos de um objeto. Lê-se "objeto aponta para propriedade".</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// AMBIENTE DE CÓDIGO</span><hr></div>
+
+        <!-- SANDBOX AULA 2 -->
+        <div class="sandbox-wrap">
+          <div class="sandbox-header">
+            <div class="sandbox-title">
+              <div class="s-dots"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div>
+              <span>classes.php</span>
+            </div>
+            <div class="sandbox-actions">
+              <span class="sandbox-tag">PHP Sandbox</span>
+              <button class="run-btn" onclick="runCode('sb-2')">▶ Executar</button>
+            </div>
+          </div>
+          <div class="sandbox-grid">
+            <div class="sandbox-editor-wrap">
+              <div class="sandbox-pane-label"><div class="dot"></div> Editor PHP</div>
+              <textarea class="sandbox-editor" id="sb-2" spellcheck="false">&lt;?php
+
+class Produto {
+  public $nome;
+  public $preco;
+}
+
+// Criando objetos
+$p1 = new Produto();
+$p1->nome  = "Teclado Mecânico";
+$p1->preco = 350.00;
+
+$p2 = new Produto();
+$p2->nome  = "Mouse Gamer";
+$p2->preco = 150.00;
+
+echo "Produto: " . $p1->nome . "\n";
+echo "Preço: R$ " . $p1->preco . "\n\n";
+
+echo "Produto: " . $p2->nome . "\n";
+echo "Preço: R$ " . $p2->preco . "\n";
+
+?&gt;</textarea>
+            </div>
+            <div>
+              <div class="sandbox-pane-label"><div class="dot"></div> Saída</div>
+              <div class="sandbox-output" id="out-sb-2"><span class="out-placeholder">Clique em "Executar" para ver a saída...</span></div>
+            </div>
+          </div>
+          <div class="sandbox-footer">
+            <span class="sandbox-note">💡 Cada objeto é independente — alterar $p1 não afeta $p2</span>
+            <button class="sandbox-clear" onclick="clearSandbox('sb-2','out-sb-2')">Limpar</button>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 2 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique criação de classes e objetos</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Explique a diferença entre <strong>classe</strong> e <strong>objeto</strong> usando uma analogia do mundo real.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Classe:</strong> é como a planta de uma casa — define quartos, portas, janelas, mas não é uma casa física.</p>
+                <p><strong>Objeto:</strong> é a casa construída a partir dessa planta. Você pode construir 10 casas (10 objetos) usando a mesma planta (1 classe).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">No ambiente de código acima, crie uma classe <code style="font-family:'Space Mono',monospace">Livro</code> com propriedades <code style="font-family:'Space Mono',monospace">titulo</code>, <code style="font-family:'Space Mono',monospace">autor</code> e <code style="font-family:'Space Mono',monospace">ano</code>. Instancie 2 livros diferentes e exiba seus dados.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+class Livro {
+  public $titulo;
+  public $autor;
+  public $ano;
+}
+
+$livro1 = new Livro();
+$livro1->titulo = "1984";
+$livro1->autor  = "George Orwell";
+$livro1->ano    = 1949;
+
+$livro2 = new Livro();
+$livro2->titulo = "O Hobbit";
+$livro2->autor  = "J.R.R. Tolkien";
+$livro2->ano    = 1937;
+
+echo $livro1->titulo . " - " . $livro1->autor . " (" . $livro1->ano . ")\n";
+echo $livro2->titulo . " - " . $livro2->autor . " (" . $livro2->ano . ")\n";
+?&gt;</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(0)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(1)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(2)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-1 -->
+
+    <!-- (CONTINUA: Aulas 3-8 seguem o mesmo padrão) -->
+    <!-- Por brevidade, vou incluir placeholder para as demais aulas -->
+    
+    <div class="lesson-panel" id="lesson-2">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 03 / 08</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Propriedades</em> e <em>Métodos</em></h1>
+        <p class="lesson-desc">Domine a estrutura interna de classes: propriedades armazenam dados, métodos definem comportamentos.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">Propriedades da Classe</h2>
+          <div class="prose">
+            <p><strong>Propriedades</strong> (ou atributos) são variáveis que pertencem à classe. Representam as características do objeto.</p>
+            <p>Propriedades podem ter diferentes <em>níveis de visibilidade</em>:</p>
+            <ul>
+              <li><strong>public:</strong> acessível de qualquer lugar</li>
+              <li><strong>protected:</strong> acessível apenas dentro da classe e subclasses</li>
+              <li><strong>private:</strong> acessível apenas dentro da própria classe</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · propriedades.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Usuario {<br>
+<span class="ln">4</span>  <span class="c-kw">public</span> <span class="c-var">$nome</span>;        <span class="c-cmt">// Pública: acessível em todo lugar</span><br>
+<span class="ln">5</span>  <span class="c-kw">protected</span> <span class="c-var">$email</span>;    <span class="c-cmt">// Protegida: só classe + filhas</span><br>
+<span class="ln">6</span>  <span class="c-kw">private</span> <span class="c-var">$senha</span>;      <span class="c-cmt">// Privada: só nesta classe</span><br>
+<span class="ln">7</span>}<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-var">$user</span> = <span class="c-kw">new</span> Usuario();<br>
+<span class="ln">10</span><span class="c-var">$user</span>-&gt;<span class="c-var">nome</span> = <span class="c-str">"João"</span>;  <span class="c-cmt">// ✓ OK (public)</span><br>
+<span class="ln">11</span><span class="c-cmt">// $user->senha = "123"; // ✗ ERRO (private)</span><br>
+<span class="ln">12</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Métodos da Classe</h2>
+          <div class="prose">
+            <p><strong>Métodos</strong> são funções que pertencem à classe. Definem o <em>comportamento</em> do objeto — o que ele pode fazer.</p>
+            <p>Dentro de um método, usamos <code style="font-family:'Space Mono',monospace">$this</code> para acessar propriedades e outros métodos do próprio objeto.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · metodos.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Calculadora {<br>
+<span class="ln">4</span>  <span class="c-kw">public</span> <span class="c-var">$resultado</span> = <span class="c-num">0</span>;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span>  <span class="c-kw">public function</span> <span class="c-fn">somar</span>(<span class="c-var">$a</span>, <span class="c-var">$b</span>) {<br>
+<span class="ln">7</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">resultado</span> = <span class="c-var">$a</span> + <span class="c-var">$b</span>;<br>
+<span class="ln">8</span>    <span class="c-kw">return</span> <span class="c-var">$this</span>-&gt;<span class="c-var">resultado</span>;<br>
+<span class="ln">9</span>  }<br>
+<span class="ln">10</span><br>
+<span class="ln">11</span>  <span class="c-kw">public function</span> <span class="c-fn">exibirResultado</span>() {<br>
+<span class="ln">12</span>    <span class="c-kw">echo</span> <span class="c-str">"Resultado: "</span> . <span class="c-var">$this</span>-&gt;<span class="c-var">resultado</span>;<br>
+<span class="ln">13</span>  }<br>
+<span class="ln">14</span>}<br>
+<span class="ln">15</span><br>
+<span class="ln">16</span><span class="c-var">$calc</span> = <span class="c-kw">new</span> Calculadora();<br>
+<span class="ln">17</span><span class="c-var">$calc</span>-&gt;<span class="c-fn">somar</span>(<span class="c-num">10</span>, <span class="c-num">5</span>);<br>
+<span class="ln">18</span><span class="c-var">$calc</span>-&gt;<span class="c-fn">exibirResultado</span>(); <span class="c-cmt">// Resultado: 15</span><br>
+<span class="ln">19</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">🔑</div>
+            <div class="callout-body">
+              <strong>A palavra-chave $this</strong>
+              <p><code style="font-family:'Space Mono',monospace">$this</code> é uma variável especial que referencia o <em>próprio objeto</em> dentro de um método. Use-a para acessar propriedades e chamar outros métodos.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 3 -->
+        <div class="activity-card" id="act-2-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Dentro de um método da classe, qual palavra-chave usamos para acessar propriedades do próprio objeto?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">A</div> $self</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','2-0')"><div class="quiz-opt-letter">B</div> $this</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">C</div> $obj</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','2-0')"><div class="quiz-opt-letter">D</div> $me</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-2-0"></div>
+            <div class="xp-reward" id="xp-2-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> $this referencia o objeto atual dentro de métodos.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 3 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique propriedades, métodos e $this</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual a diferença entre uma <strong>propriedade</strong> e um <strong>método</strong> em uma classe?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Propriedade:</strong> armazena dados/características do objeto (ex: $nome, $idade, $preco).</p>
+                <p><strong>Método:</strong> define comportamentos/ações que o objeto pode executar (ex: calcular(), salvar(), enviar()).</p>
+                <p>Resumo: propriedades = dados, métodos = funções.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie uma classe <code style="font-family:'Space Mono',monospace">ContaBancaria</code> com propriedade <code style="font-family:'Space Mono',monospace">$saldo</code> e métodos <code style="font-family:'Space Mono',monospace">depositar($valor)</code> e <code style="font-family:'Space Mono',monospace">sacar($valor)</code>. Teste depositando R$100 e sacando R$30.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+class ContaBancaria {
+  public $saldo = 0;
+
+  public function depositar($valor) {
+    $this->saldo += $valor;
+    echo "Depósito: R$ $valor\n";
+  }
+
+  public function sacar($valor) {
+    if ($this->saldo >= $valor) {
+      $this->saldo -= $valor;
+      echo "Saque: R$ $valor\n";
+    } else {
+      echo "Saldo insuficiente!\n";
+    }
+  }
+}
+
+$conta = new ContaBancaria();
+$conta->depositar(100);  // Depósito: R$ 100
+$conta->sacar(30);       // Saque: R$ 30
+echo "Saldo final: R$ " . $conta->saldo; // R$ 70
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Por que usamos <code style="font-family:'Space Mono',monospace">$this</code> dentro de métodos? O que acontece se não usarmos?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Usamos <code style="font-family:'Space Mono',monospace">$this</code> para referenciar <em>propriedades e métodos do próprio objeto</em> dentro da classe.</p>
+                <p><strong>Sem $this:</strong> PHP trata como variável local do método, não como propriedade da classe. Ex: <code style="font-family:'Space Mono',monospace">$nome</code> (variável local) vs <code style="font-family:'Space Mono',monospace">$this->nome</code> (propriedade da classe).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(1)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(2)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(3)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-2 -->
+
+    <!-- ══════════ AULA 4: CONSTRUTORES ══════════ -->
+    <div class="lesson-panel" id="lesson-3">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 04 / 08</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Construtores</em></h1>
+        <p class="lesson-desc">Aprenda a inicializar objetos automaticamente com o método mágico __construct().</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é um Construtor?</h2>
+          <div class="prose">
+            <p>O <strong>construtor</strong> é um método especial que é executado <em>automaticamente</em> sempre que um novo objeto é criado. Serve para inicializar propriedades.</p>
+            <p>Em PHP, o construtor é definido com o nome <code style="font-family:'Space Mono',monospace">__construct()</code> (dois underscores).</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · construtor.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Pessoa {<br>
+<span class="ln">4</span>  <span class="c-kw">public</span> <span class="c-var">$nome</span>;<br>
+<span class="ln">5</span>  <span class="c-kw">public</span> <span class="c-var">$idade</span>;<br>
+<span class="ln">6</span><br>
+<span class="ln">7</span>  <span class="c-cmt">// Construtor</span><br>
+<span class="ln">8</span>  <span class="c-kw">public function</span> <span class="c-fn">__construct</span>(<span class="c-var">$nome</span>, <span class="c-var">$idade</span>) {<br>
+<span class="ln">9</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">nome</span>  = <span class="c-var">$nome</span>;<br>
+<span class="ln">10</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">idade</span> = <span class="c-var">$idade</span>;<br>
+<span class="ln">11</span>  }<br>
+<span class="ln">12</span>}<br>
+<span class="ln">13</span><br>
+<span class="ln">14</span><span class="c-cmt">// Ao criar o objeto, o construtor é chamado</span><br>
+<span class="ln">15</span><span class="c-var">$p1</span> = <span class="c-kw">new</span> Pessoa(<span class="c-str">"Ana"</span>, <span class="c-num">25</span>);<br>
+<span class="ln">16</span><span class="c-fn">echo</span> <span class="c-var">$p1</span>-&gt;<span class="c-var">nome</span>; <span class="c-cmt">// Ana</span><br>
+<span class="ln">17</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">✨</div>
+            <div class="callout-body">
+              <strong>Vantagem do construtor</strong>
+              <p>Sem construtor, você precisa definir cada propriedade manualmente após criar o objeto. Com construtor, tudo é feito em uma linha!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Construtor com valores padrão</h2>
+          <div class="prose">
+            <p>Você pode definir <strong>valores padrão</strong> para parâmetros do construtor, tornando-os opcionais.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · construtor_padrao.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Config {<br>
+<span class="ln">4</span>  <span class="c-kw">public</span> <span class="c-var">$tema</span>;<br>
+<span class="ln">5</span>  <span class="c-kw">public</span> <span class="c-var">$idioma</span>;<br>
+<span class="ln">6</span><br>
+<span class="ln">7</span>  <span class="c-kw">public function</span> <span class="c-fn">__construct</span>(<span class="c-var">$tema</span> = <span class="c-str">"claro"</span>, <span class="c-var">$idioma</span> = <span class="c-str">"pt-BR"</span>) {<br>
+<span class="ln">8</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">tema</span>   = <span class="c-var">$tema</span>;<br>
+<span class="ln">9</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">idioma</span> = <span class="c-var">$idioma</span>;<br>
+<span class="ln">10</span>  }<br>
+<span class="ln">11</span>}<br>
+<span class="ln">12</span><br>
+<span class="ln">13</span><span class="c-var">$cfg1</span> = <span class="c-kw">new</span> Config();                   <span class="c-cmt">// tema=claro, idioma=pt-BR</span><br>
+<span class="ln">14</span><span class="c-var">$cfg2</span> = <span class="c-kw">new</span> Config(<span class="c-str">"escuro"</span>);           <span class="c-cmt">// tema=escuro, idioma=pt-BR</span><br>
+<span class="ln">15</span><span class="c-var">$cfg3</span> = <span class="c-kw">new</span> Config(<span class="c-str">"escuro"</span>, <span class="c-str">"en-US"</span>); <span class="c-cmt">// tema=escuro, idioma=en-US</span><br>
+<span class="ln">16</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 4 -->
+        <div class="activity-card" id="act-3-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Quando o método __construct() é executado?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">A</div> Quando chamamos explicitamente $obj->__construct()</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','3-0')"><div class="quiz-opt-letter">B</div> Automaticamente ao criar um objeto com new</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">C</div> Ao final da execução do script</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','3-0')"><div class="quiz-opt-letter">D</div> Apenas se houver parâmetros</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-3-0"></div>
+            <div class="xp-reward" id="xp-3-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> O construtor é chamado automaticamente ao instanciar.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 4 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique criação de construtores</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual a <strong>principal vantagem</strong> de usar construtores em vez de definir propriedades manualmente após criar o objeto?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Vantagens do construtor:</strong></p>
+                <ul>
+                  <li><strong>Praticidade:</strong> inicializa tudo em uma linha (<code style="font-family:'Space Mono',monospace">new Pessoa("Ana", 25)</code>)</li>
+                  <li><strong>Consistência:</strong> garante que o objeto sempre tenha valores iniciais corretos</li>
+                  <li><strong>Menos código:</strong> evita repetição de atribuições propriedade por propriedade</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie uma classe <code style="font-family:'Space Mono',monospace">Produto</code> com construtor que receba <code style="font-family:'Space Mono',monospace">$nome</code> e <code style="font-family:'Space Mono',monospace">$preco</code>. Crie 2 produtos e exiba seus dados.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+class Produto {
+  public $nome;
+  public $preco;
+
+  public function __construct($nome, $preco) {
+    $this->nome  = $nome;
+    $this->preco = $preco;
+  }
+}
+
+$p1 = new Produto("Notebook", 3500.00);
+$p2 = new Produto("Mouse", 80.00);
+
+echo $p1->nome . ": R$ " . $p1->preco . "\n";
+echo $p2->nome . ": R$ " . $p2->preco . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">É possível ter uma classe sem construtor? O que acontece nesse caso?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Sim!</strong> Uma classe pode existir sem <code style="font-family:'Space Mono',monospace">__construct()</code>. Nesse caso:</p>
+                <ul>
+                  <li>PHP usa um construtor vazio padrão</li>
+                  <li>Você pode criar objetos normalmente: <code style="font-family:'Space Mono',monospace">new MinhaClasse()</code></li>
+                  <li>Propriedades terão valores <code style="font-family:'Space Mono',monospace">null</code> até você atribuí-las manualmente</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(2)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(3)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(4)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-3 -->
+    <!-- ══════════ AULA 5: HERANÇA ══════════ -->
+    <div class="lesson-panel" id="lesson-4">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 05 / 08</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Herança</em></h1>
+        <p class="lesson-desc">Reaproveite código criando classes filhas que herdam características de classes pai.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é Herança?</h2>
+          <div class="prose">
+            <p><strong>Herança</strong> permite criar uma nova classe (filha) baseada em uma classe existente (pai). A classe filha <em>herda</em> todas as propriedades e métodos públicos/protegidos da classe pai.</p>
+            <p>Usa-se a palavra-chave <code style="font-family:'Space Mono',monospace">extends</code> para estabelecer herança.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · heranca.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Classe PAI</span><br>
+<span class="ln">4</span><span class="c-kw">class</span> Animal {<br>
+<span class="ln">5</span>  <span class="c-kw">public</span> <span class="c-var">$nome</span>;<br>
+<span class="ln">6</span><br>
+<span class="ln">7</span>  <span class="c-kw">public function</span> <span class="c-fn">comer</span>() {<br>
+<span class="ln">8</span>    <span class="c-kw">echo</span> <span class="c-var">$this</span>-&gt;<span class="c-var">nome</span> . <span class="c-str">" está comendo\n"</span>;<br>
+<span class="ln">9</span>  }<br>
+<span class="ln">10</span>}<br>
+<span class="ln">11</span><br>
+<span class="ln">12</span><span class="c-cmt">// Classe FILHA</span><br>
+<span class="ln">13</span><span class="c-kw">class</span> Cachorro <span class="c-kw">extends</span> Animal {<br>
+<span class="ln">14</span>  <span class="c-kw">public function</span> <span class="c-fn">latir</span>() {<br>
+<span class="ln">15</span>    <span class="c-kw">echo</span> <span class="c-str">"Au au!\n"</span>;<br>
+<span class="ln">16</span>  }<br>
+<span class="ln">17</span>}<br>
+<span class="ln">18</span><br>
+<span class="ln">19</span><span class="c-var">$dog</span> = <span class="c-kw">new</span> Cachorro();<br>
+<span class="ln">20</span><span class="c-var">$dog</span>-&gt;<span class="c-var">nome</span> = <span class="c-str">"Rex"</span>;<br>
+<span class="ln">21</span><span class="c-var">$dog</span>-&gt;<span class="c-fn">comer</span>();  <span class="c-cmt">// Herdado de Animal</span><br>
+<span class="ln">22</span><span class="c-var">$dog</span>-&gt;<span class="c-fn">latir</span>();  <span class="c-cmt">// Próprio de Cachorro</span><br>
+<span class="ln">23</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Sobrescrita de métodos</h2>
+          <div class="prose">
+            <p>A classe filha pode <strong>sobrescrever</strong> (override) métodos da classe pai, fornecendo sua própria implementação.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · override.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Forma {<br>
+<span class="ln">4</span>  <span class="c-kw">public function</span> <span class="c-fn">desenhar</span>() {<br>
+<span class="ln">5</span>    <span class="c-kw">echo</span> <span class="c-str">"Desenhando uma forma...\n"</span>;<br>
+<span class="ln">6</span>  }<br>
+<span class="ln">7</span>}<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-kw">class</span> Circulo <span class="c-kw">extends</span> Forma {<br>
+<span class="ln">10</span>  <span class="c-cmt">// Sobrescreve o método da classe pai</span><br>
+<span class="ln">11</span>  <span class="c-kw">public function</span> <span class="c-fn">desenhar</span>() {<br>
+<span class="ln">12</span>    <span class="c-kw">echo</span> <span class="c-str">"Desenhando um círculo ⭕\n"</span>;<br>
+<span class="ln">13</span>  }<br>
+<span class="ln">14</span>}<br>
+<span class="ln">15</span><br>
+<span class="ln">16</span><span class="c-var">$forma</span> = <span class="c-kw">new</span> Forma();<br>
+<span class="ln">17</span><span class="c-var">$forma</span>-&gt;<span class="c-fn">desenhar</span>(); <span class="c-cmt">// Desenhando uma forma...</span><br>
+<span class="ln">18</span><br>
+<span class="ln">19</span><span class="c-var">$circulo</span> = <span class="c-kw">new</span> Circulo();<br>
+<span class="ln">20</span><span class="c-var">$circulo</span>-&gt;<span class="c-fn">desenhar</span>(); <span class="c-cmt">// Desenhando um círculo ⭕</span><br>
+<span class="ln">21</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">🔗</div>
+            <div class="callout-body">
+              <strong>A palavra-chave parent::</strong>
+              <p>Use <code style="font-family:'Space Mono',monospace">parent::metodo()</code> para chamar a versão original do método da classe pai dentro de um método sobrescrito.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 5 -->
+        <div class="activity-card" id="act-4-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual palavra-chave é usada para estabelecer herança em PHP?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">A</div> implements</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','4-0')"><div class="quiz-opt-letter">B</div> extends</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">C</div> inherits</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','4-0')"><div class="quiz-opt-letter">D</div> parent</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-4-0"></div>
+            <div class="xp-reward" id="xp-4-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> extends estabelece relação de herança.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 5 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique herança e sobrescrita</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Quais propriedades e métodos uma classe filha <strong>não</strong> herda da classe pai?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>A classe filha <strong>não herda</strong> membros <code style="font-family:'Space Mono',monospace">private</code> da classe pai.</p>
+                <p><strong>Herda:</strong> membros <code style="font-family:'Space Mono',monospace">public</code> e <code style="font-family:'Space Mono',monospace">protected</code><br>
+                <strong>Não herda:</strong> membros <code style="font-family:'Space Mono',monospace">private</code></p>
+                <p>Membros privados ficam isolados apenas na classe onde foram declarados.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie uma hierarquia: classe <code style="font-family:'Space Mono',monospace">Veiculo</code> (com propriedade $marca) e classe <code style="font-family:'Space Mono',monospace">Carro extends Veiculo</code> (com propriedade $portas). Instancie um Carro e exiba marca e portas.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+class Veiculo {
+  public $marca;
+}
+
+class Carro extends Veiculo {
+  public $portas;
+}
+
+$meuCarro = new Carro();
+$meuCarro->marca  = "Toyota";
+$meuCarro->portas = 4;
+
+echo "Marca: " . $meuCarro->marca . "\n";
+echo "Portas: " . $meuCarro->portas . "\n";
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Explique o que é <strong>sobrescrita de métodos</strong> e dê um exemplo prático de quando seria útil.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Sobrescrita:</strong> quando a classe filha fornece sua própria implementação de um método herdado da classe pai.</p>
+                <p><strong>Exemplo prático:</strong> Classe <code style="font-family:'Space Mono',monospace">Usuario</code> tem método <code style="font-family:'Space Mono',monospace">calcularDesconto()</code> que retorna 5%. Classe <code style="font-family:'Space Mono',monospace">UsuarioVIP extends Usuario</code> sobrescreve esse método para retornar 20%. Mesmo método, comportamento diferente.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(3)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(4)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(5)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-4 -->
+    <!-- ══════════ AULA 6: ENCAPSULAMENTO ══════════ -->
+    <div class="lesson-panel" id="lesson-5">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 06 / 08</span>
+          <span class="lesson-dur">⏱ ~30 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Encapsulamento</em></h1>
+        <p class="lesson-desc">Proteja seus dados usando visibilidade de propriedades e métodos getters/setters.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é Encapsulamento?</h2>
+          <div class="prose">
+            <p><strong>Encapsulamento</strong> é o princípio de <em>ocultar</em> detalhes internos de uma classe e expor apenas o necessário. Isso protege dados contra modificações indevidas.</p>
+            <p>Usamos <strong>modificadores de acesso</strong> para controlar visibilidade:</p>
+            <ul>
+              <li><strong>public:</strong> acessível de qualquer lugar</li>
+              <li><strong>protected:</strong> acessível na classe e subclasses</li>
+              <li><strong>private:</strong> acessível apenas dentro da própria classe</li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · encapsulamento.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> ContaBancaria {<br>
+<span class="ln">4</span>  <span class="c-kw">private</span> <span class="c-var">$saldo</span>; <span class="c-cmt">// Oculto do exterior</span><br>
+<span class="ln">5</span><br>
+<span class="ln">6</span>  <span class="c-kw">public function</span> <span class="c-fn">__construct</span>(<span class="c-var">$saldoInicial</span>) {<br>
+<span class="ln">7</span>    <span class="c-var">$this</span>-&gt;<span class="c-var">saldo</span> = <span class="c-var">$saldoInicial</span>;<br>
+<span class="ln">8</span>  }<br>
+<span class="ln">9</span><br>
+<span class="ln">10</span>  <span class="c-kw">public function</span> <span class="c-fn">depositar</span>(<span class="c-var">$valor</span>) {<br>
+<span class="ln">11</span>    <span class="c-kw">if</span> (<span class="c-var">$valor</span> > <span class="c-num">0</span>) {<br>
+<span class="ln">12</span>      <span class="c-var">$this</span>-&gt;<span class="c-var">saldo</span> += <span class="c-var">$valor</span>;<br>
+<span class="ln">13</span>    }<br>
+<span class="ln">14</span>  }<br>
+<span class="ln">15</span>}<br>
+<span class="ln">16</span><br>
+<span class="ln">17</span><span class="c-var">$conta</span> = <span class="c-kw">new</span> ContaBancaria(<span class="c-num">1000</span>);<br>
+<span class="ln">18</span><span class="c-cmt">// $conta->saldo = -500; // ✗ ERRO: saldo é private</span><br>
+<span class="ln">19</span><span class="c-var">$conta</span>-&gt;<span class="c-fn">depositar</span>(<span class="c-num">200</span>);  <span class="c-cmt">// ✓ OK: usa método público</span><br>
+<span class="ln">20</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">🛡️</div>
+            <div class="callout-body">
+              <strong>Por que encapsular?</strong>
+              <p>Se <code style="font-family:'Space Mono',monospace">$saldo</code> fosse público, alguém poderia fazer <code style="font-family:'Space Mono',monospace">$conta->saldo = -999999</code>! Com encapsulamento, controlamos como os dados são modificados.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Getters e Setters</h2>
+          <div class="prose">
+            <p><strong>Getters</strong> (métodos get) permitem <em>ler</em> propriedades privadas. <strong>Setters</strong> (métodos set) permitem <em>modificar</em> propriedades privadas com validação.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · getters_setters.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">class</span> Pessoa {<br>
+<span class="ln">4</span>  <span class="c-kw">private</span> <span class="c-var">$idade</span>;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span>  <span class="c-cmt">// SETTER: define valor com validação</span><br>
+<span class="ln">7</span>  <span class="c-kw">public function</span> <span class="c-fn">setIdade</span>(<span class="c-var">$idade</span>) {<br>
+<span class="ln">8</span>    <span class="c-kw">if</span> (<span class="c-var">$idade</span> >= <span class="c-num">0</span> && <span class="c-var">$idade</span> <= <span class="c-num">150</span>) {<br>
+<span class="ln">9</span>      <span class="c-var">$this</span>-&gt;<span class="c-var">idade</span> = <span class="c-var">$idade</span>;<br>
+<span class="ln">10</span>    } <span class="c-kw">else</span> {<br>
+<span class="ln">11</span>      <span class="c-kw">echo</span> <span class="c-str">"Idade inválida!\n"</span>;<br>
+<span class="ln">12</span>    }<br>
+<span class="ln">13</span>  }<br>
+<span class="ln">14</span><br>
+<span class="ln">15</span>  <span class="c-cmt">// GETTER: retorna o valor</span><br>
+<span class="ln">16</span>  <span class="c-kw">public function</span> <span class="c-fn">getIdade</span>() {<br>
+<span class="ln">17</span>    <span class="c-kw">return</span> <span class="c-var">$this</span>-&gt;<span class="c-var">idade</span>;<br>
+<span class="ln">18</span>  }<br>
+<span class="ln">19</span>}<br>
+<span class="ln">20</span><br>
+<span class="ln">21</span><span class="c-var">$p</span> = <span class="c-kw">new</span> Pessoa();<br>
+<span class="ln">22</span><span class="c-var">$p</span>-&gt;<span class="c-fn">setIdade</span>(<span class="c-num">25</span>);  <span class="c-cmt">// ✓ Válido</span><br>
+<span class="ln">23</span><span class="c-var">$p</span>-&gt;<span class="c-fn">setIdade</span>(<span class="c-num">999</span>); <span class="c-cmt">// ✗ Idade inválida!</span><br>
+<span class="ln">24</span><span class="c-fn">echo</span> <span class="c-var">$p</span>-&gt;<span class="c-fn">getIdade</span>(); <span class="c-cmt">// 25</span><br>
+<span class="ln">25</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 6 -->
+        <div class="activity-card" id="act-5-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual modificador de acesso torna uma propriedade visível APENAS dentro da própria classe?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">A</div> public</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">B</div> protected</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','5-0')"><div class="quiz-opt-letter">C</div> private</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','5-0')"><div class="quiz-opt-letter">D</div> hidden</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-5-0"></div>
+            <div class="xp-reward" id="xp-5-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> private isola propriedades dentro da classe.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 6 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique encapsulamento e getters/setters</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Por que é considerada <strong>boa prática</strong> tornar propriedades privadas e usar getters/setters?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Vantagens:</strong></p>
+                <ul>
+                  <li><strong>Validação:</strong> setters podem verificar se o valor é válido antes de atribuir</li>
+                  <li><strong>Controle:</strong> você decide se algo pode ser lido, modificado, ou ambos</li>
+                  <li><strong>Manutenção:</strong> lógica interna pode mudar sem quebrar código externo</li>
+                  <li><strong>Segurança:</strong> evita modificações indevidas (ex: saldo negativo)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie uma classe <code style="font-family:'Space Mono',monospace">Produto</code> com propriedade privada <code style="font-family:'Space Mono',monospace">$preco</code>. Crie setPreco() que só aceita valores > 0, e getPreco() para ler o preço.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+class Produto {
+  private $preco;
+
+  public function setPreco($preco) {
+    if ($preco > 0) {
+      $this->preco = $preco;
+    } else {
+      echo "Preço deve ser positivo!\n";
+    }
+  }
+
+  public function getPreco() {
+    return $this->preco;
+  }
+}
+
+$p = new Produto();
+$p->setPreco(150);  // ✓ OK
+$p->setPreco(-10);  // ✗ Preço deve ser positivo!
+echo "Preço: R$ " . $p->getPreco(); // 150
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Qual a diferença prática entre usar <code style="font-family:'Space Mono',monospace">public $nome</code> e <code style="font-family:'Space Mono',monospace">private $nome</code> + getter/setter?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>public $nome:</strong> qualquer código externo pode atribuir qualquer valor diretamente (<code style="font-family:'Space Mono',monospace">$obj->nome = ""</code>).</p>
+                <p><strong>private + setter:</strong> você controla o que é atribuído. Exemplo: <code style="font-family:'Space Mono',monospace">setNome($n)</code> pode verificar se <code style="font-family:'Space Mono',monospace">$n</code> não está vazio antes de aceitar.</p>
+                <p>Resumo: private + getters/setters = controle e validação.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(4)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(5)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(6)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-5 -->
+    <!-- ══════════ AULA 7: INTERFACES ══════════ -->
+    <div class="lesson-panel" id="lesson-6">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 07 / 08</span>
+          <span class="lesson-dur">⏱ ~25 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Interfaces</em></h1>
+        <p class="lesson-desc">Defina contratos que classes devem cumprir usando interfaces.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que é uma Interface?</h2>
+          <div class="prose">
+            <p>Uma <strong>interface</strong> é um contrato que define <em>quais métodos</em> uma classe deve implementar, mas não como. É como um esqueleto de métodos sem corpo.</p>
+            <p>Interfaces garantem que diferentes classes sigam o mesmo padrão, facilitando substituição e polimorfismo.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · interface.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Define o contrato</span><br>
+<span class="ln">4</span><span class="c-kw">interface</span> Pagavel {<br>
+<span class="ln">5</span>  <span class="c-kw">public function</span> <span class="c-fn">calcularPagamento</span>();<br>
+<span class="ln">6</span>}<br>
+<span class="ln">7</span><br>
+<span class="ln">8</span><span class="c-cmt">// Implementa a interface</span><br>
+<span class="ln">9</span><span class="c-kw">class</span> Funcionario <span class="c-kw">implements</span> Pagavel {<br>
+<span class="ln">10</span>  <span class="c-kw">public</span> <span class="c-var">$salario</span> = <span class="c-num">3000</span>;<br>
+<span class="ln">11</span><br>
+<span class="ln">12</span>  <span class="c-kw">public function</span> <span class="c-fn">calcularPagamento</span>() {<br>
+<span class="ln">13</span>    <span class="c-kw">return</span> <span class="c-var">$this</span>-&gt;<span class="c-var">salario</span>;<br>
+<span class="ln">14</span>  }<br>
+<span class="ln">15</span>}<br>
+<span class="ln">16</span><br>
+<span class="ln">17</span><span class="c-kw">class</span> Freelancer <span class="c-kw">implements</span> Pagavel {<br>
+<span class="ln">18</span>  <span class="c-kw">public</span> <span class="c-var">$horasTrabalhadas</span> = <span class="c-num">40</span>;<br>
+<span class="ln">19</span>  <span class="c-kw">public</span> <span class="c-var">$valorHora</span> = <span class="c-num">100</span>;<br>
+<span class="ln">20</span><br>
+<span class="ln">21</span>  <span class="c-kw">public function</span> <span class="c-fn">calcularPagamento</span>() {<br>
+<span class="ln">22</span>    <span class="c-kw">return</span> <span class="c-var">$this</span>-&gt;<span class="c-var">horasTrabalhadas</span> * <span class="c-var">$this</span>-&gt;<span class="c-var">valorHora</span>;<br>
+<span class="ln">23</span>  }<br>
+<span class="ln">24</span>}<br>
+<span class="ln">25</span><br>
+<span class="ln">26</span><span class="c-var">$f</span> = <span class="c-kw">new</span> Funcionario();<br>
+<span class="ln">27</span><span class="c-fn">echo</span> <span class="c-var">$f</span>-&gt;<span class="c-fn">calcularPagamento</span>(); <span class="c-cmt">// 3000</span><br>
+<span class="ln">28</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">📋</div>
+            <div class="callout-body">
+              <strong>Interface vs Classe Abstrata</strong>
+              <p><strong>Interface:</strong> apenas métodos sem implementação. Uma classe pode implementar múltiplas interfaces.<br>
+              <strong>Classe abstrata:</strong> pode ter métodos implementados. Uma classe só pode herdar de uma classe abstrata.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Múltiplas Interfaces</h2>
+          <div class="prose">
+            <p>Uma classe pode implementar <strong>várias interfaces</strong> ao mesmo tempo, separando-as por vírgula.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · multiplas_interfaces.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-kw">interface</span> Voador {<br>
+<span class="ln">4</span>  <span class="c-kw">public function</span> <span class="c-fn">voar</span>();<br>
+<span class="ln">5</span>}<br>
+<span class="ln">6</span><br>
+<span class="ln">7</span><span class="c-kw">interface</span> Nadador {<br>
+<span class="ln">8</span>  <span class="c-kw">public function</span> <span class="c-fn">nadar</span>();<br>
+<span class="ln">9</span>}<br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-kw">class</span> Pato <span class="c-kw">implements</span> Voador, Nadador {<br>
+<span class="ln">12</span>  <span class="c-kw">public function</span> <span class="c-fn">voar</span>() {<br>
+<span class="ln">13</span>    <span class="c-kw">echo</span> <span class="c-str">"Pato voando! 🦆\n"</span>;<br>
+<span class="ln">14</span>  }<br>
+<span class="ln">15</span><br>
+<span class="ln">16</span>  <span class="c-kw">public function</span> <span class="c-fn">nadar</span>() {<br>
+<span class="ln">17</span>    <span class="c-kw">echo</span> <span class="c-str">"Pato nadando! 🦆\n"</span>;<br>
+<span class="ln">18</span>  }<br>
+<span class="ln">19</span>}<br>
+<span class="ln">20</span><br>
+<span class="ln">21</span><span class="c-var">$donald</span> = <span class="c-kw">new</span> Pato();<br>
+<span class="ln">22</span><span class="c-var">$donald</span>-&gt;<span class="c-fn">voar</span>();<br>
+<span class="ln">23</span><span class="c-var">$donald</span>-&gt;<span class="c-fn">nadar</span>();<br>
+<span class="ln">24</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 7 -->
+        <div class="activity-card" id="act-6-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual palavra-chave usamos para fazer uma classe cumprir um contrato de interface?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">A</div> extends</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','6-0')"><div class="quiz-opt-letter">B</div> implements</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">C</div> uses</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','6-0')"><div class="quiz-opt-letter">D</div> requires</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-6-0"></div>
+            <div class="xp-reward" id="xp-6-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> implements declara que a classe segue uma interface.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 7 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique criação e uso de interfaces</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Qual a <strong>principal diferença</strong> entre uma interface e uma classe abstrata?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Interface:</strong></p>
+                <ul>
+                  <li>Apenas métodos sem implementação (apenas assinaturas)</li>
+                  <li>Uma classe pode implementar múltiplas interfaces</li>
+                  <li>Não pode ter propriedades</li>
+                </ul>
+                <p><strong>Classe Abstrata:</strong></p>
+                <ul>
+                  <li>Pode ter métodos implementados e não implementados</li>
+                  <li>Uma classe só pode herdar de uma classe abstrata (herança única)</li>
+                  <li>Pode ter propriedades</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Crie uma interface <code style="font-family:'Space Mono',monospace">Imprimivel</code> com método <code style="font-family:'Space Mono',monospace">imprimir()</code>. Crie duas classes que implementem essa interface: <code style="font-family:'Space Mono',monospace">Relatorio</code> e <code style="font-family:'Space Mono',monospace">Nota Fiscal</code>.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <pre style="background:var(--bg);border-radius:8px;padding:16px;font-family:'Space Mono',monospace;font-size:.8rem;color:var(--green);line-height:1.8;">&lt;?php
+interface Imprimivel {
+  public function imprimir();
+}
+
+class Relatorio implements Imprimivel {
+  public function imprimir() {
+    echo "Imprimindo relatório... 📄\n";
+  }
+}
+
+class NotaFiscal implements Imprimivel {
+  public function imprimir() {
+    echo "Imprimindo nota fiscal... 🧾\n";
+  }
+}
+
+$rel = new Relatorio();
+$rel->imprimir();
+
+$nf = new NotaFiscal();
+$nf->imprimir();
+?&gt;</pre>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Por que interfaces são úteis para <strong>polimorfismo</strong>? Dê um exemplo prático.</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Interfaces permitem tratar objetos diferentes de forma uniforme se implementam a mesma interface.</p>
+                <p><strong>Exemplo:</strong> Você tem um array de objetos <code style="font-family:'Space Mono',monospace">Pagavel</code> (interface). Esse array pode conter <code style="font-family:'Space Mono',monospace">Funcionario</code>, <code style="font-family:'Space Mono',monospace">Freelancer</code>, <code style="font-family:'Space Mono',monospace">Fornecedor</code>... Todos diferentes, mas você pode fazer um loop e chamar <code style="font-family:'Space Mono',monospace">calcularPagamento()</code> em todos — polimorfismo em ação!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(5)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(6)">✓ Concluir Aula</button>
+        <button class="nav-lesson-btn primary" onclick="goToLesson(7)">Próxima Aula →</button>
+      </div>
+    </div><!-- /lesson-6 -->
+    <!-- ══════════ AULA 8: NAMESPACES ══════════ -->
+    <div class="lesson-panel" id="lesson-7">
+      <div class="lesson-hero">
+        <div class="lesson-meta">
+          <span class="lesson-num-tag">AULA 08 / 08</span>
+          <span class="lesson-dur">⏱ ~20 min</span>
+        </div>
+        <h1 class="lesson-title"><em>Namespaces</em></h1>
+        <p class="lesson-desc">Organize código em projetos grandes evitando conflitos de nomes com namespaces.</p>
+      </div>
+
+      <div class="lesson-body">
+
+        <div class="content-block">
+          <h2 class="block-title">O que são Namespaces?</h2>
+          <div class="prose">
+            <p><strong>Namespaces</strong> são como "pastas" para organizar classes e funções. Resolvem o problema de duas classes terem o mesmo nome em partes diferentes do código.</p>
+            <p>Imagine que você tem uma classe <code style="font-family:'Space Mono',monospace">Database</code> no seu código e outra biblioteca também tem uma classe <code style="font-family:'Space Mono',monospace">Database</code>. Namespaces evitam esse conflito.</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · namespace.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Definindo um namespace</span><br>
+<span class="ln">4</span><span class="c-kw">namespace</span> App\Models;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-kw">class</span> Usuario {<br>
+<span class="ln">7</span>  <span class="c-kw">public</span> <span class="c-var">$nome</span> = <span class="c-str">"João"</span>;<br>
+<span class="ln">8</span>}<br>
+<span class="ln">9</span><br>
+<span class="ln">10</span><span class="c-cmt">// Usando a classe</span><br>
+<span class="ln">11</span><span class="c-var">$user</span> = <span class="c-kw">new</span> Usuario();<br>
+<span class="ln">12</span><span class="c-fn">echo</span> <span class="c-var">$user</span>-&gt;<span class="c-var">nome</span>;<br>
+<span class="ln">13</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-icon">📁</div>
+            <div class="callout-body">
+              <strong>Convenção de namespace</strong>
+              <p>Por convenção, namespaces seguem a estrutura de pastas. Ex: arquivo em <code style="font-family:'Space Mono',monospace">App/Models/Usuario.php</code> teria namespace <code style="font-family:'Space Mono',monospace">App\Models</code>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Usando classes de outros namespaces</h2>
+          <div class="prose">
+            <p>Para usar uma classe de outro namespace, você pode:</p>
+            <ul>
+              <li>Usar o <strong>caminho completo</strong> (fully qualified name)</li>
+              <li>Importar com <strong>use</strong></li>
+            </ul>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · uso_namespace.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Método 1: Caminho completo</span><br>
+<span class="ln">4</span><span class="c-var">$user1</span> = <span class="c-kw">new</span> \App\Models\Usuario();<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-cmt">// Método 2: Importar com use (recomendado)</span><br>
+<span class="ln">7</span><span class="c-kw">use</span> App\Models\Usuario;<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-var">$user2</span> = <span class="c-kw">new</span> Usuario(); <span class="c-cmt">// Mais limpo!</span><br>
+<span class="ln">10</span><br>
+<span class="ln">11</span><span class="c-cmt">// Método 3: Alias (apelido)</span><br>
+<span class="ln">12</span><span class="c-kw">use</span> App\Models\Usuario <span class="c-kw">as</span> User;<br>
+<span class="ln">13</span><span class="c-var">$user3</span> = <span class="c-kw">new</span> User();<br>
+<span class="ln">14</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h2 class="block-title">Namespaces em projetos reais</h2>
+          <div class="prose">
+            <p>Em frameworks modernos (Laravel, Symfony), namespaces são essenciais:</p>
+          </div>
+          <div class="code-block">
+            <div class="cb-header">
+              <div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div>
+              <span class="cb-lang">PHP · exemplo_real.php</span>
+              <button class="cb-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="cb-body">
+<span class="ln">1</span><span class="c-tag">&lt;?php</span><br>
+<span class="ln">2</span><br>
+<span class="ln">3</span><span class="c-cmt">// Estrutura típica de projeto</span><br>
+<span class="ln">4</span><span class="c-kw">namespace</span> MeuApp\Controllers;<br>
+<span class="ln">5</span><br>
+<span class="ln">6</span><span class="c-kw">use</span> MeuApp\Models\Produto;<br>
+<span class="ln">7</span><span class="c-kw">use</span> MeuApp\Services\EmailService;<br>
+<span class="ln">8</span><br>
+<span class="ln">9</span><span class="c-kw">class</span> ProdutoController {<br>
+<span class="ln">10</span>  <span class="c-kw">public function</span> <span class="c-fn">criar</span>() {<br>
+<span class="ln">11</span>    <span class="c-var">$produto</span> = <span class="c-kw">new</span> Produto();<br>
+<span class="ln">12</span>    <span class="c-var">$email</span>   = <span class="c-kw">new</span> EmailService();<br>
+<span class="ln">13</span>    <span class="c-cmt">// ...</span><br>
+<span class="ln">14</span>  }<br>
+<span class="ln">15</span>}<br>
+<span class="ln">16</span><span class="c-tag">?&gt;</span>
+            </div>
+          </div>
+          <div class="callout callout-info">
+            <div class="callout-icon">⚡</div>
+            <div class="callout-body">
+              <strong>Autoloading (PSR-4)</strong>
+              <p>Em projetos modernos, usa-se <strong>Composer</strong> para autoloading. O Composer carrega automaticamente classes baseado no namespace — você não precisa fazer <code style="font-family:'Space Mono',monospace">require</code> manual!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// ATIVIDADE INTERATIVA</span><hr></div>
+
+        <!-- QUIZ AULA 8 -->
+        <div class="activity-card" id="act-7-0">
+          <div class="activity-header">
+            <div class="activity-icon">🧠</div>
+            <div class="activity-header-info">
+              <div class="activity-tag">Quiz conceitual · +15 XP</div>
+              <h3>Teste seu conhecimento!</h3>
+            </div>
+          </div>
+          <div class="activity-body">
+            <p class="quiz-question">Qual palavra-chave usamos para importar uma classe de outro namespace?</p>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','7-0')"><div class="quiz-opt-letter">A</div> import</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'correct','7-0')"><div class="quiz-opt-letter">B</div> use</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','7-0')"><div class="quiz-opt-letter">C</div> require</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,'wrong','7-0')"><div class="quiz-opt-letter">D</div> include</div>
+            </div>
+            <div class="quiz-feedback" id="qfb-7-0"></div>
+            <div class="xp-reward" id="xp-7-0"><div class="xp-icon">🎯</div><div class="xp-text">Correto! <strong>+15 XP!</strong> use importa classes de outros namespaces.</div></div>
+          </div>
+        </div>
+
+        <!-- EXERCÍCIOS AULA 8 -->
+        <div class="exercises-section">
+          <div class="ex-header">
+            <div class="ex-icon">📝</div>
+            <div class="ex-header-info">
+              <h3>Exercícios Propostos</h3>
+              <p>Pratique organização com namespaces</p>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 01</div>
+            <p class="ex-question">Por que namespaces são importantes em projetos grandes com múltiplas bibliotecas?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>Razões principais:</strong></p>
+                <ul>
+                  <li><strong>Evita conflitos:</strong> Duas bibliotecas podem ter classes com mesmo nome sem conflito</li>
+                  <li><strong>Organização:</strong> Agrupa classes relacionadas logicamente</li>
+                  <li><strong>Legibilidade:</strong> Fica claro de onde vem cada classe</li>
+                  <li><strong>Manutenção:</strong> Facilita encontrar e modificar código</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 02</div>
+            <p class="ex-question">Explique a diferença entre estas duas formas de usar uma classe:<br>
+            <code style="font-family:'Space Mono',monospace">new \App\Models\Usuario()</code> vs <code style="font-family:'Space Mono',monospace">use App\Models\Usuario; new Usuario()</code></p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p><strong>1ª forma (caminho completo):</strong> Usa o nome totalmente qualificado direto. Funciona, mas fica verboso se usado muitas vezes.</p>
+                <p><strong>2ª forma (com use):</strong> Importa a classe no topo do arquivo, depois pode usar o nome curto. <strong>Recomendado!</strong> Código mais limpo e legível.</p>
+                <p>Ambas funcionam, mas <code style="font-family:'Space Mono',monospace">use</code> é a prática padrão em PHP moderno.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="exercise">
+            <div class="ex-num">EXERCÍCIO 03</div>
+            <p class="ex-question">Em um projeto Laravel, você vê <code style="font-family:'Space Mono',monospace">namespace App\Http\Controllers;</code> no início de um arquivo. O que isso significa?</p>
+            <button class="gabarito-toggle" onclick="toggleGab(this)"><span>🔑 Ver gabarito</span><span class="arrow">▼</span></button>
+            <div class="gabarito-body">
+              <div class="gab-label">// GABARITO</div>
+              <div class="prose">
+                <p>Significa que todas as classes definidas nesse arquivo pertencem ao namespace <code style="font-family:'Space Mono',monospace">App\Http\Controllers</code>.</p>
+                <p>Isso indica:</p>
+                <ul>
+                  <li>O arquivo provavelmente está em <code style="font-family:'Space Mono',monospace">app/Http/Controllers/</code></li>
+                  <li>Contém controllers (controladores) da aplicação</li>
+                  <li>Para usar essas classes em outro lugar: <code style="font-family:'Space Mono',monospace">use App\Http\Controllers\NomeController;</code></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"><hr><span>// CONCLUSÃO DO MÓDULO</span><hr></div>
+
+        <div class="callout callout-tip" style="margin-bottom:48px;">
+          <div class="callout-icon">🎉</div>
+          <div class="callout-body">
+            <strong>Parabéns! Você dominou POO em PHP!</strong>
+            <p>Você agora conhece os 4 pilares da POO, sabe criar classes e objetos, trabalhar com herança, encapsular dados, usar interfaces e organizar código com namespaces. Essas habilidades são fundamentais para trabalhar com frameworks modernos como Laravel e Symfony!</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lesson-nav">
+        <button class="nav-lesson-btn" onclick="goToLesson(6)">← Anterior</button>
+        <button class="complete-btn" onclick="completeLesson(7)">✓ Concluir Módulo</button>
+        <button class="nav-lesson-btn disabled">Próximo Módulo →</button>
+      </div>
+    </div><!-- /lesson-7 -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- XP BAR -->
+<div class="xp-bar-total">
+  <span class="xp-label">XP Total</span>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill-global"></div></div>
+  <span class="xp-count" id="xp-count">0 / 120 XP</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   STATE & NAVIGATION
+══════════════════════════════════════ */
+let currentLesson = 0;
+const totalLessons = 8;
+let completedLessons = new Set();
+let totalXP = 0;
+const maxXP = 120;
+
+function goToLesson(idx) {
+  document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lesson-' + idx).classList.add('active');
+  document.getElementById('lb-' + idx).classList.add('active');
+  currentLesson = idx;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function completeLesson(idx) {
+  if (completedLessons.has(idx)) return;
+  completedLessons.add(idx);
+  document.getElementById('lb-' + idx).classList.add('completed');
+  updateProgress();
+  showToast('✅ Aula ' + (idx + 1) + ' concluída!');
+  if (idx < totalLessons - 1) {
+    setTimeout(() => goToLesson(idx + 1), 1200);
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((completedLessons.size / totalLessons) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+function addXP(amount) {
+  totalXP = Math.min(totalXP + amount, maxXP);
+  const pct = (totalXP / maxXP) * 100;
+  document.getElementById('xp-fill-global').style.width = pct + '%';
+  document.getElementById('xp-count').textContent = totalXP + ' / ' + maxXP + ' XP';
+}
+
+function answerQuiz(el, result, actId) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o === el) o.classList.add(result === 'correct' ? 'correct' : 'wrong');
+    else if (result === 'wrong' && o.getAttribute('onclick').includes('correct'))
+      o.classList.add('correct');
+  });
+  const fb = document.getElementById('qfb-' + actId);
+  const xpEl = document.getElementById('xp-' + actId);
+  if (result === 'correct') {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '✅ <strong>Correto!</strong> Muito bem!';
+    xpEl.classList.add('show');
+    addXP(15);
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '❌ <strong>Não foi dessa vez.</strong> Releia o conteúdo.';
+  }
+}
+
+function toggleGab(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+function copyCode(btn) {
+  const body = btn.closest('.code-block').querySelector('.cb-body');
+  navigator.clipboard.writeText(body.innerText.replace(/^\d+\t/gm, '').trim()).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+/* ══════════════════════════════════════
+   PHP SANDBOX COM SUPORTE BÁSICO A POO
+══════════════════════════════════════ */
+function runCode(editorId) {
+  const code = document.getElementById(editorId).value;
+  const outId = 'out-' + editorId;
+  const outEl = document.getElementById(outId);
+  outEl.classList.remove('error');
+
+  try {
+    const result = emulatePHP(code);
+    outEl.innerHTML = result.error
+      ? `<span style="color:var(--red)">⚠ ${result.error}</span>`
+      : (result.output || '<span style="color:var(--muted);font-style:italic">(sem saída)</span>');
+    if (result.error) outEl.classList.add('error');
+  } catch(e) {
+    outEl.classList.add('error');
+    outEl.innerHTML = `<span style="color:var(--red)">⚠ Erro: ${e.message}</span>`;
+  }
+}
+
+function emulatePHP(code) {
+  let clean = code
+    .replace(/<\?php/gi, '')
+    .replace(/<\?=/gi, 'echo ')
+    .replace(/\?>/gi, '')
+    .trim();
+
+  // Remove comments
+  clean = clean.replace(/\/\/[^\n]*/g, '').replace(/#[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // PHP constants
+  const constants = {
+    PHP_VERSION: '8.2.0', PHP_OS: 'Linux',
+    __DIR__: '/var/www/phpmaster',
+  };
+  Object.entries(constants).forEach(([k, v]) => {
+    clean = clean.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(String(v)));
+  });
+
+  // ═══ POO SUPPORT ═══
+  // Capture class definitions
+  const classRegex = /class\s+(\w+)\s*\{([^}]*)\}/g;
+  let match;
+  const classes = {};
+  
+  while ((match = classRegex.exec(clean)) !== null) {
+    const className = match[1];
+    const classBody = match[2];
+    
+    // Extract properties
+    const props = [];
+    const propRegex = /public\s+\$(\w+)/g;
+    let propMatch;
+    while ((propMatch = propRegex.exec(classBody)) !== null) {
+      props.push(propMatch[1]);
+    }
+    
+    classes[className] = { props };
+  }
+
+  // Remove class definitions from code
+  clean = clean.replace(classRegex, '');
+
+  // Transform: new ClassName() → createObject('ClassName')
+  clean = clean.replace(/new\s+(\w+)\s*\(\s*\)/g, (_, className) => {
+    return `__createObject('${className}')`;
+  });
+
+  // Transform: $obj->prop → obj.prop
+  clean = clean.replace(/\$(\w+)\s*->\s*(\w+)/g, '_$1.$2');
+
+  // Transform PHP variables
+  clean = clean.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, '_$1');
+
+  // echo
+  clean = clean.replace(/\becho\s+/g, '__out(');
+  clean = clean.replace(/(__out\([^;{}\n]+);/g, (m, inner) => inner + ');');
+
+  // String concat
+  clean = clean.replace(/([^.])\.([^.])/g, '$1+$2');
+
+  // bool literals
+  clean = clean.replace(/\btrue\b/g, 'true').replace(/\bfalse\b/g, 'false').replace(/\bnull\b/gi, 'null');
+
+  const js = `
+    const __classes = ${JSON.stringify(classes)};
+    
+    function __createObject(className) {
+      if (!__classes[className]) {
+        throw new Error('Class ' + className + ' not found');
+      }
+      const obj = {};
+      __classes[className].props.forEach(prop => {
+        obj[prop] = null;
+      });
+      return obj;
+    }
+    
+    let __output = '';
+    function __out(v) {
+      if (v === null || v === undefined) return;
+      let s = v === true ? '1' : v === false ? '' : String(v);
+      __output += s.replace(/\\\\n/g, '\\n').replace(/\\\\t/g, '\\t');
+    }
+    ${clean}
+    __output;
+  `;
+
+  try {
+    const result = new Function(js)();
+    return { output: result != null ? String(result) : '' };
+  } catch(e) {
+    return { error: 'Parse Error: ' + e.message };
+  }
+}
+
+function clearSandbox(editorId, outId) {
+  document.getElementById(editorId).value = '';
+  const outEl = document.getElementById(outId);
+  outEl.innerHTML = '<span class="out-placeholder">Clique em "Executar" para ver a saída...</span>';
+  outEl.classList.remove('error');
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR MOBILE
+══════════════════════════════════════ */
+(function(){
+  const toggle  = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); toggle.textContent = '✕'; }
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); toggle.textContent = '☰'; }
+
+  toggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+  overlay.addEventListener('click', closeSidebar);
+  document.querySelectorAll('.lesson-btn').forEach(btn => {
+    btn.addEventListener('click', () => { if (window.innerWidth <= 900) closeSidebar(); });
+  });
+})();
+</script>
+</body>
+</html>
